@@ -1,0 +1,49 @@
+{
+    "id": "job_67dd4f6c43c820.52982211",
+    "type": "file",
+    "start_time": 1742557036,
+    "status": "completed",
+    "progress": 100,
+    "current_step": 5,
+    "metadata": {
+        "filename": "20250207_135159.mp4",
+        "filesize": 63183637,
+        "language": "fr",
+        "force_language": true
+    },
+    "updates": [
+        {
+            "time": 1742557036,
+            "message": "Traitement d\u00e9marr\u00e9",
+            "step": 1,
+            "progress": 0
+        },
+        {
+            "time": 1742557036,
+            "message": "Pr\u00e9traitement audio",
+            "step": 2,
+            "progress": 20
+        },
+        {
+            "time": 1742557037,
+            "message": "Transcription en cours",
+            "step": 3,
+            "progress": 40
+        },
+        {
+            "time": 1742557039,
+            "message": "Finalisation",
+            "step": 4,
+            "progress": 70
+        },
+        {
+            "time": 1742557040,
+            "message": "Traitement termin\u00e9 avec succ\u00e8s",
+            "step": 5,
+            "progress": 100
+        }
+    ],
+    "last_update": 1742557039,
+    "end_time": 1742557040,
+    "result_id": "result_67dd4f704a3058.18319059"
+}

@@ -20,9 +20,69 @@ cleanupOldFiles(RESULT_DIR);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transcription Audio</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Styles pour l'overlay de chargement */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loading-spinner:after {
+            content: " ";
+            display: block;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid #3498db;
+            border-color: #3498db transparent #3498db transparent;
+            animation: spinner 1.2s linear infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Overlay de chargement qui s'affiche lors de la soumission -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Traitement en cours...</div>
+    </div>
+
     <nav class="main-nav">
         <ul>
             <li><a href="index.php" class="active">Accueil</a></li>
@@ -79,12 +139,12 @@ cleanupOldFiles(RESULT_DIR);
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary">Transcrire</button>
+            <button type="submit" class="btn-primary" onclick="showLoadingOverlay()">Transcrire</button>
         </form>
     </div>
 
     <div id="youtube-tab" class="tab-content">
-        <form action="youtube_download.php" method="post">
+        <form action="youtube_download.php" method="post" onsubmit="showLoadingOverlay()">
             <div class="form-group">
                 <label for="youtube_url">URL YouTube</label>
                 <input type="url" name="youtube_url" id="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
@@ -114,11 +174,17 @@ cleanupOldFiles(RESULT_DIR);
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary">Transcrire</button>
+            <button type="submit" class="btn-primary" onclick="showLoadingOverlay()">Transcrire</button>
         </form>
     </div>
 
     <script>
+        // Fonction pour afficher l'overlay de chargement
+        function showLoadingOverlay() {
+            document.getElementById('loading-overlay').classList.add('visible');
+            return true;
+        }
+
         function showTab(tabId) {
             // Masquer tous les contenus d'onglets
             const tabContents = document.querySelectorAll('.tab-content');
