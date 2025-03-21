@@ -1,0 +1,11 @@
+[21-Mar-2025 08:26:55 UTC] PHP Deprecated:  Implicit conversion from float 2.4 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:26:57 UTC] PHP Deprecated:  Implicit conversion from float 2.88 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:26:59 UTC] PHP Deprecated:  Implicit conversion from float 3.456 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:27:03 UTC] PHP Deprecated:  Implicit conversion from float 4.1472 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:27:07 UTC] PHP Deprecated:  Implicit conversion from float 4.97664 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:03 UTC] PHP Deprecated:  Implicit conversion from float 2.4 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:05 UTC] PHP Deprecated:  Implicit conversion from float 2.88 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:08 UTC] PHP Deprecated:  Implicit conversion from float 3.456 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:11 UTC] PHP Deprecated:  Implicit conversion from float 4.1472 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:15 UTC] PHP Deprecated:  Implicit conversion from float 4.97664 to int loses precision in /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php on line 125
+[21-Mar-2025 08:47:48 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/ns2poportable/Desktop/inteligent-transcription/youtube_download.php:125) in /Users/ns2poportable/Desktop/inteligent-transcription/utils.php on line 15

@@ -1,0 +1,25 @@
+Array
+(
+    [FILES] => Array
+        (
+            [audio_file] => Array
+                (
+                    [name] => 20250207_135159.mp4
+                    [full_path] => 20250207_135159.mp4
+                    [type] => video/mp4
+                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpJCU1FO
+                    [error] => 0
+                    [size] => 63183637
+                )
+
+        )
+
+    [POST] => Array
+        (
+            [language] => fr
+        )
+
+    [upload_max_filesize] => 100M
+    [post_max_size] => 100M
+    [max_file_uploads] => 20
+)

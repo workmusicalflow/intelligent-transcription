@@ -5,7 +5,7 @@ Cette documentation explique comment l'application de transcription a été éte
 ## Fonctionnalités
 
 - Interface utilisateur avec onglets pour choisir entre le téléchargement de fichier et l'URL YouTube
-- Validation des URL YouTube
+- Validation des URL YouTube (formats standard et Shorts)
 - Téléchargement de vidéos YouTube via l'API loader.to
 - Conversion automatique en format audio
 - Intégration avec le pipeline de transcription existant
@@ -21,13 +21,14 @@ VIDEO_DOWNLOAD_API_KEY=votre_clé_api
 ## Fichiers modifiés/ajoutés
 
 - **config.php** : Ajout des constantes pour l'API loader.to
-- **utils.php** : Ajout des fonctions de validation d'URL YouTube
+- **utils.php** : Ajout des fonctions de validation d'URL YouTube (y compris support pour les Shorts)
 - **index.php** : Ajout de l'interface à onglets pour le téléchargement de fichier et l'URL YouTube
 - **youtube_download.php** : Script de traitement des URL YouTube
 - **assets/css/style.css** : Styles pour l'interface à onglets
 - **test_video_api.php** : Script de test pour l'API loader.to
 - **mock_video_api.php** : Serveur mock pour simuler l'API loader.to
 - **test_mock_api.php** : Script de test pour le serveur mock
+- **test_youtube_shorts.php** : Script de test pour la validation des liens YouTube Shorts
 
 ## Fonctionnement de l'API loader.to
 
@@ -104,7 +105,11 @@ Pour tester l'intégration sans dépendre de l'API réelle, un serveur mock est 
 
 2. **Erreur d'authentification** : Vérifiez que votre clé API est correcte et active.
 
-3. **URL YouTube invalide** : Assurez-vous que l'URL est au format correct (ex: https://www.youtube.com/watch?v=VIDEO_ID).
+3. **URL YouTube invalide** : Assurez-vous que l'URL est dans l'un des formats supportés :
+
+   - Format standard : `https://www.youtube.com/watch?v=VIDEO_ID`
+   - Format court : `https://youtu.be/VIDEO_ID`
+   - Format Shorts : `https://www.youtube.com/shorts/VIDEO_ID`
 
 4. **Progression bloquée** : Si la progression du téléchargement semble bloquée, vérifiez les logs et assurez-vous que l'API est accessible.
 
@@ -121,8 +126,21 @@ Les logs de débogage sont disponibles dans les fichiers suivants :
 
 1. Accédez à la page d'accueil de l'application
 2. Cliquez sur l'onglet "YouTube"
-3. Collez une URL YouTube (ex: https://www.youtube.com/watch?v=AJpK3YTTKZ4)
+3. Collez une URL YouTube dans l'un des formats suivants :
+   - Format standard : `https://www.youtube.com/watch?v=AJpK3YTTKZ4`
+   - Format court : `https://youtu.be/AJpK3YTTKZ4`
+   - Format Shorts : `https://www.youtube.com/shorts/G1C3ydiPxzU`
 4. Sélectionnez la langue (ou laissez sur "Détection automatique")
 5. Cliquez sur "Transcrire"
 6. Attendez que le téléchargement, le prétraitement et la transcription soient terminés
 7. Consultez le résultat de la transcription
+
+## Test des liens YouTube Shorts
+
+Pour tester spécifiquement la prise en charge des liens YouTube Shorts, vous pouvez utiliser le script de test fourni :
+
+```bash
+php test_youtube_shorts.php
+```
+
+Ce script vérifie que les fonctions de validation et d'extraction d'ID fonctionnent correctement avec différents formats d'URL YouTube, y compris les Shorts.

@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Configuration pour l'application de transcription audio
+ */
+
+// Chemins
+define('UPLOAD_DIR', __DIR__ . '/uploads');
+define('RESULT_DIR', __DIR__ . '/results');
+define('PYTHON_PATH', __DIR__ . '/venv/bin/python'); // Sera remplacé par le chemin vers l'environnement virtuel
+
+// Limites
+define('MAX_UPLOAD_SIZE_MB', 100);
+define('MAX_UPLOAD_SIZE_BYTES', MAX_UPLOAD_SIZE_MB * 1024 * 1024);
+
+// Clé API OpenAI
+// Récupérer la clé API depuis le fichier .env
+$env = parse_ini_file('.env');
+define('OPENAI_API_KEY', $env['OPENAI_API_KEY'] ?? '');
+
+// Vérifier si la clé API est configurée
+if (!OPENAI_API_KEY) {
+    die('Erreur: La clé API OpenAI n\'est pas configurée dans le fichier .env');
+}

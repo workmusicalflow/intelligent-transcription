@@ -17,6 +17,35 @@ function redirect($url)
 }
 
 /**
+ * Vérifie si une URL est une URL YouTube valide
+ * 
+ * @param string $url URL à vérifier
+ * @return bool True si l'URL est une URL YouTube valide, false sinon
+ */
+function isValidYoutubeUrl($url)
+{
+    // Pattern pour les URLs YouTube standard et les URLs YouTube Shorts
+    $pattern = '/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})(\S*)?$/';
+    return preg_match($pattern, $url) === 1;
+}
+
+/**
+ * Extrait l'ID de la vidéo YouTube à partir de l'URL
+ * 
+ * @param string $url URL YouTube
+ * @return string|null ID de la vidéo YouTube ou null si non trouvé
+ */
+function getYoutubeVideoId($url)
+{
+    // Pattern pour les URLs YouTube standard et les URLs YouTube Shorts
+    $pattern = '/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})(\S*)?$/';
+    if (preg_match($pattern, $url, $matches)) {
+        return $matches[4];
+    }
+    return null;
+}
+
+/**
  * Affiche un message d'erreur
  * 
  * @param string $code Code d'erreur
@@ -35,7 +64,8 @@ function getErrorMessage($code, $message = null)
         'missing_id' => 'ID de résultat manquant',
         'result_not_found' => 'Résultat non trouvé',
         'invalid_result' => 'Résultat invalide',
-        'invalid_file' => 'Le fichier n\'est pas un fichier audio ou vidéo valide'
+        'invalid_file' => 'Le fichier n\'est pas un fichier audio ou vidéo valide',
+        'youtube' => 'Erreur lors du téléchargement de la vidéo YouTube'
     ];
 
     // Si un message spécifique est fourni, l'utiliser

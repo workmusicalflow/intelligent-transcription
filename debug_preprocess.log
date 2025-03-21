@@ -1,0 +1,23 @@
+Array
+(
+    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd2acbde9aa_G1C3ydiPxzU.mp3' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
+    [output] => {
+  "success": true,
+  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd2acbde9aa_G1C3ydiPxzU.mp3",
+  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd2acbde9aa_G1C3ydiPxzU.mp3",
+  "original_size_mb": 2.360774040222168,
+  "new_size_mb": 2.360774040222168,
+  "message": "Le fichier est d\u00e9j\u00e0 plus petit que la taille cible"
+}
+
+    [result] => Array
+        (
+            [success] => 1
+            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd2acbde9aa_G1C3ydiPxzU.mp3
+            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd2acbde9aa_G1C3ydiPxzU.mp3
+            [original_size_mb] => 2.3607740402222
+            [new_size_mb] => 2.3607740402222
+            [message] => Le fichier est déjà plus petit que la taille cible
+        )
+
+)

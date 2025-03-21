@@ -7,6 +7,7 @@
 // Inclure les fichiers nécessaires
 require_once 'config.php';
 require_once 'utils.php';
+require_once 'context_manager.php';
 
 // Vérifier si un ID de résultat est fourni
 if (!isset($_GET['id'])) {
@@ -33,6 +34,9 @@ if (!$result) {
 $isParaphrased = isset($_GET['paraphrased']) && $_GET['paraphrased'] == '1';
 $originalText = '';
 
+// Initialiser le gestionnaire de contexte
+$contextManager = ContextManager::getInstance();
+
 if ($isParaphrased) {
     // C'est un résultat de paraphrase
     if (!isset($result['paraphrased_text']) && !isset($result['text'])) {
@@ -57,6 +61,21 @@ if ($isParaphrased) {
     $text = $result['text'];
     $language = $result['language'];
     $resultType = 'transcription';
+}
+
+// Stocker la transcription dans le gestionnaire de contexte
+if ($isParaphrased) {
+    $contextManager->updateContext($originalText, $text, [
+        'type' => 'paraphrase',
+        'language' => $language,
+        'result_id' => $resultId
+    ]);
+} else {
+    $contextManager->updateContext($text, '', [
+        'type' => 'transcription',
+        'language' => $language,
+        'result_id' => $resultId
+    ]);
 }
 ?>
 <!DOCTYPE html>
@@ -106,6 +125,7 @@ if ($isParaphrased) {
         <?php if (!$isParaphrased): ?>
             <a href="paraphrase.php?id=<?= urlencode($resultId) ?>" class="btn-secondary">Paraphraser le texte</a>
         <?php endif; ?>
+        <a href="chat.php" class="btn-secondary">Discuter avec l'assistant</a>
     </div>
 
     <script>

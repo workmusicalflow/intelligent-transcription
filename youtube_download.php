@@ -15,6 +15,7 @@ if (!isset($_POST['youtube_url']) || empty($_POST['youtube_url'])) {
 
 $youtubeUrl = $_POST['youtube_url'];
 $language = $_POST['language'] ?? 'auto';
+$forceLanguage = isset($_POST['force_language']) ? true : false;
 
 // Valider l'URL YouTube
 if (!isValidYoutubeUrl($youtubeUrl)) {
@@ -121,8 +122,8 @@ $attempts = 0;
 $waitTime = 2; // Temps d'attente entre les tentatives en secondes
 
 while ($attempts < $maxAttempts) {
-    // Attendre avant de vérifier la progression
-    sleep($waitTime);
+    // Attendre avant de vérifier la progression (conversion explicite en entier)
+    sleep((int)$waitTime);
 
     // Récupérer l'URL de progression depuis la réponse de l'API
     $progressUrl = $result['progress_url'] ?? (VIDEO_DOWNLOAD_PROGRESS_URL . "?id={$downloadId}");
@@ -171,7 +172,7 @@ while ($attempts < $maxAttempts) {
         $waitTime = 1; // Réduire le temps d'attente
     } else {
         // Augmenter légèrement le temps d'attente pour les téléchargements plus longs
-        $waitTime = min($waitTime * 1.2, 5);
+        $waitTime = min($waitTime * 1.2, 5.0);
     }
 
     $attempts++;
@@ -258,8 +259,18 @@ $command = escapeshellcmd($pythonPath) . ' ' .
     '--file=' . escapeshellarg($filePath) . ' ' .
     '--output=' . escapeshellarg($resultPath);
 
-if ($language !== 'auto') {
+// Toujours transmettre le paramètre de langue, même pour "auto"
+// Si "auto", on passe une chaîne vide pour que l'API utilise la détection automatique
+if ($language === 'auto') {
+    $command .= ' --language=""';
+} else {
     $command .= ' --language=' . escapeshellarg($language);
+
+    // Ajouter le paramètre pour forcer la traduction dans la langue spécifiée
+    // seulement si la case à cocher est cochée
+    if ($forceLanguage) {
+        $command .= ' --force-language';
+    }
 }
 
 // Exécuter la commande et capturer la sortie standard et d'erreur
