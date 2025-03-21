@@ -7,7 +7,7 @@ Array
                     [name] => 20250207_135159.mp4
                     [full_path] => 20250207_135159.mp4
                     [type] => video/mp4
-                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpbX9ZiW
+                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpGMkcTh
                     [error] => 0
                     [size] => 63183637
                 )
@@ -16,7 +16,7 @@ Array
 
     [POST] => Array
         (
-            [language] => fr
+            [language] => auto
             [force_language] => on
         )
 

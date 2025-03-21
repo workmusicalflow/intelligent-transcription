@@ -1,0 +1,311 @@
+{% extends "base/layout.twig" %}
+
+{% block title %}Transcription Audio - Accueil{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .file-upload-area {
+        @apply border-2 border-dashed border-gray-300 rounded-lg p-6 
+               text-center transition-all duration-200 cursor-pointer
+               hover:border-primary hover:bg-blue-50;
+    }
+    
+    .file-upload-area.active {
+        @apply border-primary bg-blue-50;
+    }
+    
+    .features-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-12;
+    }
+    
+    .feature-card {
+        @apply p-6 bg-white rounded-lg shadow-smooth 
+               border border-gray-100 transition-all duration-200
+               hover:shadow-smooth-lg hover:border-gray-200;
+    }
+    
+    .feature-card-icon {
+        @apply w-12 h-12 rounded-full bg-blue-100 text-primary 
+               flex items-center justify-center mb-4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-2 text-gray-800">Transcription Audio</h1>
+    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Convertissez vos fichiers audio et vidéos en texte avec une précision exceptionnelle
+    </p>
+</div>
+
+<div class="bg-white rounded-xl shadow-smooth p-6 mb-12">
+    <div class="tabs">
+        <a href="#file-tab" class="tab-button active" id="file-tab-btn">Fichier</a>
+        <a href="#youtube-tab" class="tab-button" id="youtube-tab-btn">YouTube</a>
+    </div>
+    <div id="tab-debug" style="display: none;"></div>
+
+    <div id="file-tab" class="tab-content active">
+        <form action="index.php?action=upload" method="post" enctype="multipart/form-data" class="space-y-6">
+            <div class="form-group">
+                <label for="audio_file" class="block text-sm font-medium text-gray-700 mb-1">Fichier audio ou vidéo</label>
+                <div id="file-upload-area" class="file-upload-area">
+                    <input type="file" name="audio_file" id="audio_file" accept="audio/*,video/*" required
+                           class="form-control-file absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div class="flex flex-col items-center justify-center py-6">
+                        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-gray-700 font-medium">Glissez et déposez votre fichier ici</p>
+                        <p class="text-gray-500 text-sm mt-1">ou cliquez pour sélectionner un fichier</p>
+                        <p id="selected-file-name" class="mt-2 text-primary font-medium hidden"></p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Formats acceptés: MP3, WAV, MP4, etc. (max {{ max_upload_size_mb }}MB)</p>
+            </div>
+
+            <div class="form-group">
+                <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Langue</label>
+                <select name="language" id="language" class="form-control">
+                    <option value="auto">Détection automatique</option>
+                    <option value="fr" selected>Français</option>
+                    <option value="en">Anglais</option>
+                    <option value="es">Espagnol</option>
+                    <option value="de">Allemand</option>
+                    <option value="it">Italien</option>
+                    <option value="pt">Portugais</option>
+                    <option value="ru">Russe</option>
+                    <option value="zh">Chinois</option>
+                    <option value="ja">Japonais</option>
+                    <option value="ar">Arabe</option>
+                </select>
+                <div class="mt-3">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="force_language" id="force_language_file" class="form-checkbox h-5 w-5 text-primary" checked>
+                        <span class="ml-2 text-gray-700">Forcer la traduction dans la langue sélectionnée</span>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1">Si l'audio est dans une autre langue, le texte sera traduit</p>
+                </div>
+            </div>
+
+            <button type="submit" onclick="showLoadingOverlay()" class="btn-primary w-full md:w-auto">Transcrire</button>
+        </form>
+    </div>
+
+    <div id="youtube-tab" class="tab-content">
+        <form action="index.php?action=youtube" method="post" class="space-y-6" onsubmit="showLoadingOverlay()">
+            <div class="form-group">
+                <label for="youtube_url" class="block text-sm font-medium text-gray-700 mb-1">URL YouTube</label>
+                <input type="url" name="youtube_url" id="youtube_url" placeholder="https://www.youtube.com/watch?v=..."
+                       class="form-control" required>
+                <p class="text-xs text-gray-500 mt-2">Entrez l'URL d'une vidéo YouTube à transcrire</p>
+            </div>
+
+            <div class="form-group">
+                <label for="language_youtube" class="block text-sm font-medium text-gray-700 mb-1">Langue</label>
+                <select name="language" id="language_youtube" class="form-control">
+                    <option value="auto">Détection automatique</option>
+                    <option value="fr" selected>Français</option>
+                    <option value="en">Anglais</option>
+                    <option value="es">Espagnol</option>
+                    <option value="de">Allemand</option>
+                    <option value="it">Italien</option>
+                    <option value="pt">Portugais</option>
+                    <option value="ru">Russe</option>
+                    <option value="zh">Chinois</option>
+                    <option value="ja">Japonais</option>
+                    <option value="ar">Arabe</option>
+                </select>
+                <div class="mt-3">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="force_language" id="force_language_youtube" class="form-checkbox h-5 w-5 text-primary" checked>
+                        <span class="ml-2 text-gray-700">Forcer la traduction dans la langue sélectionnée</span>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1">Si l'audio est dans une autre langue, le texte sera traduit</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-full md:w-auto">Transcrire</button>
+        </form>
+    </div>
+</div>
+
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Transcription précise</h3>
+        <p class="text-gray-600">Notre application utilise l'API OpenAI Whisper pour une transcription audio de haute qualité.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Support multi-formats</h3>
+        <p class="text-gray-600">Compatible avec tous les formats audio et vidéo courants (MP3, WAV, MP4, etc.).</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Vidéos YouTube</h3>
+        <p class="text-gray-600">Transcrivez directement des vidéos YouTube en fournissant simplement l'URL.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Multilangue</h3>
+        <p class="text-gray-600">Détection automatique de la langue ou traduction forcée dans la langue de votre choix.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Rapide et efficace</h3>
+        <p class="text-gray-600">Traitement optimisé pour une transcription rapide, même pour les fichiers volumineux.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-card-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Interface intuitive</h3>
+        <p class="text-gray-600">Design simple et convivial pour une utilisation facile sans formation préalable.</p>
+    </div>
+</div>
+
+<!-- Overlay de chargement -->
+<div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex justify-center items-center flex-col">
+    <div class="spinner mb-4"></div>
+    <div class="text-white text-xl font-medium">Traitement en cours...</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM chargé');
+        
+        // Références des éléments
+        var fileTab = document.getElementById('file-tab');
+        var youtubeTab = document.getElementById('youtube-tab');
+        var fileTabBtn = document.getElementById('file-tab-btn');
+        var youtubeTabBtn = document.getElementById('youtube-tab-btn');
+        
+        // Vérifier que tous les éléments sont disponibles
+        if (!fileTab || !youtubeTab || !fileTabBtn || !youtubeTabBtn) {
+            console.error('Éléments manquants');
+            return;
+        }
+        
+        // État initial
+        fileTab.style.display = 'block';
+        youtubeTab.style.display = 'none';
+        
+        // Gestionnaire pour l'onglet Fichier
+        fileTabBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Clic sur Fichier');
+            
+            fileTab.style.display = 'block';
+            youtubeTab.style.display = 'none';
+            
+            fileTabBtn.classList.add('active');
+            youtubeTabBtn.classList.remove('active');
+        });
+        
+        // Gestionnaire pour l'onglet YouTube
+        youtubeTabBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Clic sur YouTube');
+            
+            fileTab.style.display = 'none';
+            youtubeTab.style.display = 'block';
+            
+            fileTabBtn.classList.remove('active');
+            youtubeTabBtn.classList.add('active');
+        });
+        
+        // Fonction pour afficher l'overlay de chargement
+        window.showLoadingOverlay = function() {
+            console.log("Affichage de l'overlay de chargement");
+            const overlay = document.getElementById("loading-overlay");
+            if (overlay) {
+                overlay.classList.remove("hidden");
+                overlay.classList.add("flex");
+            }
+            return true;
+        };
+        
+        // Initialiser la gestion du drag & drop pour le sélecteur de fichier
+        const fileInput = document.getElementById("audio_file");
+        const uploadArea = document.getElementById("file-upload-area");
+        const fileNameDisplay = document.getElementById("selected-file-name");
+        
+        if (fileInput && uploadArea) {
+            // Mise à jour du nom du fichier
+            fileInput.addEventListener("change", function() {
+                if (this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                    fileNameDisplay.classList.remove("hidden");
+                } else {
+                    fileNameDisplay.classList.add("hidden");
+                }
+            });
+            
+            // Effets visuels pour le drag & drop
+            ["dragenter", "dragover"].forEach(eventName => {
+                uploadArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.add("active");
+                }, false);
+            });
+            
+            ["dragleave", "drop"].forEach(eventName => {
+                uploadArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    uploadArea.classList.remove("active");
+                    
+                    if (eventName === "drop") {
+                        fileInput.files = e.dataTransfer.files;
+                        if (fileInput.files.length > 0) {
+                            fileNameDisplay.textContent = fileInput.files[0].name;
+                            fileNameDisplay.classList.remove("hidden");
+                        }
+                    }
+                }, false);
+            });
+        }
+        
+        console.log("Initialisation des onglets terminée");
+    });
+</script>
+{% endblock %}

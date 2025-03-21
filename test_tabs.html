@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test des Onglets</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background-color: #f7f7f7;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 16px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+      }
+
+      .tab-button:hover {
+        background-color: #f5f5f5;
+      }
+
+      .tab-button.active {
+        border-bottom-color: #3498db;
+        color: #3498db;
+        font-weight: bold;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .debug-box {
+        margin-top: 30px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+      }
+
+      .log-entry {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Test des Onglets</h1>
+
+      <h2>Utilisation de data-tab (Nouvelle méthode)</h2>
+      <div class="tabs">
+        <button class="tab-button active" data-tab="data-tab1">Onglet 1</button>
+        <button class="tab-button" data-tab="data-tab2">Onglet 2</button>
+      </div>
+
+      <div id="data-tab1" class="tab-content active">
+        <h3>Contenu de l'onglet 1</h3>
+        <p>Ceci est le contenu du premier onglet avec attribut data-tab.</p>
+      </div>
+
+      <div id="data-tab2" class="tab-content">
+        <h3>Contenu de l'onglet 2</h3>
+        <p>Ceci est le contenu du second onglet avec attribut data-tab.</p>
+      </div>
+
+      <h2 style="margin-top: 30px">
+        Utilisation de onclick (Ancienne méthode)
+      </h2>
+      <div class="tabs">
+        <button class="tab-button active" onclick="showTab('onclick-tab1')">
+          Onglet 1
+        </button>
+        <button class="tab-button" onclick="showTab('onclick-tab2')">
+          Onglet 2
+        </button>
+      </div>
+
+      <div id="onclick-tab1" class="tab-content active">
+        <h3>Contenu de l'onglet 1</h3>
+        <p>Ceci est le contenu du premier onglet avec attribut onclick.</p>
+      </div>
+
+      <div id="onclick-tab2" class="tab-content">
+        <h3>Contenu de l'onglet 2</h3>
+        <p>Ceci est le contenu du second onglet avec attribut onclick.</p>
+      </div>
+
+      <div class="debug-box">
+        <h3>Debug Console</h3>
+        <div id="debug-log"></div>
+      </div>
+    </div>
+
+    <script>
+      // Initialisation pour journaliser les messages
+      function log(message) {
+        const logElement = document.getElementById("debug-log");
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logElement.appendChild(entry);
+        console.log(message);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        log("Document chargé, initialisation...");
+
+        // Méthode avec data-tab
+        const dataTabButtons = document.querySelectorAll(
+          ".tab-button[data-tab]"
+        );
+        log(
+          `Trouvé ${dataTabButtons.length} boutons d'onglets avec attribut data-tab`
+        );
+
+        dataTabButtons.forEach((button) => {
+          button.addEventListener("click", function (e) {
+            const tabId = this.getAttribute("data-tab");
+            log(`Clic sur un onglet data-tab: ${tabId}`);
+
+            // Désactiver tous les onglets dans ce groupe
+            const parentTabs = this.closest(".tabs");
+            parentTabs.querySelectorAll(".tab-button").forEach((btn) => {
+              btn.classList.remove("active");
+            });
+
+            // Activer cet onglet
+            this.classList.add("active");
+
+            // Masquer tous les contenus d'onglets liés à ce groupe
+            const tabContents = document.querySelectorAll(".tab-content");
+            tabContents.forEach((content) => {
+              content.classList.remove("active");
+            });
+
+            // Afficher le contenu de l'onglet sélectionné
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+              selectedTab.classList.add("active");
+              log(`Onglet activé: ${tabId}`);
+            } else {
+              log(`ERREUR: Contenu de l'onglet non trouvé pour l'ID: ${tabId}`);
+            }
+          });
+
+          log(
+            `Écouteur d'événement ajouté pour l'onglet avec data-tab="${button.getAttribute(
+              "data-tab"
+            )}"`
+          );
+        });
+
+        log("Initialisation terminée");
+      });
+
+      // Fonction pour l'ancienne méthode onclick
+      function showTab(tabId) {
+        log(`Fonction showTab appelée avec tabId: ${tabId}`);
+
+        // Trouver tous les contenus d'onglets
+        const tabContents = document.querySelectorAll(".tab-content");
+        log(`Trouvé ${tabContents.length} contenus d'onglets`);
+
+        // Masquer tous les contenus
+        tabContents.forEach((content) => {
+          content.classList.remove("active");
+          log(`Désactivation du contenu: ${content.id}`);
+        });
+
+        // Afficher le contenu sélectionné
+        const selectedContent = document.getElementById(tabId);
+        if (selectedContent) {
+          selectedContent.classList.add("active");
+          log(`Activation du contenu: ${tabId}`);
+        } else {
+          log(`ERREUR: Contenu non trouvé pour l'ID: ${tabId}`);
+        }
+
+        // Désactiver tous les boutons d'onglets
+        const tabButtons = document.querySelectorAll(".tab-button");
+        tabButtons.forEach((button) => {
+          button.classList.remove("active");
+          log(`Désactivation du bouton: ${button.textContent.trim()}`);
+        });
+
+        // Activer le bouton sélectionné
+        const activeButton = document.querySelector(
+          `.tab-button[onclick*="${tabId}"]`
+        );
+        if (activeButton) {
+          activeButton.classList.add("active");
+          log(`Activation du bouton: ${activeButton.textContent.trim()}`);
+        } else {
+          log(`ERREUR: Bouton non trouvé pour l'onglet: ${tabId}`);
+        }
+      }
+    </script>
+  </body>
+</html>

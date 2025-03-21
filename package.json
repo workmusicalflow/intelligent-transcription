@@ -1,0 +1,27 @@
+{
+  "name": "inteligent-transcription",
+  "version": "1.0.0",
+  "description": "Une application simple et efficace pour transcrire des fichiers audio et vidéo en texte en utilisant l'API OpenAI Whisper.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "dev": "npx tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --watch",
+    "build": "npx tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "transcription",
+    "audio",
+    "whisper",
+    "openai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.18",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.0"
+  }
+}

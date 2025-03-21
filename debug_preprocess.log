@@ -1,23 +1,25 @@
 Array
 (
-    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd561d6099f_8_F3eEXfYYg.mp3' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
+    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd8854e4a3b_20250207_135159.mp4' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
     [output] => {
   "success": true,
-  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd561d6099f_8_F3eEXfYYg.mp3",
-  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd561d6099f_8_F3eEXfYYg.mp3",
-  "original_size_mb": 2.133528709411621,
-  "new_size_mb": 2.133528709411621,
-  "message": "Le fichier est d\u00e9j\u00e0 plus petit que la taille cible"
+  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd8854e4a3b_20250207_135159.mp4",
+  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd8854e4a3b_20250207_135159_preprocessed.mp3",
+  "original_size_mb": 60.256611824035645,
+  "new_size_mb": 0.2824363708496094,
+  "bitrate_kbps": 50,
+  "message": "Fichier pr\u00e9trait\u00e9 avec succ\u00e8s. Taille r\u00e9duite de 60.26 Mo \u00e0 0.28 Mo"
 }
 
     [result] => Array
         (
             [success] => 1
-            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd561d6099f_8_F3eEXfYYg.mp3
-            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd561d6099f_8_F3eEXfYYg.mp3
-            [original_size_mb] => 2.1335287094116
-            [new_size_mb] => 2.1335287094116
-            [message] => Le fichier est déjà plus petit que la taille cible
+            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_67dd8854e4a3b_20250207_135159.mp4
+            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_67dd8854e4a3b_20250207_135159_preprocessed.mp3
+            [original_size_mb] => 60.256611824036
+            [new_size_mb] => 0.28243637084961
+            [bitrate_kbps] => 50
+            [message] => Fichier prétraité avec succès. Taille réduite de 60.26 Mo à 0.28 Mo
         )
 
 )

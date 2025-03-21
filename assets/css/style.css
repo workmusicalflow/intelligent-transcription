@@ -134,16 +134,68 @@ button:hover {
   background-color: #2980b9;
 }
 
-.btn-primary {
-  background-color: #3498db;
+/* Styles des boutons améliorés */
+.btn-primary,
+.btn-secondary,
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  margin: 8px 5px;
+  min-width: 160px;
 }
 
+/* Bouton primaire - bleu */
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Bouton secondaire - gris */
 .btn-secondary {
   background-color: #7f8c8d;
+  color: white;
 }
 
 .btn-secondary:hover {
   background-color: #6c7a7a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Bouton d'action - vert */
+.btn-action {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btn-action:hover {
+  background-color: #219955;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation au clic */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-action:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -183,22 +235,112 @@ button:hover {
 }
 
 .text-box {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   margin: 15px 0;
   white-space: pre-wrap;
-  line-height: 1.5;
+  line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 1rem;
 }
 
+/* Conteneur des boutons d'action */
 .actions {
-  margin-top: 20px;
-  text-align: center;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
 }
 
-.actions a {
-  display: inline-block;
-  margin: 0 10px;
-  text-decoration: none;
+.actions a,
+.actions button {
+  flex: 0 1 auto;
+  min-width: 160px;
+  margin: 5px;
+}
+
+/* Style spécifique pour le bouton de copie */
+#copy-button {
+  margin-top: 12px;
+  margin-bottom: 20px;
+  min-width: 160px;
+}
+
+/* Styles pour la page de résultat */
+.result-text {
+  margin-bottom: 30px;
+}
+
+.result-text h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+/* Style pour les informations de résultat */
+.result-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Style pour les messages d'erreur */
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c62828;
+  font-size: 0.95rem;
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .actions a,
+  .actions button,
+  #copy-button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  body {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .text-box {
+    padding: 15px;
+  }
+}
+
+/* Responsive pour grands écrans */
+@media (min-width: 768px) {
+  .text-box {
+    max-height: 500px;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .result-text h2 {
+    font-size: 1.6rem;
+  }
 }

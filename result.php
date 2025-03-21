@@ -123,9 +123,9 @@ if ($isParaphrased) {
         <a href="index.php" class="btn-primary">Nouvelle transcription</a>
         <a href="download.php?id=<?= urlencode($resultId) ?>" class="btn-secondary">Télécharger en TXT</a>
         <?php if (!$isParaphrased): ?>
-            <a href="paraphrase.php?id=<?= urlencode($resultId) ?>" class="btn-secondary">Paraphraser le texte</a>
+            <a href="paraphrase.php?id=<?= urlencode($resultId) ?>" class="btn-action">Paraphraser le texte</a>
         <?php endif; ?>
-        <a href="chat.php" class="btn-secondary">Discuter avec l'assistant</a>
+        <a href="chat.php" class="btn-action">Discuter avec l'assistant</a>
     </div>
 
     <script>

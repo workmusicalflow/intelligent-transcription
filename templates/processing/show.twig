@@ -1,0 +1,240 @@
+{% extends "base/layout.twig" %}
+
+{% block title %}Traitement en cours | {{ app_name }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .progress-wrapper {
+        @apply relative h-7 bg-gray-200 rounded-full overflow-hidden;
+    }
+    
+    .progress-bar {
+        @apply absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-green-400 
+               flex items-center justify-center text-sm text-white font-medium
+               transition-all duration-500 ease-out;
+    }
+    
+    .progress-bar::after {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent
+               opacity-50;
+        animation: shine 2s ease-in-out infinite;
+    }
+    
+    @keyframes shine {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    .processing-steps {
+        @apply space-y-4 my-6 max-w-2xl mx-auto;
+    }
+    
+    .processing-step {
+        @apply flex items-start p-4 rounded-lg bg-white border border-gray-100 
+               transition-all duration-200 opacity-60;
+    }
+    
+    .processing-step.active {
+        @apply opacity-100 border-blue-100 bg-blue-50 transform scale-[1.02] 
+               shadow-md;
+    }
+    
+    .processing-step.completed {
+        @apply opacity-100 border-green-100 bg-green-50;
+    }
+    
+    .step-icon {
+        @apply flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+               border-2 mr-4 text-lg font-bold;
+    }
+    
+    .step-icon.active {
+        @apply border-blue-500 bg-blue-100 text-blue-600;
+    }
+    
+    .step-icon.completed {
+        @apply border-green-500 bg-green-100 text-green-600;
+    }
+    
+    .step-content {
+        @apply flex-grow;
+    }
+    
+    .step-name {
+        @apply text-lg font-medium;
+    }
+    
+    .step-description {
+        @apply text-sm text-gray-600 mt-1;
+    }
+    
+    .spinner {
+        @apply w-16 h-16 mx-auto mb-6;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #3498db;
+        border-radius: 50%;
+        animation: spinner 1s linear infinite;
+    }
+    
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+    
+    .success-icon {
+        @apply w-20 h-20 rounded-full bg-green-500 flex items-center justify-center 
+               mx-auto mb-6;
+        animation: scale-in 0.5s ease-out;
+    }
+    
+    .success-icon svg {
+        @apply w-10 h-10 text-white;
+    }
+    
+    @keyframes scale-in {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-md p-8 max-w-3xl mx-auto">
+    <h1 class="text-center text-3xl font-bold text-gray-800 mb-6">Traitement en cours</h1>
+    
+    <p class="text-center text-gray-600 mb-8">
+        Veuillez patienter pendant que nous traitons votre 
+        {{ file_type == 'youtube' ? 'vidéo YouTube' : 'fichier audio' }}...
+    </p>
+
+    {% if status != 'completed' and status != 'error' %}
+        <div class="spinner"></div>
+    {% endif %}
+    
+    <div class="progress-wrapper mb-8">
+        <div class="progress-bar" style="width: {{ progress }}%">
+            {{ progress }}%
+        </div>
+    </div>
+
+    <div class="processing-steps">
+        <div class="processing-step {{ current_step >= 1 ? 'active' : '' }} {{ current_step > 1 ? 'completed' : '' }}">
+            <div class="step-icon {{ current_step >= 1 ? 'active' : '' }} {{ current_step > 1 ? 'completed' : '' }}">
+                {% if current_step > 1 %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                {% else %}
+                    1
+                {% endif %}
+            </div>
+            <div class="step-content">
+                <div class="step-name">Initialisation</div>
+                <div class="step-description">Préparation du fichier pour le traitement</div>
+            </div>
+        </div>
+
+        <div class="processing-step {{ current_step >= 2 ? 'active' : '' }} {{ current_step > 2 ? 'completed' : '' }}">
+            <div class="step-icon {{ current_step >= 2 ? 'active' : '' }} {{ current_step > 2 ? 'completed' : '' }}">
+                {% if current_step > 2 %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                {% else %}
+                    2
+                {% endif %}
+            </div>
+            <div class="step-content">
+                <div class="step-name">Prétraitement</div>
+                <div class="step-description">Optimisation audio pour une meilleure transcription</div>
+            </div>
+        </div>
+
+        <div class="processing-step {{ current_step >= 3 ? 'active' : '' }} {{ current_step > 3 ? 'completed' : '' }}">
+            <div class="step-icon {{ current_step >= 3 ? 'active' : '' }} {{ current_step > 3 ? 'completed' : '' }}">
+                {% if current_step > 3 %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                {% else %}
+                    3
+                {% endif %}
+            </div>
+            <div class="step-content">
+                <div class="step-name">Transcription</div>
+                <div class="step-description">Conversion de l'audio en texte avec l'IA</div>
+            </div>
+        </div>
+
+        <div class="processing-step {{ current_step >= 4 ? 'active' : '' }} {{ current_step > 4 ? 'completed' : '' }}">
+            <div class="step-icon {{ current_step >= 4 ? 'active' : '' }} {{ current_step > 4 ? 'completed' : '' }}">
+                {% if current_step > 4 %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                {% else %}
+                    4
+                {% endif %}
+            </div>
+            <div class="step-content">
+                <div class="step-name">Finalisation</div>
+                <div class="step-description">Mise en forme et enregistrement des résultats</div>
+            </div>
+        </div>
+    </div>
+
+    {% if status == 'completed' %}
+        <div class="text-center mt-8">
+            <div class="success-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Traitement terminé !</h2>
+            <p class="text-gray-600 mb-4">Votre transcription est maintenant prête.</p>
+            <a href="{{ url('index.php', {'action': 'result', 'id': result_id}) }}" class="btn-primary">
+                Voir les résultats
+            </a>
+        </div>
+    {% elseif status == 'error' %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mt-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-red-800">Une erreur est survenue</h3>
+                    <p class="text-red-700 mt-2">{{ error_message }}</p>
+                    <div class="mt-4">
+                        <a href="{{ url('index.php') }}" class="btn-primary">Réessayer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Script de rafraîchissement automatique si le traitement est en cours -->
+{% if status != 'completed' and status != 'error' %}
+<script>
+    // Rafraîchir la page après 3 secondes
+    setTimeout(function() {
+        window.location.href = "{{ url('index.php', {'action': 'check_status', 'job_id': job_id, 'refresh': 'true'}) }}";
+    }, 3000);
+
+    // Overlay de chargement
+    if (window.parent.document.getElementById('loading-overlay')) {
+        window.parent.document.getElementById('loading-overlay').classList.add('hidden');
+    }
+</script>
+{% elseif status == 'completed' %}
+<script>
+    // Redirection automatique vers la page de résultat
+    setTimeout(function() {
+        window.location.href = "{{ url('index.php', {'action': 'result', 'id': result_id}) }}";
+    }, 2000);
+</script>
+{% endif %}
+{% endblock %}
