@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * Exemple d'utilisation de la nouvelle structure MVC
+ * Ce fichier montre comment utiliser les contrôleurs et les services
+ */
+
+// Inclure le fichier d'initialisation
+require_once __DIR__ . '/../src/bootstrap.php';
+
+// Utiliser les classes avec leurs namespaces
+use Controllers\TranscriptionController;
+use Controllers\ParaphraseController;
+use Controllers\ChatController;
+use Utils\FileUtils;
+use Utils\ResponseUtils;
+
+// Nettoyer les anciens fichiers
+FileUtils::cleanupOldFiles(UPLOAD_DIR);
+FileUtils::cleanupOldFiles(TEMP_AUDIO_DIR);
+FileUtils::cleanupOldFiles(RESULT_DIR);
+
+// Déterminer l'action à effectuer
+$action = $_GET['action'] ?? 'home';
+
+// Traiter l'action
+switch ($action) {
+    case 'upload':
+        // Traiter le téléchargement d'un fichier audio
+        $controller = new TranscriptionController();
+        $controller->handleFileUpload();
+        break;
+
+    case 'youtube':
+        // Traiter le téléchargement d'une vidéo YouTube
+        $controller = new TranscriptionController();
+        $controller->handleYouTubeDownload();
+        break;
+
+    case 'result':
+        // Afficher le résultat d'une transcription
+        $controller = new TranscriptionController();
+        $result = $controller->showResult();
+        
+        // Inclure le template de résultat
+        include TEMPLATES_DIR . '/result.php';
+        break;
+
+    case 'download':
+        // Télécharger un résultat de transcription
+        $controller = new TranscriptionController();
+        $controller->downloadResult();
+        break;
+
+    case 'paraphrase':
+        // Afficher le formulaire de paraphrase
+        $controller = new ParaphraseController();
+        $data = $controller->showParaphraseForm();
+        
+        // Inclure le template de paraphrase
+        include TEMPLATES_DIR . '/paraphrase_form.php';
+        break;
+
+    case 'paraphrase_submit':
+        // Traiter la paraphrase
+        $controller = new ParaphraseController();
+        $result = $controller->handleParaphrase();
+        
+        // Inclure le template de résultat de paraphrase
+        include TEMPLATES_DIR . '/paraphrase_result.php';
+        break;
+
+    case 'chat':
+        // Afficher la page de chat
+        $controller = new ChatController();
+        $data = $controller->showChatPage();
+        
+        // Inclure le template de chat
+        include TEMPLATES_DIR . '/chat.php';
+        break;
+
+    case 'chat_submit':
+        // Traiter une requête de chat (AJAX)
+        $controller = new ChatController();
+        $result = $controller->handleChatRequest();
+        
+        // Renvoyer le résultat en JSON
+        ResponseUtils::jsonResponse($result);
+        break;
+
+    case 'export_chat':
+        // Exporter une conversation
+        $controller = new ChatController();
+        $result = $controller->exportConversation();
+        
+        // Renvoyer le résultat en JSON
+        ResponseUtils::jsonResponse($result);
+        break;
+
+    case 'download_export':
+        // Télécharger un fichier d'export de conversation
+        $controller = new ChatController();
+        $controller->downloadExport($_GET['filename']);
+        break;
+
+    case 'home':
+    default:
+        // Afficher la page d'accueil
+        $paraphraseController = new ParaphraseController();
+        $styles = $paraphraseController->getAvailableStyles();
+        $languages = $paraphraseController->getAvailableLanguages();
+        
+        // Inclure le template de la page d'accueil
+        include TEMPLATES_DIR . '/home.php';
+        break;
+}

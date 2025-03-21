@@ -974,3 +974,243 @@ Array
 
     [error] => 
 )
+Array
+(
+    [attempt] => 1
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 20
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 2
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 3
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 4
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 5
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 500
+            [download_url] => 
+            [text] => Downloading
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 6
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 290
+            [download_url] => 
+            [text] => Downloading
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 7
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 1
+            [progress] => 1000
+            [download_url] => https://emma18.oceansaver.in/pacific/?DD0610PZslcrhCnW8KRqBHB
+            [text] => Finished
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 1
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 1
+            [progress] => 1000
+            [download_url] => https://emma18.oceansaver.in/pacific/?DD0610PZslcrhCnW8KRqBHB
+            [text] => Finished
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 1
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 1
+            [progress] => 1000
+            [download_url] => https://emma18.oceansaver.in/pacific/?DD0610PZslcrhCnW8KRqBHB
+            [text] => Finished
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 1
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 20
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 2
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 3
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 4
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 0
+            [progress] => 21
+            [download_url] => 
+            [text] => Initialising
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 5
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 1
+            [progress] => 1000
+            [download_url] => https://leo3.oceansaver.in/pacific/?2dFitZt1oOy8i5EPpyyoOLx
+            [text] => Finished
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)
+Array
+(
+    [attempt] => 1
+    [progress_url] => https://p.oceansaver.in/api/progress
+    [http_code] => 200
+    [response] => Array
+        (
+            [success] => 1
+            [progress] => 1000
+            [download_url] => https://leo3.oceansaver.in/pacific/?2dFitZt1oOy8i5EPpyyoOLx
+            [text] => Finished
+            [message] => If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https://video-download-api.com/
+        )
+
+    [error] => 
+)

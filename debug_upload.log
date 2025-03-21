@@ -7,7 +7,7 @@ Array
                     [name] => 20250207_135159.mp4
                     [full_path] => 20250207_135159.mp4
                     [type] => video/mp4
-                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpJCU1FO
+                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpCf3aOa
                     [error] => 0
                     [size] => 63183637
                 )
@@ -16,7 +16,8 @@ Array
 
     [POST] => Array
         (
-            [language] => fr
+            [language] => en
+            [force_language] => on
         )
 
     [upload_max_filesize] => 100M
