@@ -113,9 +113,19 @@
 
 {% block content %}
 <div class="chat-container">
-    <div class="chat-header">
-        <h1 class="text-2xl font-bold">Chat avec l'IA</h1>
-        <p class="text-gray-600">Posez des questions sur votre transcription ou demandez des analyses</p>
+    <div class="chat-header flex justify-between items-start">
+        <div>
+            <h1 class="text-2xl font-bold">Chat avec l'IA</h1>
+            <p class="text-gray-600">Posez des questions sur votre transcription ou demandez des analyses</p>
+        </div>
+        {% if chat_id is defined and chat_id %}
+            <a href="{{ url('analytics.php', {'action': 'conversation', 'id': chat_id}) }}" class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Voir les analytics
+            </a>
+        {% endif %}
     </div>
     
     {% if is_new_chat %}
@@ -133,7 +143,14 @@
                 {% for message in messages %}
                     <div class="message {% if message.sender == 'user' %}message-user{% else %}message-ai{% endif %}">
                         <div class="message-content">{{ message.content|nl2br }}</div>
-                        <div class="message-time">{{ message.timestamp|date("H:i") }}</div>
+                        <div class="message-time flex justify-between">
+                            <span>{{ message.timestamp|date("H:i") }}</span>
+                            {% if message.sender == 'ai' and message.from_cache is defined %}
+                                <span class="text-xs px-1.5 py-0.5 rounded-full {% if message.from_cache %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {% if message.from_cache %}Cache{% else %}API{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}

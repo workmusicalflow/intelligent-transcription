@@ -33,13 +33,40 @@ class YouTubeService
      */
     public function downloadAndTranscribe($youtubeUrl, $language = 'auto', $forceLanguage = false)
     {
-        // Valider l'URL YouTube
-        if (!YouTubeUtils::isValidYoutubeUrl($youtubeUrl)) {
+        // Valider les paramètres de transcription
+        $paramsValidation = \Utils\ValidationUtils::validateTranscriptionParams([
+            'language' => $language,
+            'force_language' => $forceLanguage
+        ]);
+        
+        if (!$paramsValidation['valid']) {
             return [
                 'success' => false,
-                'error' => 'URL YouTube invalide'
+                'error' => $paramsValidation['error'],
+                'category' => 'validation',
+                'advice' => 'Veuillez vérifier les paramètres de transcription fournis.'
             ];
         }
+        
+        // Extraire les paramètres validés
+        $language = $paramsValidation['sanitized']['language'];
+        $forceLanguage = $paramsValidation['sanitized']['force_language'];
+        
+        // Valider l'URL YouTube
+        $urlValidation = \Utils\ValidationUtils::validateYoutubeUrl($youtubeUrl);
+        
+        if (!$urlValidation['valid']) {
+            return [
+                'success' => false,
+                'error' => $urlValidation['error'],
+                'category' => 'validation',
+                'advice' => 'Veuillez fournir une URL YouTube valide, par exemple: https://www.youtube.com/watch?v=VIDEO_ID'
+            ];
+        }
+        
+        // Utiliser l'URL normalisée pour uniformiser les formats
+        $youtubeUrl = $urlValidation['normalized_url'];
+        $youtubeId = $urlValidation['video_id'];
 
         // Créer le répertoire de téléchargement si nécessaire
         if (!is_dir(UPLOAD_DIR)) {

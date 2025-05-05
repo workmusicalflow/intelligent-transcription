@@ -69,6 +69,34 @@ class TwigManager
         self::addGlobal('app_version', '1.0.0');
         self::addGlobal('base_url', \BASE_URL ?? '');
         self::addGlobal('is_debug', \DEBUG_MODE);
+        
+        // Ajouter des informations d'authentification
+        if (class_exists('\\Services\\AuthService')) {
+            // Initialize authentication if not already done
+            if (method_exists('\\Services\\AuthService', 'init')) {
+                \Services\AuthService::init();
+            }
+            
+            // Add authentication globals
+            self::addGlobal('is_authenticated', method_exists('\\Services\\AuthService', 'isAuthenticated') 
+                ? \Services\AuthService::isAuthenticated() 
+                : false);
+                
+            self::addGlobal('is_admin', method_exists('\\Services\\AuthService', 'isAdmin') 
+                ? \Services\AuthService::isAdmin() 
+                : false);
+            
+            // Add current user if authenticated
+            if (method_exists('\\Services\\AuthService', 'isAuthenticated') && 
+                \Services\AuthService::isAuthenticated() &&
+                method_exists('\\Services\\AuthService', 'getCurrentUser')) {
+                    
+                $currentUser = \Services\AuthService::getCurrentUser();
+                self::addGlobal('current_user', method_exists($currentUser, 'toArray') 
+                    ? $currentUser->toArray() 
+                    : []);
+            }
+        }
 
         // Ajouter les variables personnalisées
         foreach (self::$globalVars as $name => $value) {

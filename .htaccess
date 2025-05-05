@@ -3,3 +3,22 @@ php_value upload_max_filesize 100M
 php_value post_max_size 100M
 php_value max_execution_time 300
 php_value max_input_time 300
+
+# Protéger les fichiers sensibles
+<FilesMatch "^\.env|config\.php\.bak">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protéger les répertoires sensibles
+<DirectoryMatch "^/(?:logs|cache|venv)/">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# Désactiver la navigation dans les répertoires
+Options -Indexes
+
+# Protéger contre les inclusions de fichiers distants
+php_flag allow_url_fopen off
+php_flag allow_url_include off

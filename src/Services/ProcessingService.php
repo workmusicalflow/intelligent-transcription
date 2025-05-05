@@ -130,9 +130,11 @@ class ProcessingService
      * 
      * @param string $jobId ID du job
      * @param string $error Message d'erreur
+     * @param string $category Catégorie d'erreur (optionnel)
+     * @param string $advice Conseil pour résoudre l'erreur (optionnel)
      * @return array État final
      */
-    public function failJob($jobId, $error)
+    public function failJob($jobId, $error, $category = 'unknown', $advice = '')
     {
         $status = $this->getStatus($jobId);
 
@@ -143,12 +145,21 @@ class ProcessingService
         $status['status'] = 'error';
         $status['error'] = $error;
         $status['end_time'] = time();
+        $status['error_category'] = $category;
+        $status['error_advice'] = $advice;
+
+        // Formater le message d'erreur avec conseil si disponible
+        $errorMessage = 'Erreur: ' . $error;
+        if (!empty($advice)) {
+            $errorMessage .= "\nConseil: " . $advice;
+        }
 
         $status['updates'][] = [
             'time' => time(),
-            'message' => 'Erreur: ' . $error,
+            'message' => $errorMessage,
             'step' => $status['current_step'],
-            'progress' => $status['progress']
+            'progress' => $status['progress'],
+            'category' => $category
         ];
 
         $this->saveStatus($jobId, $status);

@@ -9,7 +9,7 @@ require_once 'context_manager.php';
 class ChatAPI
 {
     private $apiKey;
-    private $model = 'gpt-3.5-turbo';
+    private $model = 'gpt-4.1-nano';
 
     public function __construct($apiKey = null)
     {

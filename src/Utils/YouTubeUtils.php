@@ -12,12 +12,12 @@ class YouTubeUtils
      * 
      * @param string $url URL à vérifier
      * @return bool True si l'URL est une URL YouTube valide, false sinon
+     * @deprecated Utiliser ValidationUtils::validateYoutubeUrl() à la place
      */
     public static function isValidYoutubeUrl($url)
     {
-        // Pattern pour les URLs YouTube standard et les URLs YouTube Shorts
-        $pattern = '/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})(\S*)?$/';
-        return preg_match($pattern, $url) === 1;
+        $validation = \Utils\ValidationUtils::validateYoutubeUrl($url);
+        return $validation['valid'];
     }
 
     /**
@@ -25,13 +25,13 @@ class YouTubeUtils
      * 
      * @param string $url URL YouTube
      * @return string|null ID de la vidéo YouTube ou null si non trouvé
+     * @deprecated Utiliser ValidationUtils::validateYoutubeUrl() à la place
      */
     public static function getYoutubeVideoId($url)
     {
-        // Pattern pour les URLs YouTube standard et les URLs YouTube Shorts
-        $pattern = '/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})(\S*)?$/';
-        if (preg_match($pattern, $url, $matches)) {
-            return $matches[4];
+        $validation = \Utils\ValidationUtils::validateYoutubeUrl($url);
+        if ($validation['valid']) {
+            return $validation['video_id'];
         }
         return null;
     }
@@ -106,9 +106,35 @@ class YouTubeUtils
         }
 
         if ($httpCode !== 200 || $error) {
+            $errorDetail = $error ?: 'Code HTTP ' . $httpCode;
+            
+            // Analyser l'erreur pour une catégorisation plus précise
+            $category = 'api';
+            $advice = 'Vérifiez que l\'URL YouTube est valide et que la vidéo est accessible dans votre pays.';
+            
+            if (stripos($errorDetail, 'timeout') !== false || stripos($errorDetail, 'timed out') !== false) {
+                $category = 'network';
+                $advice = 'Le service de téléchargement a mis trop de temps à répondre. Vérifiez votre connexion internet et réessayez.';
+            } elseif (stripos($errorDetail, 'refused') !== false || stripos($errorDetail, 'reset') !== false) {
+                $category = 'network';
+                $advice = 'Connexion refusée par le service de téléchargement. Réessayez dans quelques instants.';
+            } elseif ($httpCode == 429 || stripos($errorDetail, 'rate limit') !== false || stripos($errorDetail, 'too many') !== false) {
+                $category = 'quota';
+                $advice = 'Limite d\'utilisation du service de téléchargement atteinte. Veuillez réessayer plus tard.';
+            } elseif ($httpCode == 404) {
+                $category = 'not_found';
+                $advice = 'La vidéo n\'a pas pu être trouvée. Vérifiez que l\'URL est correcte et que la vidéo existe toujours.';
+            } elseif ($httpCode == 403) {
+                $category = 'access_denied';
+                $advice = 'Accès refusé à cette vidéo. Elle est peut-être privée ou soumise à des restrictions.';
+            }
+            
             return [
                 'success' => false,
-                'error' => 'Erreur lors du téléchargement de la vidéo: ' . ($error ?: 'Code HTTP ' . $httpCode)
+                'error' => 'Erreur lors du téléchargement de la vidéo',
+                'details' => $errorDetail,
+                'category' => $category,
+                'advice' => $advice
             ];
         }
 
@@ -116,9 +142,35 @@ class YouTubeUtils
         $result = json_decode($response, true);
 
         if (!$result || !isset($result['success']) || !$result['success']) {
+            $errorMessage = $result['error'] ?? 'Réponse API invalide';
+            
+            // Catégorisation plus précise des erreurs de l'API de téléchargement
+            $category = 'api_response';
+            $advice = 'Le service de téléchargement vidéo a retourné une erreur.';
+            
+            if (stripos($errorMessage, 'private') !== false || stripos($errorMessage, 'restricted') !== false) {
+                $category = 'video_private';
+                $advice = 'Cette vidéo est privée ou limitée. Vérifiez que la vidéo est publique et sans restrictions d\'âge.';
+            } elseif (stripos($errorMessage, 'copyright') !== false || stripos($errorMessage, 'blocked') !== false) {
+                $category = 'copyright';
+                $advice = 'Cette vidéo est protégée par des droits d\'auteur et ne peut pas être téléchargée.';
+            } elseif (stripos($errorMessage, 'exist') !== false || stripos($errorMessage, 'found') !== false || stripos($errorMessage, 'deleted') !== false) {
+                $category = 'video_not_found';
+                $advice = 'Cette vidéo n\'existe pas ou a été supprimée. Vérifiez l\'URL.';
+            } elseif (stripos($errorMessage, 'country') !== false || stripos($errorMessage, 'region') !== false || stripos($errorMessage, 'geo') !== false) {
+                $category = 'geo_restriction';
+                $advice = 'Cette vidéo n\'est pas disponible dans votre pays en raison de restrictions géographiques.';
+            } elseif (stripos($errorMessage, 'quota') !== false || stripos($errorMessage, 'limit') !== false) {
+                $category = 'quota';
+                $advice = 'Le service de téléchargement a atteint sa limite d\'utilisation. Veuillez réessayer plus tard.';
+            }
+            
             return [
                 'success' => false,
-                'error' => 'Réponse API invalide'
+                'error' => 'Erreur du service de téléchargement',
+                'details' => $errorMessage,
+                'category' => $category,
+                'advice' => $advice
             ];
         }
 
@@ -127,7 +179,10 @@ class YouTubeUtils
         if (empty($downloadId)) {
             return [
                 'success' => false,
-                'error' => 'ID de téléchargement non trouvé dans la réponse'
+                'error' => 'Erreur de configuration du téléchargement',
+                'details' => 'ID de téléchargement non trouvé dans la réponse API',
+                'category' => 'api_response',
+                'advice' => 'Le service de téléchargement vidéo a rencontré un problème. Réessayez plus tard ou vérifiez que l\'URL YouTube est correcte.'
             ];
         }
 
@@ -137,7 +192,10 @@ class YouTubeUtils
         if (empty($downloadUrl)) {
             return [
                 'success' => false,
-                'error' => 'Impossible d\'obtenir l\'URL de téléchargement après plusieurs tentatives'
+                'error' => 'Impossible d\'obtenir l\'URL de téléchargement après plusieurs tentatives',
+                'details' => 'Le service a dépassé le délai d\'attente maximal',
+                'category' => 'timeout',
+                'advice' => 'Le traitement de la vidéo a pris trop de temps. Essayez avec une vidéo plus courte ou réessayez ultérieurement quand le service sera moins chargé.'
             ];
         }
 
@@ -147,7 +205,10 @@ class YouTubeUtils
         if ($fileContent === false) {
             return [
                 'success' => false,
-                'error' => 'Impossible de télécharger le fichier audio après plusieurs tentatives'
+                'error' => 'Impossible de télécharger le fichier audio après plusieurs tentatives',
+                'details' => 'Échec du téléchargement du fichier depuis le serveur',
+                'category' => 'download_failure',
+                'advice' => 'Le téléchargement du fichier audio a échoué. Vérifiez votre connexion internet et réessayez. Si le problème persiste, la vidéo est peut-être trop volumineuse.'
             ];
         }
 
@@ -155,7 +216,10 @@ class YouTubeUtils
         if (file_put_contents($outputPath, $fileContent) === false) {
             return [
                 'success' => false,
-                'error' => 'Impossible d\'enregistrer le fichier audio'
+                'error' => 'Impossible d\'enregistrer le fichier audio',
+                'details' => 'Échec lors de l\'écriture du fichier sur le disque',
+                'category' => 'file_access',
+                'advice' => 'Le système n\'a pas pu enregistrer le fichier audio. Vérifiez les permissions du répertoire et l\'espace disque disponible.'
             ];
         }
 

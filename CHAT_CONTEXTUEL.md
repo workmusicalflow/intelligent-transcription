@@ -60,7 +60,7 @@ La fonctionnalité de Chat Contextuel est implémentée avec une architecture mo
 
 Pour personnaliser le comportement de l'assistant, vous pouvez modifier le fichier `chat_api.php` :
 
-- Changer le modèle utilisé (par défaut : `gpt-3.5-turbo`)
+- Changer le modèle utilisé (par défaut : `gpt-4.1-nano`)
 - Ajuster la température pour contrôler la créativité des réponses
 - Modifier le message système pour changer le comportement de l'assistant
 

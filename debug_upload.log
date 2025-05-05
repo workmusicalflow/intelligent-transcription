@@ -4,23 +4,22 @@ Array
         (
             [audio_file] => Array
                 (
-                    [name] => 20250207_135159.mp4
-                    [full_path] => 20250207_135159.mp4
-                    [type] => video/mp4
-                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpGMkcTh
+                    [name] => WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
+                    [full_path] => WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
+                    [type] => audio/ogg
+                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpHSgc5R
                     [error] => 0
-                    [size] => 63183637
+                    [size] => 213140
                 )
 
         )
 
     [POST] => Array
         (
-            [language] => auto
-            [force_language] => on
+            [language] => fr
         )
 
-    [upload_max_filesize] => 100M
-    [post_max_size] => 100M
+    [upload_max_filesize] => 2M
+    [post_max_size] => 8M
     [max_file_uploads] => 20
 )

@@ -15,8 +15,16 @@ from openai import OpenAI
 from typing_extensions import override
 from openai import AssistantEventHandler
 
-# Charger les variables d'environnement depuis .env
-load_dotenv()
+# Charger les variables d'environnement depuis différents emplacements possibles
+env_paths = [
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))), 'inteligent-transcription-env', '.env'),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+]
+
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        break
 
 # Vérifier si la clé API OpenAI est configurée
 if not os.getenv("OPENAI_API_KEY"):
@@ -42,7 +50,7 @@ IMPORTANT: Tu dois toujours paraphraser dans la même langue que le texte origin
 Si le texte est en français, ta réponse doit être en français.
 Si le texte est en anglais, ta réponse doit être en anglais.
 Ne traduis jamais le texte dans une autre langue.""",
-            model="gpt-4o",
+            model="gpt-4.1-nano",
         )
         paraphraser_assistant_id = assistant.id
         print(f"Nouvel assistant créé avec l'ID: {paraphraser_assistant_id}")

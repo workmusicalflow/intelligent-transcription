@@ -1,0 +1,235 @@
+{% extends "base/layout.twig" %}
+
+{% block title %}Conversation Analytics{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Conversation Analytics</h1>
+        <a href="/conversation/{{ conversation.id }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+            View Conversation
+        </a>
+    </div>
+    
+    <!-- Conversation Info -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">{{ conversation.title }}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="border rounded p-3">
+                <div class="text-sm text-gray-600">Messages</div>
+                <div class="text-2xl font-bold">{{ conversation.message_count }}</div>
+            </div>
+            <div class="border rounded p-3">
+                <div class="text-sm text-gray-600">Summarized Messages</div>
+                <div class="text-2xl font-bold">{{ conversation.summarized_count }}</div>
+            </div>
+            <div class="border rounded p-3">
+                <div class="text-sm text-gray-600">Total Tokens</div>
+                <div class="text-2xl font-bold">{{ conversation.total_tokens|number_format }}</div>
+            </div>
+            <div class="border rounded p-3">
+                <div class="text-sm text-gray-600">Created</div>
+                <div class="text-lg font-bold">{{ conversation.created_at|date('d M Y') }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cache Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Cache Hit Rate Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Cache Hit Rate</h2>
+            <div class="flex items-end">
+                <span class="text-4xl font-bold text-indigo-600">{{ conversation.cache_hit_rate_formatted }}</span>
+                <span class="text-sm text-gray-500 ml-2 mb-1">of requests</span>
+            </div>
+            <div class="mt-2 text-sm text-gray-600">
+                {{ conversation.cache_hit_count }} hits / {{ conversation.cache_miss_count }} misses
+            </div>
+            <div class="mt-2 text-xs text-gray-500">
+                Last cache hit: {{ conversation.last_cache_hit ? conversation.last_cache_hit|date('d M Y H:i:s') : 'Never' }}
+            </div>
+        </div>
+        
+        <!-- Tokens Saved Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Tokens Saved</h2>
+            <div class="flex items-end">
+                <span class="text-4xl font-bold text-green-600">{{ conversation.cache_analytics.tokens_saved|number_format }}</span>
+                <span class="text-sm text-gray-500 ml-2 mb-1">tokens</span>
+            </div>
+            <div class="mt-2 text-sm text-gray-600">
+                Estimated savings: {{ conversation.cache_analytics.estimated_cost_saved_formatted }}
+            </div>
+        </div>
+        
+        <!-- Response Time Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Response Times</h2>
+            <div class="flex flex-col">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Cache Hit:</span>
+                    <span class="text-lg font-bold text-indigo-600">{{ conversation.cache_analytics.avg_hit_response_time|round(1) }} ms</span>
+                </div>
+                <div class="flex items-center justify-between mt-1">
+                    <span class="text-sm text-gray-600">Cache Miss:</span>
+                    <span class="text-lg font-bold text-red-600">{{ conversation.cache_analytics.avg_miss_response_time|round(1) }} ms</span>
+                </div>
+                {% if conversation.cache_analytics.avg_miss_response_time > 0 and conversation.cache_analytics.avg_hit_response_time > 0 %}
+                <div class="text-xs text-gray-500 mt-2">
+                    Response time improvement: {{ ((conversation.cache_analytics.avg_miss_response_time - conversation.cache_analytics.avg_hit_response_time) / conversation.cache_analytics.avg_miss_response_time * 100)|round(1) }}%
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Conversation Timeline -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Conversation Timeline</h2>
+        
+        {% if conversation.cache_analytics.timeline|length > 0 %}
+            <canvas id="timelineChart" width="800" height="300"></canvas>
+        {% else %}
+            <div class="text-center text-gray-500 py-8">
+                No timeline data available
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Message Analysis -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Message Analysis</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="py-2 px-4 text-left">Timestamp</th>
+                        <th class="py-2 px-4 text-left">Role</th>
+                        <th class="py-2 px-4 text-right">Tokens</th>
+                        <th class="py-2 px-4 text-center">Summarized</th>
+                        <th class="py-2 px-4 text-left">Preview</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for message in conversation.messages %}
+                    <tr class="{{ message.role == 'user' ? 'bg-blue-50' : 'bg-green-50' }}">
+                        <td class="py-2 px-4 text-sm">{{ message.created_at|date('d M H:i:s') }}</td>
+                        <td class="py-2 px-4 font-medium">{{ message.role|capitalize }}</td>
+                        <td class="py-2 px-4 text-right">{{ message.token_count|number_format }}</td>
+                        <td class="py-2 px-4 text-center">
+                            {% if message.is_summarized %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Summary
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-4 text-sm text-gray-600">
+                            {{ message.content|slice(0, 50) }}{% if message.content|length > 50 %}...{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Cache Management</h2>
+        <div class="flex space-x-4">
+            <a href="/cache/clear/{{ conversation.id }}" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded" onclick="return confirm('Are you sure you want to clear the cache for this conversation?')">
+                Clear Cache
+            </a>
+            <a href="/conversation/{{ conversation.id }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+                View Messages
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if conversation.cache_analytics.timeline|length > 0 %}
+        // Timeline data
+        const timeline = {{ conversation.cache_analytics.timeline|json_encode|raw }};
+        
+        const timestamps = timeline.map(item => new Date(item.created_at).toLocaleString());
+        const responseTimes = timeline.map(item => item.response_time_ms);
+        const cacheHits = timeline.map(item => item.is_cache_hit == 1);
+        
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: 'Response Time (ms)',
+                    data: responseTimes,
+                    backgroundColor: function(context) {
+                        const index = context.dataIndex;
+                        return cacheHits[index] ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+                    },
+                    borderColor: function(context) {
+                        const index = context.dataIndex;
+                        return cacheHits[index] ? 'rgb(16, 185, 129)' : 'rgb(239, 68, 68)';
+                    },
+                    borderWidth: 2,
+                    pointRadius: 6,
+                    pointBackgroundColor: function(context) {
+                        const index = context.dataIndex;
+                        return cacheHits[index] ? 'rgb(16, 185, 129)' : 'rgb(239, 68, 68)';
+                    },
+                    pointStyle: function(context) {
+                        const index = context.dataIndex;
+                        return cacheHits[index] ? 'circle' : 'triangle';
+                    },
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Response Time Timeline (Green = Cache Hit, Red = Cache Miss)'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const index = context.dataIndex;
+                                const hitStatus = cacheHits[index] ? 'Cache Hit' : 'Cache Miss';
+                                const time = context.parsed.y + ' ms';
+                                return [hitStatus, time];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Response Time (ms)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}

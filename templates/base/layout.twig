@@ -17,9 +17,37 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <ul class="hidden md:flex space-x-4" id="main-menu">
+            <ul class="hidden md:flex space-x-4 items-center" id="main-menu">
                 <li><a href="{{ url('index.php') }}" class="hover:text-blue-300 transition-colors {% if active_page == 'home' %}text-blue-300{% endif %}">Accueil</a></li>
                 <li><a href="{{ url('index.php', {'action': 'chat'}) }}" class="hover:text-blue-300 transition-colors {% if active_page == 'chat' %}text-blue-300{% endif %}">Chat</a></li>
+                <li><a href="{{ url('analytics.php') }}" class="hover:text-blue-300 transition-colors {% if active_page == 'analytics' %}text-blue-300{% endif %}">Analytics</a></li>
+                
+                {% if is_authenticated %}
+                    <li class="ml-6 relative group">
+                        <button class="flex items-center hover:text-blue-300 transition-colors focus:outline-none">
+                            <span class="mr-1">{{ current_user.username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                            <a href="{{ url('profile.php') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mon profil</a>
+                            
+                            {% if current_user.is_admin %}
+                                <a href="{{ url('admin.php') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Administration</a>
+                            {% endif %}
+                            
+                            <div class="border-t border-gray-100"></div>
+                            <a href="{{ url('login.php', {'action': 'logout'}) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Déconnexion</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="ml-6">
+                        <a href="{{ url('login.php') }}" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors">
+                            Connexion
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -27,6 +55,27 @@
         <ul class="flex flex-col space-y-2 px-4 pb-4">
             <li><a href="{{ url('index.php') }}" class="block py-2 hover:text-blue-300 {% if active_page == 'home' %}text-blue-300{% endif %}">Accueil</a></li>
             <li><a href="{{ url('index.php', {'action': 'chat'}) }}" class="block py-2 hover:text-blue-300 {% if active_page == 'chat' %}text-blue-300{% endif %}">Chat</a></li>
+            <li><a href="{{ url('analytics.php') }}" class="block py-2 hover:text-blue-300 {% if active_page == 'analytics' %}text-blue-300{% endif %}">Analytics</a></li>
+            
+            {% if is_authenticated %}
+                <li class="border-t border-gray-700 mt-2 pt-2">
+                    <a href="{{ url('profile.php') }}" class="block py-2 hover:text-blue-300">Mon profil</a>
+                </li>
+                
+                {% if current_user.is_admin %}
+                    <li>
+                        <a href="{{ url('admin.php') }}" class="block py-2 hover:text-blue-300">Administration</a>
+                    </li>
+                {% endif %}
+                
+                <li>
+                    <a href="{{ url('login.php', {'action': 'logout'}) }}" class="block py-2 hover:text-blue-300">Déconnexion</a>
+                </li>
+            {% else %}
+                <li class="border-t border-gray-700 mt-2 pt-2">
+                    <a href="{{ url('login.php') }}" class="block py-2 hover:text-blue-300">Connexion</a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>

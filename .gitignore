@@ -1,0 +1,41 @@
+# Environment and configuration
+.env
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Uploads and results directories (user-generated content)
+uploads/
+temp_audio/
+results/
+exports/
+logs/
+cache/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Debug logs
+*.log
+debug_*.log
+
+# Temporary files
+*.tmp
+*.bak

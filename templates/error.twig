@@ -1,0 +1,21 @@
+{% extends "base/layout.twig" %}
+
+{% block title %}Erreur{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+        <h1 class="text-2xl font-bold mb-4">Une erreur est survenue</h1>
+        <p>{{ error }}</p>
+    </div>
+    
+    <div class="flex space-x-4 mt-6">
+        <a href="javascript:history.back()" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded">
+            Retour à la page précédente
+        </a>
+        <a href="/" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+            Retour à l'accueil
+        </a>
+    </div>
+</div>
+{% endblock %}

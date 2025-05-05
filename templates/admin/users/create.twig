@@ -1,0 +1,111 @@
+{% extends "base/layout.twig" %}
+
+{% block title %}Créer un Utilisateur - {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Créer un Utilisateur</h1>
+        <a href="{{ url('admin.php', {'controller': 'user'}) }}" 
+           class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Retour à la liste
+        </a>
+    </div>
+    
+    {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+    
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <form method="post" action="{{ url('admin.php', {'controller': 'user', 'action': 'store'}) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">
+                        Nom d'utilisateur <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="username" name="username" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
+                        Email <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="email" name="email" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                </div>
+                
+                <div>
+                    <label for="first_name" class="block text-gray-700 text-sm font-bold mb-2">
+                        Prénom
+                    </label>
+                    <input type="text" id="first_name" name="first_name" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                
+                <div>
+                    <label for="last_name" class="block text-gray-700 text-sm font-bold mb-2">
+                        Nom
+                    </label>
+                    <input type="text" id="last_name" name="last_name" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+                        Mot de passe <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" id="password" name="password" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Au moins 8 caractères</p>
+                </div>
+                
+                <div class="flex items-center">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_admin" value="1" class="mr-2">
+                        <span class="text-gray-700">Administrateur</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="block text-gray-700 font-bold mb-2">Permissions</h3>
+                <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                    <p class="text-sm text-gray-600 mb-3">Les administrateurs ont automatiquement toutes les permissions.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="permissions[]" value="transcriptions.own" class="mr-2" checked>
+                            <span class="text-gray-700">Accès à ses propres transcriptions</span>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="checkbox" name="permissions[]" value="transcriptions.all" class="mr-2">
+                            <span class="text-gray-700">Accès à toutes les transcriptions</span>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="checkbox" name="permissions[]" value="users.view" class="mr-2">
+                            <span class="text-gray-700">Voir la liste des utilisateurs</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end">
+                <button type="submit" 
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Créer l'utilisateur
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

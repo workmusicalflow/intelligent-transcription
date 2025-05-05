@@ -1,118 +1,152 @@
-# Application de Transcription Audio
+# Intelligent Transcription
 
-Une application simple et efficace pour transcrire des fichiers audio et vidéo en texte en utilisant l'API OpenAI Whisper.
+A powerful application for transcribing audio and video files to text with smart paraphrasing and contextual chat capabilities, powered by OpenAI.
 
-## Fonctionnalités
+## 📋 Overview
 
-- Téléchargement de fichiers audio et vidéo
-- Transcription précise grâce à l'API OpenAI Whisper
-- Paraphrase des transcriptions avec l'API OpenAI GPT
-- Chat contextuel pour interagir avec le contenu transcrit
-- Support pour de nombreuses langues
-- Interface simple et intuitive
-- Téléchargement des résultats en format texte
+Intelligent Transcription helps you convert spoken content from audio files, video files, and YouTube videos into accurate text transcriptions. It also offers advanced features like AI-powered paraphrasing to improve readability and contextual chat to interact with the transcribed content.
 
-## Prérequis
+### Key Features
 
-- PHP 8.1 ou supérieur
-- Python 3.9 ou supérieur
-- Une clé API OpenAI valide
+- 🎵 **Audio/Video Transcription**: Upload files and get accurate text transcriptions
+- 📺 **YouTube Integration**: Transcribe content directly from YouTube URLs (including Shorts)
+- 🌍 **Multi-language Support**: Automatic language detection and translation options
+- ✍️ **Smart Paraphrasing**: Improve clarity with AI-powered reformulation
+- 💬 **Contextual Chat**: Ask questions about the transcribed content
+- 📥 **Export Options**: Download transcriptions and conversation histories
 
-## Installation
+## 🚀 Quick Start
 
-1. Clonez ce dépôt ou téléchargez les fichiers
+### Prerequisites
+- PHP 8.1 or higher
+- Python 3.9 or higher
+- SQLite3 support for PHP
+- OpenAI API key
+- Video Download API key (for YouTube functionality)
 
-2. Configurez votre clé API OpenAI dans le fichier `.env` :
+### Installation
 
+1. **Clone the repository**:
+   ```bash
+   git clone https://your-repository-url.git
+   cd intelligent-transcription
    ```
-   OPENAI_API_KEY=votre_clé_api_openai
+
+2. **Create and configure .env file**:
+   ```
+   OPENAI_API_KEY=your_openai_api_key
+   VIDEO_DOWNLOAD_API_KEY=your_video_download_api_key
    ```
 
-3. Exécutez le script d'installation pour configurer l'environnement Python :
-
+3. **Run the setup script**:
    ```bash
    ./setup_env.sh
    ```
 
-4. Démarrez un serveur PHP local avec le fichier php.ini personnalisé :
+4. **Initialize the database**:
+   ```bash
+   php migrate.php
+   ```
 
+5. **Start the server**:
    ```bash
    php -S localhost:8000 -c php.ini
    ```
 
-5. Accédez à l'application dans votre navigateur :
-   ```
-   http://localhost:8000
-   ```
+6. **Access the application**:
+   Open your browser and go to `http://localhost:8000`
 
-## Structure du projet
+## 📚 Documentation
 
-- `index.php` - Page d'accueil avec formulaire de téléchargement
-- `transcribe.php` - Script de traitement de la transcription
-- `result.php` - Page d'affichage des résultats
-- `download.php` - Script de téléchargement du résultat en TXT
-- `config.php` - Configuration (clés API, chemins, etc.)
-- `utils.php` - Fonctions utilitaires
-- `transcribe.py` - Script Python pour la transcription avec OpenAI Whisper
-- `setup_env.sh` - Script d'installation de l'environnement Python
-- `chat.php` - Interface de chat contextuel
-- `chat_api.php` - API pour interagir avec OpenAI pour le chat
-- `context_manager.php` - Gestionnaire de contexte pour le chat
-- `CHAT_CONTEXTUEL.md` - Documentation de la fonctionnalité de chat
-- `uploads/` - Stockage des fichiers audio téléchargés
-- `results/` - Stockage des résultats de transcription
-- `exports/` - Stockage des exports d'historique de chat
-- `assets/` - Ressources CSS et JavaScript
-- `venv/` - Environnement virtuel Python (créé par setup_env.sh)
+Our comprehensive documentation covers all aspects of the application:
 
-## Utilisation
+- [**Detailed Project Overview**](docs/README.md) - Complete features, setup, and usage guide
+- [**Backend Architecture**](docs/architecture.md) - Backend components and data flow diagrams
+- [**API Documentation**](docs/api.md) - Internal and external API endpoints
+- [**Frontend Architecture**](docs/frontend.md) - UI components and frontend design
+- [**Database Integration**](docs/database.md) - SQLite database schema and implementation
+- [**User Workflows**](docs/workflows.md) - Common usage patterns with sequence diagrams
+- [**Contribution Guidelines**](docs/contributing.md) - How to contribute to the project
 
-1. Accédez à la page d'accueil
-2. Téléchargez un fichier audio ou vidéo
-3. Sélectionnez la langue du fichier (ou laissez en détection automatique)
-4. Cliquez sur "Transcrire"
-5. Attendez que la transcription soit terminée
-6. Consultez le résultat et téléchargez-le si nécessaire
-7. Pour interagir avec le contenu transcrit, cliquez sur "Discuter avec l'assistant"
-8. Posez des questions sur le contenu transcrit et obtenez des réponses contextuelles
-9. Exportez l'historique de conversation si nécessaire
+## 📊 Project Structure
 
-Pour plus de détails sur la fonctionnalité de chat, consultez [CHAT_CONTEXTUEL.md](CHAT_CONTEXTUEL.md).
+The application follows a modified MVC architecture:
 
-## Langues supportées
+```
+/
+├── assets/                # CSS and JavaScript files
+├── database/              # SQLite database files
+├── docs/                  # Project documentation
+├── results/               # Transcription results (JSON)
+├── src/                   # Application source code
+│   ├── Controllers/       # Request handlers
+│   ├── Database/          # Database management
+│   ├── Services/          # Business logic
+│   ├── Utils/             # Helper functions
+│   └── Template/          # Template management
+├── templates/             # Twig templates
+├── uploads/               # Uploaded files
+├── temp_audio/            # Preprocessed audio
+├── config.php             # Configuration file
+├── migrate.php            # Database migration script
+├── transcribe.py          # Python transcription script
+├── paraphrase.py          # Python paraphrasing script
+└── setup_env.sh           # Environment setup script
+```
 
-- Français
-- Anglais
-- Espagnol
-- Allemand
-- Italien
-- Portugais
-- Russe
-- Chinois
-- Japonais
-- Arabe
-- Et bien d'autres...
+## 🔍 Usage Examples
 
-## Limitations
+### File Transcription
+1. Go to the homepage
+2. Upload an audio/video file
+3. Select language options
+4. Click "Transcribe"
+5. View and download the transcription
 
-- Taille maximale des fichiers : 100 MB
-- Formats supportés : MP3, WAV, MP4, AVI, MOV, etc.
+### YouTube Transcription
+1. Go to the homepage
+2. Enter a YouTube URL
+3. Select language options
+4. Click "Transcribe YouTube"
+5. View and download the transcription
 
-## Dépannage
+### Using Contextual Chat
+1. After transcription, click "Chat with Assistant"
+2. Ask questions about the transcribed content
+3. Get AI-powered responses based on the context
+4. Export the conversation if needed
 
-Si vous rencontrez des problèmes :
+## ⚠️ Limitations
 
-1. Vérifiez que votre clé API OpenAI est valide
-2. Assurez-vous que Python et PHP sont correctement installés
-3. Vérifiez que l'environnement virtuel a été correctement configuré
-4. Consultez les logs pour plus d'informations
+- Maximum file size: 100MB
+- Supported formats: MP3, WAV, MP4, AVI, MOV, etc.
+- API rate limits may apply
 
-## Développement futur
+## 🔧 Troubleshooting
 
-- Ajout d'un système de cache pour éviter de retranscrire les mêmes fichiers
-- Implémentation d'un traitement asynchrone pour les fichiers volumineux
-- Ajout de fonctionnalités de traduction
-- Amélioration de l'interface utilisateur
-- Persistance des conversations de chat dans une base de données
-- Interface AJAX pour le chat avec streaming des réponses en temps réel
-- Personnalisation des modèles et paramètres pour le chat contextuel
+If you encounter issues:
+
+- Check API keys in your .env file
+- Verify Python environment setup
+- Check debug logs for detailed error information
+- Ensure file permissions are correct for upload directories
+
+## 🔮 Future Development
+
+- User authentication system
+- Advanced file management
+- Real-time streaming responses
+- Batch processing
+- Additional language options
+- Data migration utilities
+- Multi-user support
+
+## 📝 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgements
+
+- OpenAI for the powerful AI models
+- Loader.to for YouTube download functionality
+- All contributors to the project

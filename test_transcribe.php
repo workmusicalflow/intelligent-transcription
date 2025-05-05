@@ -9,7 +9,7 @@ require_once 'config.php';
 require_once 'utils.php';
 
 // Chemin vers un fichier audio de test
-$testFile = __DIR__ . '/uploads/audio_67dcdc120718d_20250207_135159.mp4';
+$testFile = __DIR__ . '/uploads/audio_6813d6d11b58d_hMirZ5dwUSo.mp3';
 
 // Vérifier si le fichier existe
 if (!file_exists($testFile)) {

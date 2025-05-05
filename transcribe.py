@@ -11,19 +11,27 @@ import json
 import argparse
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement depuis .env
-load_dotenv()
+# Charger les variables d'environnement depuis différents emplacements possibles
+env_paths = [
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))), 'inteligent-transcription-env', '.env'),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+]
 
-# Vérifier si la clé API OpenAI est configurée
-if not os.getenv("OPENAI_API_KEY"):
-    print(json.dumps({
-        "success": False,
-        "error": "La clé API OpenAI n'est pas configurée dans le fichier .env"
-    }))
-    sys.exit(1)
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        break
 
+# Importer et configurer OpenAI
 try:
     import openai
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    if not openai.api_key:
+        print(json.dumps({
+            "success": False,
+            "error": "La clé API OpenAI n'est pas configurée dans le fichier .env"
+        }))
+        sys.exit(1)
 except ImportError:
     print(json.dumps({
         "success": False,
@@ -72,7 +80,7 @@ def transcribe_audio(file_path, language=None, force_language=False):
                 # Utiliser l'API OpenAI pour traduire le texte dans la langue spécifiée
                 try:
                     translation_response = client.chat.completions.create(
-                        model="gpt-3.5-turbo",
+                        model="gpt-4.1-nano",
                         messages=[
                             {"role": "system", "content": f"Tu es un traducteur professionnel. Traduis le texte suivant en {language}, en conservant le style et le ton."},
                             {"role": "user", "content": transcribed_text}

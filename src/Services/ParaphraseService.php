@@ -17,13 +17,43 @@ class ParaphraseService
      */
     public function paraphraseText($text, $style = 'standard', $language = 'fr')
     {
-        // Vérifier si le texte est vide
-        if (empty($text)) {
+        // Valider le texte à paraphraser
+        $textValidation = \Utils\ValidationUtils::validateTextMessage($text, [
+            'min_length' => 10,  // Minimum 10 caractères pour une paraphrase sensée
+            'max_length' => 20000,  // Maximum 20000 caractères pour éviter les abus
+            'strip_tags' => true
+        ]);
+        
+        if (!$textValidation['valid']) {
             return [
                 'success' => false,
-                'error' => 'Le texte à paraphraser est vide'
+                'error' => $textValidation['error'],
+                'category' => 'validation',
+                'advice' => 'Le texte doit contenir entre 10 et 20000 caractères pour être paraphrasé correctement.'
             ];
         }
+        
+        // Récupérer le texte nettoyé
+        $text = $textValidation['sanitized'];
+        
+        // Valider les paramètres de paraphrase
+        $paramsValidation = \Utils\ValidationUtils::validateParaphraseParams([
+            'style' => $style,
+            'language' => $language
+        ]);
+        
+        if (!$paramsValidation['valid']) {
+            return [
+                'success' => false,
+                'error' => $paramsValidation['error'],
+                'category' => 'validation',
+                'advice' => 'Veuillez vérifier les paramètres de paraphrase fournis.'
+            ];
+        }
+        
+        // Récupérer les paramètres validés
+        $style = $paramsValidation['sanitized']['style'];
+        $language = $paramsValidation['sanitized']['language'];
 
         // Exécuter le script Python de paraphrase
         $pythonPath = PYTHON_PATH;
@@ -43,62 +73,24 @@ class ParaphraseService
             '--style=' . escapeshellarg($style) . ' ' .
             '--language=' . escapeshellarg($language);
 
-        // Exécuter la commande et capturer la sortie standard et d'erreur
-        $descriptorspec = array(
-            0 => array("pipe", "r"),  // stdin
-            1 => array("pipe", "w"),  // stdout
-            2 => array("pipe", "w")   // stderr
-        );
-
-        $process = proc_open($command, $descriptorspec, $pipes);
-
-        if (!is_resource($process)) {
-            // Nettoyer les fichiers temporaires
-            @unlink($inputFile);
-            @unlink($outputFile);
-
-            return [
-                'success' => false,
-                'error' => "Impossible de démarrer le processus de paraphrase"
-            ];
-        }
-
-        // Lire la sortie standard
-        $output = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-
-        // Lire la sortie d'erreur
-        $error_output = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-
-        // Fermer le processus
-        $return_value = proc_close($process);
-
-        // Enregistrer les informations de débogage
-        $debug_info = [
-            'command' => $command,
-            'output' => $output,
-            'error_output' => $error_output,
-            'return_value' => $return_value
-        ];
-        file_put_contents(BASE_DIR . '/debug_paraphrase.log', print_r($debug_info, true));
-
-        // Lire le résultat
-        $result = [];
-        if (file_exists($outputFile)) {
-            $resultContent = file_get_contents($outputFile);
-            $result = json_decode($resultContent, true);
-        }
-
+        // Utiliser notre utilitaire d'exécution Python
+        $result = \Utils\PythonErrorUtils::executePythonProcess($command, 'paraphrase', $outputFile);
+        
         // Nettoyer les fichiers temporaires
         @unlink($inputFile);
         @unlink($outputFile);
-
-        if (!$result || !isset($result['success']) || !$result['success']) {
-            return [
-                'success' => false,
-                'error' => $result['error'] ?? 'Erreur inconnue lors de la paraphrase'
-            ];
+        
+        // Si l'opération a échoué, retourner l'erreur avec des informations utiles
+        if (!isset($result['success']) || !$result['success']) {
+            // Pour les erreurs de paraphrase, ajouter des conseils spécifiques
+            if (!isset($result['advice'])) {
+                if (mb_strlen($text) > 10000) {
+                    $result['advice'] = "Le texte est peut-être trop long. Essayez de le diviser en sections plus petites.";
+                } else {
+                    $result['advice'] = "Essayez un style de paraphrase différent ou reformulez certaines parties du texte.";
+                }
+            }
+            return $result;
         }
 
         return $result;
