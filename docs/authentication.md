@@ -1,190 +1,278 @@
-# Système d'Authentification
+# Authentication System Documentation
 
-Ce document décrit l'implémentation du système d'authentification et de gestion des utilisateurs dans l'application Intelligent Transcription.
+## Overview
 
-## Vue d'ensemble
+The Intelligent Transcription system includes a complete user authentication system that provides:
 
-Le système d'authentification permet de sécuriser l'application avec les fonctionnalités suivantes :
+- User accounts with secure password storage
+- Role-based access control
+- Session management with "Remember Me" functionality
+- Integration with transcription data
+- Admin user management interface
+- CSRF protection
+- Secure HTTP-only cookies
 
-- Authentification des utilisateurs par nom d'utilisateur/mot de passe
-- Sessions persistantes avec option "Se souvenir de moi"
-- Gestion des utilisateurs (création, édition, suppression)
-- Système de permissions flexible
-- Interface d'administration
-- Protection des routes et ressources
+## Setup
 
-## Architecture
+### Installation
 
-Le système d'authentification suit le modèle MVC et se compose des éléments suivants :
+To install the authentication system:
 
-### Base de données
+1. Run the installation script:
+   ```bash
+   php install_auth.php
+   ```
 
-Les tables suivantes sont utilisées pour l'authentification :
+2. This creates:
+   - All authentication database tables
+   - A default admin user
+   - Required indexes and relations
 
-- `users` : Stocke les informations des utilisateurs
-- `user_sessions` : Gère les sessions utilisateur actives
-- `password_reset_tokens` : Stocke les tokens de réinitialisation de mot de passe
-- `user_permissions` : Gère les permissions associées aux utilisateurs
+3. Default admin credentials:
+   - Username: `admin`
+   - Password: `admin123`
 
-### Modèles
+> ⚠️ **Important:** Change the default admin password after first login!
 
-- `User` : Gère les opérations CRUD sur les utilisateurs, la gestion des permissions et l'authentification
+### Troubleshooting Installation
 
-### Services
+If you encounter errors during installation:
 
-- `AuthService` : Service centralisé pour l'authentification, la gestion des sessions et les contrôles d'accès
+1. Run the cleanup script to remove temporary tables:
+   ```bash
+   php cleanup_temp_tables.php
+   ```
 
-### Contrôleurs
+2. Then run the installation script again:
+   ```bash
+   php install_auth.php
+   ```
 
-- `AuthController` : Gère la connexion, déconnexion, réinitialisation de mot de passe et profil utilisateur
-- `UserController` : Gère la création, édition et suppression des utilisateurs (admin uniquement)
+## User Management
 
-### Templates
+### User Roles and Permissions
 
-- `auth/login.twig` : Formulaire de connexion
-- `auth/profile.twig` : Page de profil utilisateur
-- `auth/password_reset.twig` : Formulaire de réinitialisation de mot de passe
-- `admin/users/index.twig` : Liste des utilisateurs (admin)
-- `admin/users/create.twig` : Création d'utilisateur (admin)
-- `admin/users/edit.twig` : Édition d'utilisateur (admin)
+The system includes the following permission types:
 
-## Installation
+| Permission | Description |
+|------------|-------------|
+| `admin.access` | General admin access |
+| `users.manage` | Ability to create and manage users |
+| `users.view` | View users list |
+| `transcriptions.own` | Access to own transcriptions only |
+| `transcriptions.all` | Access to all transcriptions |
 
-Pour installer le système d'authentification, exécutez le script `update_auth_schema.php` qui va créer les tables nécessaires dans la base de données SQLite :
+Admin users automatically have all permissions.
 
-```bash
-php update_auth_schema.php
+### User Administration
+
+Administrator users can:
+
+1. Create new users at `/admin.php?controller=user&action=create`
+2. Edit existing users at `/admin.php?controller=user&action=edit&id={user_id}`
+3. Delete users at `/admin.php?controller=user&action=delete&id={user_id}`
+4. Assign permissions to users
+
+Regular users have access to:
+1. Their own profile at `/profile.php`
+2. Their own transcriptions
+
+## File Structure
+
+### Key Components
+
+- **Entry Points:**
+  - `/login.php` - Login form and authentication
+  - `/profile.php` - User profile management
+  - `/admin.php` - Admin interface
+
+- **Controllers:**
+  - `src/Controllers/AuthController.php` - Authentication logic
+  - `src/Controllers/UserController.php` - User management
+
+- **Models:**
+  - `src/Models/User.php` - User data model
+
+- **Services:**
+  - `src/Services/AuthService.php` - Session and authentication
+
+- **Database:**
+  - `src/Database/auth_schema.sql` - Database schema
+  - `src/Database/DatabaseManager.php` - Database connection
+
+- **Templates:**
+  - `templates/auth/login.twig` - Login form
+  - `templates/auth/profile.twig` - Profile management
+  - `templates/admin/users/` - User administration templates
+
+## Integration with Transcription System
+
+The authentication system integrates with the transcription system through the following mechanisms:
+
+1. **User Association:** All transcriptions are associated with the user who created them via the `user_id` field.
+
+2. **Permission-Based Access:** Users can only view their own transcriptions unless they have admin privileges or the `transcriptions.all` permission.
+
+3. **Controller Integration:** The `TranscriptionController` checks for authentication and passes the user ID to the transcription service.
+
+4. **Service Integration:** The `TranscriptionService` stores and filters transcriptions by user ID based on authentication status.
+
+5. **Global Twig Variables:** Templates automatically receive authentication-related variables:
+   - `is_authenticated`: Indicates if a user is logged in
+   - `is_admin`: Indicates if the current user is an admin
+   - `current_user`: Data for the current user
+
+## Technical Implementation
+
+### Database Schema
+
+**Users Table:**
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
+    is_active BOOLEAN DEFAULT 1,
+    is_admin BOOLEAN DEFAULT 0
+);
 ```
 
-Ce script crée également un utilisateur administrateur par défaut :
-- **Nom d'utilisateur** : admin
-- **Mot de passe** : admin123
+**User Sessions Table:**
+```sql
+CREATE TABLE user_sessions (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    ip_address TEXT NOT NULL,
+    user_agent TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 
-**Important** : Changez le mot de passe administrateur par défaut après la première connexion !
+**User Permissions Table:**
+```sql
+CREATE TABLE user_permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    permission TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, permission)
+);
+```
 
-## Utilisation
+**Password Reset Tokens Table:**
+```sql
+CREATE TABLE password_reset_tokens (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    token TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 
-### Connexion/Déconnexion
+### Security Features
 
-Les utilisateurs accèdent à la page de connexion via `/login.php`. Après l'authentification, ils sont redirigés vers le tableau de bord ou la page demandée.
+1. **Password Hashing:** All passwords are hashed using PHP's `password_hash()` function with the `PASSWORD_BCRYPT` algorithm.
 
-La déconnexion s'effectue via `/login.php?action=logout`.
+2. **CSRF Protection:** All forms include a CSRF token that is verified on submission to prevent cross-site request forgery attacks.
 
-### Gestion du profil
+3. **Secure Sessions:** Sessions are managed with secure, HTTP-only cookies and session data is also stored in the database.
 
-Les utilisateurs peuvent modifier leur profil et changer leur mot de passe via `/profile.php`.
+4. **Remember Me Functionality:** Users can choose to stay logged in with a secure, expiring token.
 
-### Administration des utilisateurs
+5. **Input Validation:** All user inputs are validated and sanitized to prevent SQL injection and other attacks.
 
-Les administrateurs peuvent gérer les utilisateurs via `/admin.php?controller=user` qui permet de :
+6. **Automatic Cleanup:** Expired sessions and tokens are automatically cleaned up.
 
-- Lister tous les utilisateurs
-- Créer de nouveaux utilisateurs
-- Modifier les informations et permissions des utilisateurs
-- Activer/désactiver des comptes utilisateur
-- Supprimer des utilisateurs
+## Usage in Code
 
-## Système de permissions
+### Authentication Checks
 
-Le système implémente un modèle de permissions flexible. Les permissions par défaut sont :
-
-- `admin.access` : Accès au panneau d'administration
-- `users.manage` : Gestion des utilisateurs
-- `users.view` : Affichage de la liste des utilisateurs
-- `transcriptions.own` : Accès à ses propres transcriptions
-- `transcriptions.all` : Accès à toutes les transcriptions
-
-Les administrateurs ont automatiquement toutes les permissions.
-
-### Vérification des permissions
-
-Dans le code, les permissions sont vérifiées via `AuthService` :
+To require authentication in a controller:
 
 ```php
-// Vérifier si l'utilisateur est connecté
-if (AuthService::isAuthenticated()) {
-    // Vérifier si l'utilisateur est admin
-    if (AuthService::isAdmin()) {
-        // Code pour les admins
-    }
-    
-    // Vérifier une permission spécifique
-    if (AuthService::hasPermission('transcriptions.all')) {
-        // Code pour les utilisateurs ayant cette permission
-    }
-}
+// Initialize authentication
+AuthService::init();
 
-// Exiger l'authentification (redirection si non connecté)
+// Require authentication
 AuthService::requireAuth();
 
-// Exiger une permission spécifique
-AuthService::requirePermission('admin.access');
+// Get current user
+$user = AuthService::getCurrentUser();
+$userId = $user->getId();
 ```
 
-## Sécurité
+### Permission Checks
 
-Le système d'authentification intègre plusieurs mesures de sécurité :
+To check for specific permissions:
 
-### Stockage des mots de passe
+```php
+// Check if user has admin access
+if (AuthService::hasPermission('admin.access')) {
+    // Show admin features
+}
 
-Les mots de passe sont hachés avec l'algorithme bcrypt (via `password_hash()`) avant d'être stockés dans la base de données.
+// Require specific permission
+AuthService::requirePermission('users.manage');
+```
 
-### Protection CSRF
+### User Association
 
-Toutes les actions de modification (connexion, modification de profil, gestion des utilisateurs) sont protégées contre les attaques CSRF par un token généré à chaque session.
+To associate data with the current user:
 
-### Session sécurisée
+```php
+// Get user ID if authenticated
+$userId = null;
+if (AuthService::isAuthenticated()) {
+    $userId = AuthService::getCurrentUser()->getId();
+}
 
-Les paramètres de session sont configurés pour utiliser des cookies sécurisés (httpOnly, secure). Les sessions sont également stockées en base de données, permettant une invalidation à distance.
+// Store data with user ID
+$result = $service->storeData($data, $userId);
+```
 
-### Option "Se souvenir de moi"
+## Customization
 
-L'option "Se souvenir de moi" utilise un token unique stocké dans un cookie pour permettre la reconnexion automatique. Ce token est régénéré à chaque utilisation pour prévenir les attaques de vol de session.
+### Adding New Permissions
 
-### Nettoyage automatique
+1. Define the new permission string (e.g., `transcriptions.export`)
 
-Les sessions et tokens expirés sont automatiquement nettoyés du système.
+2. Add the permission to a user:
+   ```php
+   User::addPermission($userId, 'transcriptions.export');
+   ```
 
-## Intégration avec l'application existante
+3. Check for the permission in your code:
+   ```php
+   if (AuthService::hasPermission('transcriptions.export')) {
+       // Allow export functionality
+   }
+   ```
 
-Le système d'authentification est intégré à l'application existante via les mécanismes suivants :
+### Password Policy Customization
 
-### Middleware d'authentification
+Password requirements (minimum length, complexity, etc.) can be modified in the `ValidationUtils` class and the authentication controllers.
 
-`AuthService::init()` est appelé au début de chaque point d'entrée pour initialiser l'authentification.
+## Future Enhancements
 
-### Variables Twig globales
+Potential future enhancements to the authentication system:
 
-Les templates Twig reçoivent automatiquement les variables d'authentification suivantes :
-
-- `is_authenticated` : Indique si l'utilisateur est connecté
-- `is_admin` : Indique si l'utilisateur est administrateur
-- `current_user` : Données de l'utilisateur connecté
-
-### Association des ressources
-
-Les transcriptions, conversations et paraphrases sont associées à l'utilisateur qui les a créées via la colonne `user_id` dans les tables correspondantes.
-
-## Personnalisation
-
-### Ajout de nouvelles permissions
-
-Pour ajouter de nouvelles permissions :
-
-1. Ajoutez la permission dans l'interface utilisateur (formulaire d'édition)
-2. Implémentez la vérification de permission dans les contrôleurs concernés
-
-### Modification des exigences de mot de passe
-
-Les exigences de mot de passe (longueur minimale, complexité, etc.) peuvent être modifiées dans `ValidationUtils` et les contrôleurs d'authentification.
-
-## Limitations et développements futurs
-
-Fonctionnalités qui pourraient être ajoutées à l'avenir :
-
-- Authentification à deux facteurs (2FA)
-- Intégration OAuth pour connexion via services tiers
-- Groupes d'utilisateurs avec permissions par groupe
-- Expiration et historique des mots de passe
-- Journalisation complète des activités utilisateur
-- Implémentation de throttling (limitation des tentatives de connexion)
+- Two-factor authentication (2FA)
+- OAuth integration for third-party login
+- User groups with group-based permissions
+- Password expiration and history
+- Comprehensive activity logging
+- Login attempt throttling for security

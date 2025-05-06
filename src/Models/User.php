@@ -68,9 +68,10 @@ class User
      * Find a user by ID
      * 
      * @param int $id User ID
+     * @param bool $loadPermissions Whether to load permissions (default: true)
      * @return User|null User object or null if not found
      */
-    public static function findById($id)
+    public static function findById($id, $loadPermissions = true)
     {
         try {
             $sql = "SELECT * FROM users WHERE id = :id LIMIT 1";
@@ -81,7 +82,7 @@ class User
                 return null;
             }
             
-            return self::createFromArray($userData);
+            return self::createFromArray($userData, $loadPermissions);
         } catch (\Exception $e) {
             error_log("Error finding user by ID: " . $e->getMessage());
             return null;
@@ -92,9 +93,10 @@ class User
      * Find a user by username
      * 
      * @param string $username Username
+     * @param bool $loadPermissions Whether to load permissions (default: true)
      * @return User|null User object or null if not found
      */
-    public static function findByUsername($username)
+    public static function findByUsername($username, $loadPermissions = true)
     {
         try {
             $sql = "SELECT * FROM users WHERE username = :username LIMIT 1";
@@ -105,7 +107,7 @@ class User
                 return null;
             }
             
-            return self::createFromArray($userData);
+            return self::createFromArray($userData, $loadPermissions);
         } catch (\Exception $e) {
             error_log("Error finding user by username: " . $e->getMessage());
             return null;
@@ -116,9 +118,10 @@ class User
      * Find a user by email
      * 
      * @param string $email Email address
+     * @param bool $loadPermissions Whether to load permissions (default: true)
      * @return User|null User object or null if not found
      */
-    public static function findByEmail($email)
+    public static function findByEmail($email, $loadPermissions = true)
     {
         try {
             $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
@@ -129,7 +132,7 @@ class User
                 return null;
             }
             
-            return self::createFromArray($userData);
+            return self::createFromArray($userData, $loadPermissions);
         } catch (\Exception $e) {
             error_log("Error finding user by email: " . $e->getMessage());
             return null;
@@ -397,12 +400,17 @@ class User
     public static function hasPermission($userId, $permission)
     {
         try {
+            // First check if user is admin directly from database
+            $sql = "SELECT is_admin FROM users WHERE id = :user_id LIMIT 1";
+            $stmt = DatabaseManager::query($sql, [':user_id' => $userId]);
+            $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
             // Admin users have all permissions
-            $user = self::findById($userId);
-            if ($user && $user->isAdmin()) {
+            if ($userData && (bool)$userData['is_admin']) {
                 return true;
             }
             
+            // Check for specific permission
             $sql = "SELECT COUNT(*) as count FROM user_permissions 
                     WHERE user_id = :user_id AND permission = :permission";
             $stmt = DatabaseManager::query($sql, [
@@ -419,12 +427,12 @@ class User
     }
     
     /**
-     * Get all permissions for a user
+     * Load permissions directly from database (avoids recursion)
      * 
      * @param int $userId User ID
      * @return array Array of permissions
      */
-    public static function getPermissions($userId)
+    private static function loadPermissionsFromDb($userId)
     {
         try {
             $sql = "SELECT permission FROM user_permissions WHERE user_id = :user_id";
@@ -436,8 +444,12 @@ class User
             }
             
             // Add all permissions for admin users
-            $user = self::findById($userId);
-            if ($user && $user->isAdmin()) {
+            // Check if user is admin directly from database
+            $sql = "SELECT is_admin FROM users WHERE id = :user_id LIMIT 1";
+            $stmt = DatabaseManager::query($sql, [':user_id' => $userId]);
+            $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($userData && (bool)$userData['is_admin']) {
                 $permissions = array_merge($permissions, [
                     'admin.access',
                     'users.manage',
@@ -446,6 +458,23 @@ class User
             }
             
             return array_unique($permissions);
+        } catch (\Exception $e) {
+            error_log("Error loading permissions from DB: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Get all permissions for a user
+     * 
+     * @param int $userId User ID
+     * @return array Array of permissions
+     */
+    public static function getPermissions($userId)
+    {
+        try {
+            // Use the direct database method to avoid recursion
+            return self::loadPermissionsFromDb($userId);
         } catch (\Exception $e) {
             error_log("Error getting permissions: " . $e->getMessage());
             return [];
@@ -487,9 +516,10 @@ class User
      * Create a User object from database row
      * 
      * @param array $userData User data from database
+     * @param bool $loadPermissions Whether to load permissions (default: true)
      * @return User User object
      */
-    private static function createFromArray($userData)
+    private static function createFromArray($userData, $loadPermissions = true)
     {
         $user = new self();
         $user->id = (int) $userData['id'];
@@ -503,8 +533,12 @@ class User
         $user->updatedAt = $userData['updated_at'];
         $user->lastLogin = $userData['last_login'];
         
-        // Load permissions
-        $user->permissions = self::getPermissions($user->id);
+        // Load permissions (but avoid recursion)
+        if ($loadPermissions) {
+            $user->permissions = self::loadPermissionsFromDb($user->id);
+        } else {
+            $user->permissions = [];
+        }
         
         return $user;
     }
@@ -620,11 +654,11 @@ class User
     }
     
     /**
-     * Get user permissions
+     * Get permissions for the current user instance
      * 
      * @return array User permissions
      */
-    public function getPermissions()
+    public function getUserPermissions()
     {
         return $this->permissions;
     }
@@ -635,7 +669,7 @@ class User
      * @param string $permission Permission name
      * @return bool True if user has permission
      */
-    public function hasPermission($permission)
+    public function checkUserPermission($permission)
     {
         return $this->isAdmin || in_array($permission, $this->permissions);
     }
@@ -658,7 +692,7 @@ class User
             'is_admin' => $this->isAdmin,
             'is_active' => $this->isActive,
             'created_at' => $this->createdAt,
-            'permissions' => $this->permissions,
+            'permissions' => $this->getUserPermissions(),
         ];
         
         if ($includePrivate) {

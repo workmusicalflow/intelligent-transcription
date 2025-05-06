@@ -70,6 +70,13 @@ switch ($controller) {
         
     case 'dashboard':
     default:
+        // Set active admin page for dashboard view
+        $activeAdminPage = $controller === 'dashboard' ? 'dashboard' : ($controller === 'user' ? 'users' : $controller);
+        
+        // Pass the active page to the template context
+        $twig = \Template\TwigManager::getInstance();
+        $twig->addGlobal('active_admin_page', $activeAdminPage);
+        
         // Redirect to user management for now (could be a dashboard in the future)
         header('Location: admin.php?controller=user');
         exit;

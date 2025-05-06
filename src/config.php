@@ -12,7 +12,18 @@ define('UPLOAD_DIR', BASE_DIR . '/uploads');
 define('TEMP_AUDIO_DIR', BASE_DIR . '/temp_audio');
 define('RESULT_DIR', BASE_DIR . '/results');
 define('EXPORT_DIR', BASE_DIR . '/exports');
+define('CACHE_DIR', BASE_DIR . '/cache');
 define('DB_PATH', BASE_DIR . '/database/transcription.db');
+
+// Base URL for the application (default to current directory)
+if (!defined('BASE_URL')) {
+    // Try to determine the base URL automatically
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    $baseUrl = $protocol . $host . ($scriptDir === '/' ? '' : $scriptDir);
+    define('BASE_URL', $baseUrl);
+}
 
 // Chemins environnement
 define('ENV_DIR', dirname(BASE_DIR)); // Dossier parent pour les fichiers d'environnement

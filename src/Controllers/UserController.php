@@ -163,7 +163,7 @@ class UserController
         }
         
         // Get user permissions
-        $permissions = $user->getPermissions();
+        $permissions = $user->getUserPermissions();
         
         // Render user edit form
         return $this->twig->render('admin/users/edit.twig', [

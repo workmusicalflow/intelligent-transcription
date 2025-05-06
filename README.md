@@ -13,6 +13,7 @@ Intelligent Transcription helps you convert spoken content from audio files, vid
 - 🌍 **Multi-language Support**: Automatic language detection and translation options
 - ✍️ **Smart Paraphrasing**: Improve clarity with AI-powered reformulation
 - 💬 **Contextual Chat**: Ask questions about the transcribed content
+- 🔐 **User Authentication**: Secure account management with role-based access control
 - 📥 **Export Options**: Download transcriptions and conversation histories
 
 ## 🚀 Quick Start
@@ -48,12 +49,18 @@ Intelligent Transcription helps you convert spoken content from audio files, vid
    php migrate.php
    ```
 
-5. **Start the server**:
+5. **Install authentication system**:
+   ```bash
+   php install_auth.php
+   ```
+   This creates an admin user with username `admin` and password `admin123`.
+
+6. **Start the server**:
    ```bash
    php -S localhost:8000 -c php.ini
    ```
 
-6. **Access the application**:
+7. **Access the application**:
    Open your browser and go to `http://localhost:8000`
 
 ## 📚 Documentation
@@ -61,6 +68,7 @@ Intelligent Transcription helps you convert spoken content from audio files, vid
 Our comprehensive documentation covers all aspects of the application:
 
 - [**Detailed Project Overview**](docs/README.md) - Complete features, setup, and usage guide
+- [**Authentication System**](docs/authentication.md) - User management and access control
 - [**Backend Architecture**](docs/architecture.md) - Backend components and data flow diagrams
 - [**API Documentation**](docs/api.md) - Internal and external API endpoints
 - [**Frontend Architecture**](docs/frontend.md) - UI components and frontend design
@@ -133,13 +141,13 @@ If you encounter issues:
 
 ## 🔮 Future Development
 
-- User authentication system
-- Advanced file management
+- Enhanced user profile management
+- Advanced file management and sharing
 - Real-time streaming responses
 - Batch processing
 - Additional language options
 - Data migration utilities
-- Multi-user support
+- User groups and team collaboration
 
 ## 📝 License
 

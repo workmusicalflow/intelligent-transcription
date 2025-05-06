@@ -46,6 +46,9 @@ class AuthController
         // Get redirect URL
         $redirectUrl = isset($_GET['redirect']) ? $_GET['redirect'] : '/dashboard';
         
+        // Log debug information
+        error_log("Showing login form with GET params: " . json_encode($_GET));
+        
         // Render login template
         return $this->twig->render('auth/login.twig', [
             'csrf_token' => AuthService::getCsrfToken(),

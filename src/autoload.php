@@ -3,26 +3,47 @@
 /**
  * Autoloader pour charger automatiquement les classes
  */
+
+// Load Composer's autoloader first (for external dependencies like Twig)
+$composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+if (file_exists($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
+// Then register our custom autoloader for application classes
 spl_autoload_register(function ($class) {
-    // Convertir le namespace en chemin de fichier
-    $prefix = '';
-    $baseDir = __DIR__ . '/';
-
-    // Vérifier si la classe utilise le préfixe
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // Non, passer au prochain autoloader enregistré
-        return;
+    // Only try to autoload classes we expect to be in our application
+    // Add additional namespaces here as needed
+    $supportedNamespaces = [
+        'Controllers\\',
+        'Database\\',
+        'Middleware\\',
+        'Models\\',
+        'Services\\',
+        'Template\\',
+        'Utils\\'
+    ];
+    
+    $namespaceFound = false;
+    foreach ($supportedNamespaces as $namespace) {
+        if (strpos($class, $namespace) === 0) {
+            $namespaceFound = true;
+            break;
+        }
     }
-
-    // Obtenir le chemin relatif de la classe
-    $relativeClass = substr($class, $len);
-
-    // Remplacer les namespace par des séparateurs de répertoire
-    // Ajouter .php à la fin
-    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-
-    // Si le fichier existe, le charger
+    
+    if (!$namespaceFound) {
+        return; // Not our namespace, let the next autoloader handle it
+    }
+    
+    // Base directory for the application
+    $baseDir = __DIR__ . '/';
+    
+    // Replace namespace separators with directory separators
+    // Add .php to the end
+    $file = $baseDir . str_replace('\\', '/', $class) . '.php';
+    
+    // If the file exists, load it
     if (file_exists($file)) {
         require $file;
     }

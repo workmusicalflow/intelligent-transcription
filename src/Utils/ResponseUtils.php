@@ -55,18 +55,33 @@ class ResponseUtils
     }
 
     /**
-     * Redirige vers la page d'accueil avec un message d'erreur
+     * Redirige vers la page spécifiée avec un message d'erreur
      * 
-     * @param string $code Code d'erreur
-     * @param string|null $message Message d'erreur supplémentaire
+     * @param string $page Page de destination (sans l'extension .php)
+     * @param string $message Message d'erreur
      * @return void
      */
-    public static function redirectWithError($code, $message = null)
+    public static function redirectWithError($page, $message = null)
     {
-        $url = 'index.php?error=' . urlencode($code);
-        if ($message) {
-            $url .= '&message=' . urlencode($message);
+        error_log("Redirecting with error - Page: $page, Message: $message");
+        
+        $url = $page;
+        
+        // Ajouter .php si la page ne contient pas déjà .php ou /
+        if (strpos($page, '.php') === false && strpos($page, '/') === false) {
+            $url = $page . '.php';
         }
+        
+        // Gestion spéciale pour la page de login
+        if ($page === 'login') {
+            $url = 'login.php?action=login';
+        }
+        
+        // Ajouter le message d'erreur comme paramètre
+        $url .= (strpos($url, '?') === false) ? '?' : '&';
+        $url .= 'error=' . urlencode($message ?: 'Une erreur est survenue');
+        
+        error_log("Final redirect URL: $url");
         self::redirect($url);
     }
 
@@ -110,5 +125,36 @@ class ResponseUtils
     {
         $data['success'] = true;
         self::jsonResponse($data);
+    }
+    
+    /**
+     * Redirige vers la page spécifiée avec un message de succès
+     * 
+     * @param string $page Page de destination (sans l'extension .php)
+     * @param string $message Message de succès
+     * @return void
+     */
+    public static function redirectWithSuccess($page, $message = null)
+    {
+        error_log("Redirecting with success - Page: $page, Message: $message");
+        
+        $url = $page;
+        
+        // Ajouter .php si la page ne contient pas déjà .php ou /
+        if (strpos($page, '.php') === false && strpos($page, '/') === false) {
+            $url = $page . '.php';
+        }
+        
+        // Gestion spéciale pour la page de login
+        if ($page === 'login') {
+            $url = 'login.php?action=login';
+        }
+        
+        // Ajouter le message de succès comme paramètre
+        $url .= (strpos($url, '?') === false) ? '?' : '&';
+        $url .= 'success=' . urlencode($message ?: 'Opération réussie');
+        
+        error_log("Final redirect URL: $url");
+        self::redirect($url);
     }
 }

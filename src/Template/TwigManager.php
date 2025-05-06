@@ -2,6 +2,9 @@
 
 namespace Template;
 
+// Include config.php to ensure constants are defined
+require_once dirname(__DIR__, 2) . '/config.php';
+
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
@@ -20,7 +23,7 @@ class TwigManager
      * @return Environment
      */
     public static function getInstance(
-        string $templatesDir = TEMPLATES_DIR,
+        string $templatesDir = __DIR__ . '/../../templates', // Hardcode relative path to templates directory
         bool $useCache = false,
         ?string $cacheDir = null
     ): Environment {
@@ -29,10 +32,10 @@ class TwigManager
 
             $options = [];
             if ($useCache) {
-                $options['cache'] = $cacheDir ?: \CACHE_DIR;
+                $options['cache'] = $cacheDir ?: (defined('CACHE_DIR') ? \CACHE_DIR : sys_get_temp_dir()); // Access global constant
             }
-            $options['debug'] = \DEBUG_MODE;
-            $options['auto_reload'] = \DEBUG_MODE;
+            $options['debug'] = defined('DEBUG_MODE') ? \DEBUG_MODE : false; // Access global constant
+            $options['auto_reload'] = defined('DEBUG_MODE') ? \DEBUG_MODE : false; // Access global constant
 
             self::$instance = new Environment($loader, $options);
 
@@ -67,33 +70,35 @@ class TwigManager
         // Ajouter certaines constantes de l'application
         self::addGlobal('app_name', 'Transcription Audio');
         self::addGlobal('app_version', '1.0.0');
-        self::addGlobal('base_url', \BASE_URL ?? '');
-        self::addGlobal('is_debug', \DEBUG_MODE);
-        
+        self::addGlobal('base_url', defined('BASE_URL') ? BASE_URL : '');
+        self::addGlobal('is_debug', defined('DEBUG_MODE') ? DEBUG_MODE : false);
+
         // Ajouter des informations d'authentification
         if (class_exists('\\Services\\AuthService')) {
             // Initialize authentication if not already done
             if (method_exists('\\Services\\AuthService', 'init')) {
                 \Services\AuthService::init();
             }
-            
+
             // Add authentication globals
-            self::addGlobal('is_authenticated', method_exists('\\Services\\AuthService', 'isAuthenticated') 
-                ? \Services\AuthService::isAuthenticated() 
+            self::addGlobal('is_authenticated', method_exists('\\Services\\AuthService', 'isAuthenticated')
+                ? \Services\AuthService::isAuthenticated()
                 : false);
-                
-            self::addGlobal('is_admin', method_exists('\\Services\\AuthService', 'isAdmin') 
-                ? \Services\AuthService::isAdmin() 
+
+            self::addGlobal('is_admin', method_exists('\\Services\\AuthService', 'isAdmin')
+                ? \Services\AuthService::isAdmin()
                 : false);
-            
+
             // Add current user if authenticated
-            if (method_exists('\\Services\\AuthService', 'isAuthenticated') && 
+            if (
+                method_exists('\\Services\\AuthService', 'isAuthenticated') &&
                 \Services\AuthService::isAuthenticated() &&
-                method_exists('\\Services\\AuthService', 'getCurrentUser')) {
-                    
+                method_exists('\\Services\\AuthService', 'getCurrentUser')
+            ) {
+
                 $currentUser = \Services\AuthService::getCurrentUser();
-                self::addGlobal('current_user', method_exists($currentUser, 'toArray') 
-                    ? $currentUser->toArray() 
+                self::addGlobal('current_user', method_exists($currentUser, 'toArray')
+                    ? $currentUser->toArray()
                     : []);
             }
         }

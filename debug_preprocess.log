@@ -1,10 +1,10 @@
 Array
 (
-    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68190db68ccc6_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
+    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
     [output] => {
   "success": true,
-  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68190db68ccc6_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
-  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68190db68ccc6_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
+  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
+  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
   "original_size_mb": 0.20326614379882812,
   "new_size_mb": 0.20326614379882812,
   "message": "Le fichier est d\u00e9j\u00e0 plus petit que la taille cible"
@@ -13,8 +13,8 @@ Array
     [result] => Array
         (
             [success] => 1
-            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68190db68ccc6_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
-            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68190db68ccc6_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
+            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
+            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
             [original_size_mb] => 0.20326614379883
             [new_size_mb] => 0.20326614379883
             [message] => Le fichier est déjà plus petit que la taille cible

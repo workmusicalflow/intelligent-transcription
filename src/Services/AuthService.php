@@ -83,6 +83,9 @@ class AuthService
     public static function authenticate($usernameOrEmail, $password, $remember = false)
     {
         try {
+            // Debugging
+            error_log("Authentication attempt: Username/Email: $usernameOrEmail");
+            
             // Check if input is email or username
             $isEmail = filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL);
             
@@ -91,8 +94,11 @@ class AuthService
                 ? User::findByEmail($usernameOrEmail)
                 : User::findByUsername($usernameOrEmail);
             
-            // Check if user exists
-            if (!$user) {
+            // Debugging - check if user was found
+            if ($user) {
+                error_log("User found with ID: " . $user->getId());
+            } else {
+                error_log("User not found for: $usernameOrEmail");
                 return [
                     'success' => false,
                     'message' => 'Nom d\'utilisateur ou mot de passe incorrect.'
@@ -101,6 +107,7 @@ class AuthService
             
             // Check if user is active
             if (!$user->isActive()) {
+                error_log("User is not active: " . $user->getId());
                 return [
                     'success' => false,
                     'message' => 'Ce compte a été désactivé. Veuillez contacter l\'administrateur.'
@@ -112,8 +119,20 @@ class AuthService
             $stmt = DatabaseManager::query($sql, [':id' => $user->getId()]);
             $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
             
-            // Verify password
-            if (!$userData || !User::verifyPassword($password, $userData['password_hash'])) {
+            // Debugging - log password hash details
+            if ($userData) {
+                error_log("Password hash found for user: " . $user->getId());
+                $passwordVerified = User::verifyPassword($password, $userData['password_hash']);
+                error_log("Password verification result: " . ($passwordVerified ? 'Success' : 'Failed'));
+                
+                if (!$passwordVerified) {
+                    return [
+                        'success' => false,
+                        'message' => 'Nom d\'utilisateur ou mot de passe incorrect.'
+                    ];
+                }
+            } else {
+                error_log("No password hash found for user: " . $user->getId());
                 return [
                     'success' => false,
                     'message' => 'Nom d\'utilisateur ou mot de passe incorrect.'
@@ -121,6 +140,7 @@ class AuthService
             }
             
             // Set as authenticated user
+            error_log("Authentication successful for user ID: " . $user->getId());
             self::$currentUser = $user;
             $_SESSION[self::SESSION_USER_KEY] = $user->getId();
             
@@ -236,7 +256,7 @@ class AuthService
      */
     public static function hasPermission($permission)
     {
-        return self::isAuthenticated() && self::$currentUser->hasPermission($permission);
+        return self::isAuthenticated() && self::$currentUser->checkUserPermission($permission);
     }
     
     /**
