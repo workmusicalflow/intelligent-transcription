@@ -253,6 +253,340 @@ revenue:
 
 ---
 
+## 🏗️ Architecture Technique et Patterns
+
+### 🎯 Principes Architecturaux
+
+#### Architecture Hexagonale (Ports & Adapters)
+```
+src/
+├── Domain/              # Cœur métier - Entités, Value Objects, Interfaces
+│   ├── Transcription/
+│   ├── Chat/
+│   └── Analytics/
+├── Application/         # Use Cases - Orchestration métier
+│   ├── Commands/
+│   ├── Queries/
+│   └── Services/
+└── Infrastructure/      # Implémentations techniques
+    ├── Persistence/
+    ├── API/
+    └── External/
+```
+
+#### Principes SOLID Appliqués
+
+**S - Single Responsibility**
+```php
+// ✅ Bon : Une responsabilité claire
+class TranscriptionProcessor {
+    public function process(AudioFile $file): Transcription {}
+}
+
+// ❌ Mauvais : Multiples responsabilités
+class TranscriptionService {
+    public function upload() {}
+    public function process() {}
+    public function store() {}
+    public function notify() {}
+}
+```
+
+**O - Open/Closed**
+```php
+interface CacheStrategy {
+    public function cache(string $key, $value): void;
+    public function get(string $key);
+}
+
+class RedisCacheStrategy implements CacheStrategy {}
+class FileCacheStrategy implements CacheStrategy {}
+class OpenAICacheStrategy implements CacheStrategy {}
+```
+
+**L - Liskov Substitution**
+```php
+abstract class Prompt {
+    abstract public function getContent(): string;
+    abstract public function getTokenCount(): int;
+}
+
+class CachablePrompt extends Prompt {
+    public function getContent(): string {
+        return $this->ensureMinimumTokens($this->content);
+    }
+}
+```
+
+**I - Interface Segregation**
+```php
+interface Transcriber {
+    public function transcribe(AudioFile $file): Transcription;
+}
+
+interface TranslationCapable {
+    public function translate(string $text, string $targetLang): string;
+}
+
+class WhisperTranscriber implements Transcriber, TranslationCapable {}
+```
+
+**D - Dependency Inversion**
+```php
+// Domain layer
+interface TranscriptionRepository {
+    public function save(Transcription $transcription): void;
+    public function findById(TranscriptionId $id): ?Transcription;
+}
+
+// Infrastructure layer
+class SQLiteTranscriptionRepository implements TranscriptionRepository {
+    public function __construct(private Connection $db) {}
+}
+```
+
+### 🛠️ Stack Technique Cible
+
+#### Frontend (Migration Progressive)
+```typescript
+// Vue 3 + Composition API + TypeScript
+interface TranscriptionState {
+  transcriptions: Transcription[]
+  loading: boolean
+  error: string | null
+}
+
+// Composables pour logique réutilisable
+export function useTranscription() {
+  const state = reactive<TranscriptionState>({
+    transcriptions: [],
+    loading: false,
+    error: null
+  })
+  
+  const fetchTranscriptions = async () => {
+    // GraphQL query ou REST API
+  }
+  
+  return { state, fetchTranscriptions }
+}
+```
+
+#### Backend Architecture
+
+**1. Domain Layer (Cœur Métier)**
+```php
+namespace Domain\Transcription;
+
+final class Transcription {
+    private function __construct(
+        private TranscriptionId $id,
+        private AudioFile $source,
+        private TranscribedText $text,
+        private Language $language,
+        private CreatedAt $createdAt
+    ) {}
+    
+    public static function create(
+        AudioFile $source,
+        TranscribedText $text,
+        Language $language
+    ): self {
+        return new self(
+            TranscriptionId::generate(),
+            $source,
+            $text,
+            $language,
+            CreatedAt::now()
+        );
+    }
+}
+```
+
+**2. Application Layer (Use Cases)**
+```php
+namespace Application\Transcription;
+
+final class TranscribeAudioCommand {
+    public function __construct(
+        public readonly string $audioPath,
+        public readonly ?string $language,
+        public readonly bool $forceTranslation
+    ) {}
+}
+
+final class TranscribeAudioHandler {
+    public function __construct(
+        private TranscriberInterface $transcriber,
+        private TranscriptionRepository $repository,
+        private EventDispatcher $dispatcher
+    ) {}
+    
+    public function handle(TranscribeAudioCommand $command): TranscriptionId {
+        $audioFile = AudioFile::fromPath($command->audioPath);
+        $result = $this->transcriber->transcribe($audioFile);
+        
+        $transcription = Transcription::create(
+            $audioFile,
+            $result->text,
+            $result->detectedLanguage
+        );
+        
+        $this->repository->save($transcription);
+        $this->dispatcher->dispatch(new TranscriptionCreated($transcription));
+        
+        return $transcription->id();
+    }
+}
+```
+
+**3. Infrastructure Layer**
+```php
+namespace Infrastructure\API\GraphQL;
+
+use GraphQL\Attribute\Query;
+use GraphQL\Attribute\Mutation;
+
+class TranscriptionResolver {
+    public function __construct(
+        private QueryBus $queryBus,
+        private CommandBus $commandBus
+    ) {}
+    
+    #[Query]
+    public function transcription(string $id): ?Transcription {
+        return $this->queryBus->ask(new FindTranscriptionQuery($id));
+    }
+    
+    #[Mutation]
+    public function transcribeAudio(string $audioPath): TranscriptionResult {
+        $id = $this->commandBus->dispatch(
+            new TranscribeAudioCommand($audioPath)
+        );
+        return new TranscriptionResult($id, 'processing');
+    }
+}
+```
+
+### 📐 Patterns d'Implémentation
+
+#### Repository Pattern avec Specification
+```php
+interface Specification {
+    public function isSatisfiedBy($candidate): bool;
+    public function and(Specification $other): Specification;
+    public function or(Specification $other): Specification;
+}
+
+class LanguageSpecification implements Specification {
+    public function __construct(private Language $language) {}
+    
+    public function isSatisfiedBy($transcription): bool {
+        return $transcription->language()->equals($this->language);
+    }
+}
+
+// Usage
+$frenchTranscriptions = $repository->findAll(
+    new LanguageSpecification(Language::FRENCH)
+);
+```
+
+#### Event Sourcing Light
+```php
+abstract class DomainEvent {
+    public function __construct(
+        public readonly string $aggregateId,
+        public readonly DateTimeImmutable $occurredAt
+    ) {}
+}
+
+class TranscriptionCompleted extends DomainEvent {
+    public function __construct(
+        string $transcriptionId,
+        public readonly int $duration,
+        public readonly int $wordCount
+    ) {
+        parent::__construct($transcriptionId, new DateTimeImmutable());
+    }
+}
+```
+
+#### Strategy Pattern pour les Providers
+```php
+interface TranscriptionProvider {
+    public function supports(AudioFile $file): bool;
+    public function transcribe(AudioFile $file): TranscriptionResult;
+}
+
+class WhisperProvider implements TranscriptionProvider {}
+class GoogleSpeechProvider implements TranscriptionProvider {}
+
+class TranscriptionProviderChain {
+    /** @var TranscriptionProvider[] */
+    private array $providers;
+    
+    public function transcribe(AudioFile $file): TranscriptionResult {
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($file)) {
+                return $provider->transcribe($file);
+            }
+        }
+        throw new NoSuitableProviderException();
+    }
+}
+```
+
+### 🔄 Migration Progressive
+
+#### Phase 1 : Backend (3-4 semaines)
+1. Créer la structure Domain/Application/Infrastructure
+2. Migrer les Services vers des Use Cases
+3. Implémenter les Repository interfaces
+4. Ajouter PHP-DI pour l'injection de dépendances
+
+#### Phase 2 : API Layer (2-3 semaines)
+1. Installer GraphQLite
+2. Créer les Resolvers GraphQL
+3. Maintenir les endpoints REST existants
+4. Documenter avec GraphQL Playground
+
+#### Phase 3 : Frontend (4-6 semaines)
+1. Introduire Vue 3 progressivement
+2. Créer des composants Quasar
+3. Migrer vers TypeScript
+4. Implémenter Apollo Client
+
+### 📊 Métriques de Qualité
+
+```yaml
+code_quality:
+  cyclomatic_complexity: < 10
+  method_length: < 20 lines
+  class_length: < 200 lines
+  coupling: < 5 dependencies
+  
+testing:
+  unit_coverage: > 80%
+  integration_coverage: > 60%
+  mutation_score: > 70%
+  
+performance:
+  response_time_p99: < 200ms
+  memory_usage: < 128MB
+  database_queries: < 10 per request
+```
+
+### 🚀 Bénéfices de l'Architecture
+
+1. **Testabilité** : Tests unitaires sans dépendances externes
+2. **Évolutivité** : Ajout de features sans toucher au core
+3. **Maintenabilité** : Code organisé et prévisible
+4. **Performance** : Optimisations ciblées par layer
+5. **Flexibilité** : Changement de technologies sans refonte
+
+---
+
 ## 🎯 Prochaines Actions Immédiates
 
 1. **Semaine 1**
@@ -289,6 +623,7 @@ revenue:
 
 **🔗 Documents Associés**
 - [Architecture Technique](docs/architecture.md)
+- [Clean Architecture Guide](docs/clean-architecture-guide.md)
 - [Guide Prompt Caching](docs/prompt-caching-guide.md)
 - [API Documentation](docs/api.md)
 - [Security Guidelines](docs/security.md)
