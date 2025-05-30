@@ -11,6 +11,7 @@ import argparse
 import openai
 import logging
 from datetime import datetime
+from openai_cache_utils import extract_cache_metrics, log_cache_performance
 
 # Setup logging
 logging.basicConfig(
@@ -20,33 +21,47 @@ logging.basicConfig(
 )
 
 def setup_api_key():
-    """Get OpenAI API key from environment"""
+    """Get OpenAI API key and organization ID from environment"""
     # Try to get from config file first
     try:
         config_path = os.path.join(os.path.dirname(__file__), 'config.php')
         with open(config_path, 'r') as f:
             config_content = f.read()
-            # Extract API key using a simple pattern match
+            # Extract API key and org ID using pattern match
             import re
-            match = re.search(r"define\('OPENAI_API_KEY',\s*'([^']+)'\)", config_content)
-            if match:
-                api_key = match.group(1)
+            api_match = re.search(r"define\('OPENAI_API_KEY',\s*'([^']+)'\)", config_content)
+            org_match = re.search(r"define\('OPENAI_ORG_ID',\s*'([^']+)'\)", config_content)
+            
+            if api_match:
+                api_key = api_match.group(1)
                 openai.api_key = api_key
+                
+                # Set organization ID if found
+                if org_match:
+                    org_id = org_match.group(1)
+                    openai.organization = org_id
+                    logging.info(f"Using OpenAI Organization ID: {org_id}")
+                
                 return True
     except Exception as e:
         logging.error(f"Error reading config file: {e}")
     
     # Fallback to environment variable
     api_key = os.environ.get('OPENAI_API_KEY')
+    org_id = os.environ.get('OPENAI_ORG_ID')
+    
     if api_key:
         openai.api_key = api_key
+        if org_id:
+            openai.organization = org_id
+            logging.info(f"Using OpenAI Organization ID from env: {org_id}")
         return True
     
     logging.error("No API key found")
     return False
 
-def send_chat_request(messages, model="gpt-3.5-turbo"):
-    """Send a request to OpenAI chat API"""
+def send_chat_request(messages, model="gpt-4o-mini"):
+    """Send a request to OpenAI chat API with cache metrics tracking"""
     try:
         logging.info(f"Sending chat request with {len(messages)} messages")
         response = openai.chat.completions.create(
@@ -55,14 +70,18 @@ def send_chat_request(messages, model="gpt-3.5-turbo"):
             temperature=0.7,
             max_tokens=1000
         )
+        
+        # Extract cache metrics using utility function
+        cache_metrics = extract_cache_metrics(response)
+        
+        # Log cache performance
+        log_cache_performance(cache_metrics, context=f"model={model}")
+        
         return {
             "success": True,
             "response": response.choices[0].message.content,
-            "usage": {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens
-            }
+            "usage": cache_metrics,
+            "model": model
         }
     except Exception as e:
         logging.error(f"Error in OpenAI API request: {e}")
@@ -71,7 +90,7 @@ def send_chat_request(messages, model="gpt-3.5-turbo"):
             "error": str(e)
         }
 
-def process_chat(message_file, context_file, output_file, model="gpt-3.5-turbo"):
+def process_chat(message_file, context_file, output_file, model="gpt-4o-mini"):
     """Process chat request using provided message and context"""
     try:
         # Read user message
@@ -104,7 +123,7 @@ def process_chat(message_file, context_file, output_file, model="gpt-3.5-turbo")
             json.dump(result, f)
         return result
 
-def process_summarization(context_file, output_file, model="gpt-3.5-turbo"):
+def process_summarization(context_file, output_file, model="gpt-4o-mini"):
     """Summarize conversation messages"""
     try:
         # Read context (messages to summarize)
@@ -138,7 +157,7 @@ def main():
     parser.add_argument('--message', type=str, help='Path to message file')
     parser.add_argument('--context', type=str, required=True, help='Path to context file')
     parser.add_argument('--output', type=str, required=True, help='Path to output file')
-    parser.add_argument('--model', type=str, default="gpt-3.5-turbo", help='OpenAI model to use')
+    parser.add_argument('--model', type=str, default="gpt-4o-mini", help='OpenAI model to use')
     parser.add_argument('--summarize', type=str, default="false", help='Set to "true" for summarization mode')
     
     args = parser.parse_args()

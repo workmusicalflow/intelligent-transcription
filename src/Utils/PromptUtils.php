@@ -3,6 +3,7 @@
 namespace Utils;
 
 use Database\DatabaseManager;
+use App\Services\PromptCacheManager;
 
 /**
  * Utility class for managing and optimizing prompts
@@ -15,37 +16,37 @@ class PromptUtils
      * @var array
      */
     private static $defaultPrompts = [
-        'chat' => "You are a helpful AI assistant specialized in discussing transcribed content. You have access to a transcription that the user wants to discuss. Your responses should be:
-1. Relevant to the transcription content
-2. Accurate and factual
-3. Concise and clear
-4. Helpful in providing insights about the content
+        'chat' => "Tu es un assistant IA serviable spécialisé dans la discussion de contenu transcrit. Tu as accès à une transcription que l'utilisateur souhaite discuter. Tes réponses doivent être :
+1. Pertinentes par rapport au contenu de la transcription
+2. Exactes et factuelles
+3. Concises et claires
+4. Utiles pour fournir des insights sur le contenu
 
-If asked about something not in the transcription, politely explain that you can only discuss what's in the provided transcript. Don't make up information that isn't in the transcript.
+Si on te demande quelque chose qui n'est pas dans la transcription, explique poliment que tu ne peux discuter que de ce qui est dans la transcription fournie. N'invente pas d'informations qui ne sont pas dans la transcription.
 
-The following is the transcription content that we'll be discussing:
+Voici le contenu de la transcription dont nous allons discuter :
 ",
-        'summarize' => "You are an expert at summarizing conversations. Your task is to create a concise summary of the conversation history provided. Focus on:
-1. The main topics discussed
-2. Key questions asked
-3. Important information provided
-4. Any decisions or conclusions reached
+        'summarize' => "Tu es un expert en résumé de conversations. Ta tâche est de créer un résumé concis de l'historique de conversation fourni. Concentre-toi sur :
+1. Les principaux sujets discutés
+2. Les questions clés posées
+3. Les informations importantes fournies
+4. Les décisions ou conclusions atteintes
 
-Keep your summary clear, accurate, and focused on the most important points. The summary should capture the essence of the conversation without including unnecessary details.
+Garde ton résumé clair, précis et concentré sur les points les plus importants. Le résumé doit capturer l'essence de la conversation sans inclure de détails inutiles.
 
-Here is the conversation to summarize:
+Voici la conversation à résumer :
 ",
-        'paraphrase' => "You are an expert at improving and clarifying text while preserving its original meaning.
-Your task is to rewrite the provided text to make it:
-1. More clear and concise
-2. Better structured and organized
-3. More professional in tone
-4. Easier to understand
+        'paraphrase' => "Tu es un expert dans l'amélioration et la clarification de texte tout en préservant sa signification originale.
+Ta tâche est de réécrire le texte fourni pour le rendre :
+1. Plus clair et concis
+2. Mieux structuré et organisé
+3. Plus professionnel dans le ton
+4. Plus facile à comprendre
 
-Keep the original meaning intact. Preserve all factual information. Maintain the same language as the original text.
-DO NOT add new information or your own opinions.
+Garde la signification originale intacte. Préserve toutes les informations factuelles. Maintiens la même langue que le texte original.
+N'ajoute PAS de nouvelles informations ou tes propres opinions.
 
-Here is the text to improve:
+Voici le texte à améliorer :
 "
     ];
 
@@ -84,6 +85,30 @@ Here is the text to improve:
      */
     public static function getSystemPrompt($name = 'chat', $customContent = null)
     {
+        // Map old prompt names to new PromptCacheManager keys
+        $promptMapping = [
+            'chat' => 'chat_system',
+            'summarize' => 'summarization',
+            'paraphrase' => 'paraphrase_instructions'
+        ];
+        
+        // Use PromptCacheManager for optimized cached prompts
+        if (isset($promptMapping[$name])) {
+            try {
+                $cachablePrompt = PromptCacheManager::getCachablePrompt($promptMapping[$name]);
+                
+                // If custom content is provided, append it to the cached prompt
+                if ($customContent) {
+                    $cachablePrompt .= "\n\n## Additional Context\n" . $customContent;
+                }
+                
+                return $cachablePrompt;
+            } catch (\Exception $e) {
+                error_log("Error getting cachable prompt: " . $e->getMessage());
+                // Fall back to default prompts
+            }
+        }
+        
         // Check if we're using the database
         if (!defined('USE_DATABASE') || !USE_DATABASE) {
             return $customContent ?? self::$defaultPrompts[$name] ?? '';
@@ -145,18 +170,22 @@ Here is the text to improve:
         // Start with system messages
         $optimizedMessages = [];
         
-        // Add system instruction as the first message (for best caching)
+        // Get optimized system prompt from PromptCacheManager (>1024 tokens)
         $systemPrompt = self::getSystemPrompt('chat');
-        $optimizedMessages[] = [
-            'role' => 'system',
-            'content' => $systemPrompt
-        ];
         
-        // Add transcription context if available
+        // Structure the prompt to maximize OpenAI cache usage
+        // Static content first, dynamic content last
         if (!empty($transcriptionContext)) {
+            // Combine system prompt and transcription context for better caching
+            $combinedSystemContent = $systemPrompt . "\n\n## Transcription Content\n\n" . $transcriptionContext;
             $optimizedMessages[] = [
                 'role' => 'system',
-                'content' => "Transcription:\n\n" . $transcriptionContext
+                'content' => $combinedSystemContent
+            ];
+        } else {
+            $optimizedMessages[] = [
+                'role' => 'system',
+                'content' => $systemPrompt
             ];
         }
         

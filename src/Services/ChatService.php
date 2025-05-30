@@ -320,6 +320,11 @@ class ChatService
                 // Mettre à jour les statistiques de cache
                 $this->cacheService->recordCacheMiss($conversationId, $responseTime, PromptUtils::estimateTokenCount($optimizedPrompt));
                 
+                // Track OpenAI cache metrics if available
+                if (isset($result['usage']) && is_array($result['usage'])) {
+                    $this->cacheService->trackOpenAICacheMetrics($conversationId, $result['usage']);
+                }
+                
                 // Mettre en cache la conversation pour les prochaines requêtes
                 $optimizedPrompt[] = [
                     'role' => 'assistant',

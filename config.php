@@ -26,6 +26,9 @@ $env = parse_ini_file('.env');
 // Clé API OpenAI
 define('OPENAI_API_KEY', $env['OPENAI_API_KEY'] ?? '');
 
+// Organization ID OpenAI pour le prompt caching
+define('OPENAI_ORG_ID', $env['OPENAI_ORG_ID'] ?? 'org-HzNhomFpeY5ewhrUNlmpTehv');
+
 // Vérifier si la clé API OpenAI est configurée
 if (!OPENAI_API_KEY) {
     die('Erreur: La clé API OpenAI n\'est pas configurée dans le fichier .env');

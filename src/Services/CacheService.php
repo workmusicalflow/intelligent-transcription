@@ -442,4 +442,204 @@ class CacheService
             ];
         }
     }
+    
+    /**
+     * Track OpenAI cache metrics from API response
+     * 
+     * @param string $conversationId Conversation ID
+     * @param array $usageData Usage data from OpenAI API response
+     * @return void
+     */
+    public function trackOpenAICacheMetrics($conversationId, $usageData)
+    {
+        if (!$this->useDatabase || empty($usageData)) {
+            return;
+        }
+        
+        try {
+            // Extract cache metrics
+            $cachedTokens = $usageData['cached_tokens'] ?? 0;
+            $promptTokens = $usageData['prompt_tokens'] ?? 0;
+            $completionTokens = $usageData['completion_tokens'] ?? 0;
+            $totalTokens = $usageData['total_tokens'] ?? 0;
+            $cacheHitRate = $usageData['cache_hit_rate'] ?? 0;
+            $costSaved = $usageData['estimated_cost_saved_usd'] ?? 0;
+            $cacheEligible = $usageData['cache_eligible'] ?? ($promptTokens >= 1024);
+            
+            // Check if openai_cache_metrics table exists
+            $sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='openai_cache_metrics'";
+            $stmt = DatabaseManager::query($sql);
+            $tableExists = $stmt->fetch() !== false;
+            
+            if (!$tableExists) {
+                // Create the table if it doesn't exist
+                $createTableSql = "
+                    CREATE TABLE openai_cache_metrics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        conversation_id TEXT NOT NULL,
+                        cached_tokens INTEGER DEFAULT 0,
+                        prompt_tokens INTEGER DEFAULT 0,
+                        completion_tokens INTEGER DEFAULT 0,
+                        total_tokens INTEGER DEFAULT 0,
+                        cache_hit_rate REAL DEFAULT 0,
+                        cache_eligible BOOLEAN DEFAULT 0,
+                        estimated_cost_saved REAL DEFAULT 0,
+                        model TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id)
+                    )
+                ";
+                DatabaseManager::query($createTableSql);
+                
+                // Create index for performance
+                DatabaseManager::query("CREATE INDEX idx_openai_cache_conversation ON openai_cache_metrics(conversation_id)");
+            }
+            
+            // Insert cache metrics
+            $sql = "INSERT INTO openai_cache_metrics 
+                    (conversation_id, cached_tokens, prompt_tokens, completion_tokens, total_tokens, 
+                     cache_hit_rate, cache_eligible, estimated_cost_saved, model) 
+                    VALUES (:conversation_id, :cached_tokens, :prompt_tokens, :completion_tokens, 
+                            :total_tokens, :cache_hit_rate, :cache_eligible, :cost_saved, :model)";
+            
+            DatabaseManager::query($sql, [
+                ':conversation_id' => $conversationId,
+                ':cached_tokens' => $cachedTokens,
+                ':prompt_tokens' => $promptTokens,
+                ':completion_tokens' => $completionTokens,
+                ':total_tokens' => $totalTokens,
+                ':cache_hit_rate' => $cacheHitRate,
+                ':cache_eligible' => $cacheEligible ? 1 : 0,
+                ':cost_saved' => $costSaved,
+                ':model' => $usageData['model'] ?? 'gpt-4o-mini'
+            ]);
+            
+            // Log significant cache hits
+            if ($cachedTokens > 0) {
+                error_log(sprintf(
+                    "OpenAI Cache Hit: Conversation %s - %d/%d tokens cached (%.1f%%), saved $%.4f",
+                    $conversationId,
+                    $cachedTokens,
+                    $promptTokens,
+                    $cacheHitRate,
+                    $costSaved
+                ));
+            }
+        } catch (\Exception $e) {
+            error_log('Error tracking OpenAI cache metrics: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get OpenAI cache statistics
+     * 
+     * @param string|null $conversationId Optional conversation ID for specific stats
+     * @param string $period Time period: 'hour', 'day', 'week', 'month', 'all'
+     * @return array Cache statistics
+     */
+    public function getOpenAICacheStats($conversationId = null, $period = 'day')
+    {
+        if (!$this->useDatabase) {
+            return [
+                'success' => false,
+                'error' => 'Database not enabled'
+            ];
+        }
+        
+        try {
+            // Determine time filter
+            $timeFilter = '';
+            switch ($period) {
+                case 'hour':
+                    $timeFilter = "AND created_at > datetime('now', '-1 hour')";
+                    break;
+                case 'day':
+                    $timeFilter = "AND created_at > datetime('now', '-1 day')";
+                    break;
+                case 'week':
+                    $timeFilter = "AND created_at > datetime('now', '-7 days')";
+                    break;
+                case 'month':
+                    $timeFilter = "AND created_at > datetime('now', '-30 days')";
+                    break;
+            }
+            
+            $params = [];
+            $conversationFilter = '';
+            
+            if ($conversationId) {
+                $conversationFilter = 'AND conversation_id = :conversation_id';
+                $params[':conversation_id'] = $conversationId;
+            }
+            
+            // Get aggregated stats
+            $sql = "SELECT 
+                    COUNT(*) as total_requests,
+                    SUM(cached_tokens) as total_cached_tokens,
+                    SUM(prompt_tokens) as total_prompt_tokens,
+                    AVG(cache_hit_rate) as avg_cache_hit_rate,
+                    SUM(estimated_cost_saved) as total_cost_saved,
+                    MAX(cache_hit_rate) as max_cache_hit_rate
+                    FROM openai_cache_metrics 
+                    WHERE 1=1 $conversationFilter $timeFilter";
+            
+            $stmt = DatabaseManager::query($sql, $params);
+            $stats = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            // Calculate overall cache hit rate
+            $overallCacheHitRate = 0;
+            if ($stats['total_prompt_tokens'] > 0) {
+                $overallCacheHitRate = round(($stats['total_cached_tokens'] / $stats['total_prompt_tokens']) * 100, 2);
+            }
+            
+            return [
+                'success' => true,
+                'period' => $period,
+                'stats' => [
+                    'total_requests' => (int)$stats['total_requests'],
+                    'total_cached_tokens' => (int)$stats['total_cached_tokens'],
+                    'total_prompt_tokens' => (int)$stats['total_prompt_tokens'],
+                    'overall_cache_hit_rate' => $overallCacheHitRate,
+                    'avg_cache_hit_rate' => round((float)$stats['avg_cache_hit_rate'], 2),
+                    'max_cache_hit_rate' => round((float)$stats['max_cache_hit_rate'], 2),
+                    'total_cost_saved' => round((float)$stats['total_cost_saved'], 4),
+                    'cache_eligible_requests' => $this->countCacheEligibleRequests($conversationId, $timeFilter)
+                ]
+            ];
+        } catch (\Exception $e) {
+            error_log('Error getting OpenAI cache stats: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => 'Error retrieving cache statistics'
+            ];
+        }
+    }
+    
+    /**
+     * Count cache-eligible requests (prompts >= 1024 tokens)
+     */
+    private function countCacheEligibleRequests($conversationId = null, $timeFilter = '')
+    {
+        try {
+            $params = [];
+            $conversationFilter = '';
+            
+            if ($conversationId) {
+                $conversationFilter = 'AND conversation_id = :conversation_id';
+                $params[':conversation_id'] = $conversationId;
+            }
+            
+            $sql = "SELECT COUNT(*) as count 
+                    FROM openai_cache_metrics 
+                    WHERE prompt_tokens >= 1024 $conversationFilter $timeFilter";
+            
+            $stmt = DatabaseManager::query($sql, $params);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            return (int)$result['count'];
+        } catch (\Exception $e) {
+            error_log('Error counting cache eligible requests: ' . $e->getMessage());
+            return 0;
+        }
+    }
 }

@@ -21,7 +21,9 @@ spl_autoload_register(function ($class) {
         'Models\\',
         'Services\\',
         'Template\\',
-        'Utils\\'
+        'Utils\\',
+        'App\\Services\\',
+        'App\\'
     ];
     
     $namespaceFound = false;
@@ -38,6 +40,12 @@ spl_autoload_register(function ($class) {
     
     // Base directory for the application
     $baseDir = __DIR__ . '/';
+    
+    // Handle App namespace mapping to src directory
+    if (strpos($class, 'App\\') === 0) {
+        // Remove 'App\' prefix and map to src directory
+        $class = substr($class, 4);
+    }
     
     // Replace namespace separators with directory separators
     // Add .php to the end

@@ -26,6 +26,7 @@ for env_path in env_paths:
 try:
     import openai
     openai.api_key = os.getenv("OPENAI_API_KEY")
+    openai.organization = os.getenv("OPENAI_ORG_ID", "org-HzNhomFpeY5ewhrUNlmpTehv")
     if not openai.api_key:
         print(json.dumps({
             "success": False,
@@ -65,7 +66,10 @@ def transcribe_audio(file_path, language=None, force_language=False):
         # Ouvrir le fichier audio
         with open(file_path, "rb") as audio_file:
             # Appeler l'API OpenAI Whisper
-            client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            client = openai.OpenAI(
+                api_key=os.getenv("OPENAI_API_KEY"),
+                organization=os.getenv("OPENAI_ORG_ID", "org-HzNhomFpeY5ewhrUNlmpTehv")
+            )
             response = client.audio.transcriptions.create(
                 model="whisper-1",
                 file=audio_file,
@@ -80,7 +84,7 @@ def transcribe_audio(file_path, language=None, force_language=False):
                 # Utiliser l'API OpenAI pour traduire le texte dans la langue spécifiée
                 try:
                     translation_response = client.chat.completions.create(
-                        model="gpt-4.1-nano",
+                        model="gpt-4o-mini",
                         messages=[
                             {"role": "system", "content": f"Tu es un traducteur professionnel. Traduis le texte suivant en {language}, en conservant le style et le ton."},
                             {"role": "user", "content": transcribed_text}

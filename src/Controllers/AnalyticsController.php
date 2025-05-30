@@ -59,9 +59,13 @@ class AnalyticsController
             ]);
         }
         
-        // Render analytics template
+        // Get OpenAI cache statistics
+        $openaiStats = $this->cacheService->getOpenAICacheStats(null, 'day');
+        
+        // Render analytics template with both analytics
         return $this->twig->render('analytics/cache_dashboard.twig', [
-            'analytics' => $result['analytics']
+            'analytics' => $result['analytics'],
+            'openai_stats' => $openaiStats
         ]);
     }
     

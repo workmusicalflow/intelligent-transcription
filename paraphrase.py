@@ -39,7 +39,10 @@ paraphraser_assistant_id = os.getenv("PARAPHRASER_ASSISTANT_ID")
 if not paraphraser_assistant_id:
     # Si l'ID de l'assistant n'est pas configuré, nous allons créer un nouvel assistant
     try:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            organization=os.getenv("OPENAI_ORG_ID", "org-HzNhomFpeY5ewhrUNlmpTehv")
+        )
         assistant = client.beta.assistants.create(
             name="Paraphraser",
             instructions="""Tu es un assistant spécialisé dans la paraphrase de texte. 
@@ -50,7 +53,7 @@ IMPORTANT: Tu dois toujours paraphraser dans la même langue que le texte origin
 Si le texte est en français, ta réponse doit être en français.
 Si le texte est en anglais, ta réponse doit être en anglais.
 Ne traduis jamais le texte dans une autre langue.""",
-            model="gpt-4.1-nano",
+            model="gpt-4o-mini",
         )
         paraphraser_assistant_id = assistant.id
         print(f"Nouvel assistant créé avec l'ID: {paraphraser_assistant_id}")
@@ -84,7 +87,10 @@ class EventHandler(AssistantEventHandler):
 # Fonction pour supprimer le thread
 def delete_thread(thread_id):
     try:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            organization=os.getenv("OPENAI_ORG_ID", "org-HzNhomFpeY5ewhrUNlmpTehv")
+        )
         client.beta.threads.delete(thread_id)
         print(f"Thread {thread_id} supprimé avec succès.")
     except Exception as e:
@@ -109,7 +115,10 @@ def paraphrase_text(text, language="fr"):
             return {"success": False, "error": "Le texte à paraphraser est vide"}
         
         # Initialiser le client OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            organization=os.getenv("OPENAI_ORG_ID", "org-HzNhomFpeY5ewhrUNlmpTehv")
+        )
         
         # Si le thread n'existe pas, le créer
         if paraphraser_thread is None:

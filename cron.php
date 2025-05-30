@@ -5,7 +5,9 @@
  * À configurer pour s'exécuter périodiquement via cron ou tâche planifiée.
  * 
  * Exemple de configuration cron (toutes les 5 minutes):
- * */5 * * * * php /chemin/vers/cron.php >> /chemin/vers/logs/cron.log 2>&1
+ * 
+ * Minute Hour Day Month DayOfWeek Command
+ * 5      *    *   *     *         php /chemin/vers/cron.php >> /chemin/vers/logs/cron.log 2>&1
  */
 
 // Inclure les fichiers de configuration
