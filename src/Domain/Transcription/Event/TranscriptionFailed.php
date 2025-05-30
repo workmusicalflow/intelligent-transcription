@@ -2,9 +2,9 @@
 
 namespace Domain\Transcription\Event;
 
-use Domain\Common\Event\DomainEvent;
+use Domain\Common\Event\BaseEvent;
 
-final class TranscriptionFailed extends DomainEvent
+final class TranscriptionFailed extends BaseEvent
 {
     private string $reason;
     private string $errorCode;
@@ -14,9 +14,10 @@ final class TranscriptionFailed extends DomainEvent
         string $transcriptionId,
         string $reason,
         string $errorCode = 'UNKNOWN_ERROR',
-        ?array $context = null
+        ?array $context = null,
+        array $metadata = []
     ) {
-        parent::__construct($transcriptionId);
+        parent::__construct($transcriptionId, 1, $metadata);
         $this->reason = $reason;
         $this->errorCode = $errorCode;
         $this->context = $context;

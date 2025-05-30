@@ -20,6 +20,52 @@ require_once BASE_PATH . '/vendor/autoload.php';
 // Charger notre autoloader personnalisé
 require_once __DIR__ . '/autoload.php';
 
+// Initialisation du conteneur DI et de l'architecture Clean
+use Infrastructure\Container\ServiceLocator;
+
+// Configuration de l'environnement pour DI
+if (file_exists(BASE_PATH . '/.env')) {
+    $lines = file(BASE_PATH . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
+        
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+
+// Configuration par défaut
+if (!isset($_ENV['APP_ENV'])) {
+    $_ENV['APP_ENV'] = 'development';
+}
+
+if (!isset($_ENV['OPENAI_API_KEY'])) {
+    $_ENV['OPENAI_API_KEY'] = '';
+}
+
+// Initialiser le conteneur DI
+ServiceLocator::init();
+
+// Services de transition pour l'ancien code
+if (!function_exists('get_transcription_repository')) {
+    function get_transcription_repository() {
+        return ServiceLocator::getTranscriptionRepository();
+    }
+}
+
+if (!function_exists('get_transcriber')) {
+    function get_transcriber() {
+        return ServiceLocator::getTranscriber();
+    }
+}
+
+if (!function_exists('get_cache')) {
+    function get_cache() {
+        return ServiceLocator::getCache();
+    }
+}
+
 // Démarrer la session et définir les paramètres des cookies
 if (session_status() == PHP_SESSION_NONE) {
     // Définir les paramètres des cookies de session (facultatif mais recommandé)

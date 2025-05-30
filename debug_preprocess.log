@@ -1,23 +1,25 @@
 Array
 (
-    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
+    [command] => /Users/ns2poportable/Desktop/inteligent-transcription/venv/bin/python '/Users/ns2poportable/Desktop/inteligent-transcription/preprocess_audio.py' --file='/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_6830014fc4446_Enregistrement de l'\''écran 2025-05-20 153217_1.mp3' --output_dir='/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio' --target_size_mb=24
     [output] => {
   "success": true,
-  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
-  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg",
-  "original_size_mb": 0.20326614379882812,
-  "new_size_mb": 0.20326614379882812,
-  "message": "Le fichier est d\u00e9j\u00e0 plus petit que la taille cible"
+  "input_file": "/Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_6830014fc4446_Enregistrement de l'e\u0301cran 2025-05-20 153217_1.mp3",
+  "output_file": "/Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_6830014fc4446_Enregistrement de l'e\u0301cran 2025-05-20 153217_1_preprocessed.mp3",
+  "original_size_mb": 45.35409927368164,
+  "new_size_mb": 15.124608039855957,
+  "bitrate_kbps": 67,
+  "message": "Fichier pr\u00e9trait\u00e9 avec succ\u00e8s. Taille r\u00e9duite de 45.35 Mo \u00e0 15.12 Mo"
 }
 
     [result] => Array
         (
             [success] => 1
-            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
-            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_68194b66ae7e3_WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
-            [original_size_mb] => 0.20326614379883
-            [new_size_mb] => 0.20326614379883
-            [message] => Le fichier est déjà plus petit que la taille cible
+            [input_file] => /Users/ns2poportable/Desktop/inteligent-transcription/uploads/audio_6830014fc4446_Enregistrement de l'écran 2025-05-20 153217_1.mp3
+            [output_file] => /Users/ns2poportable/Desktop/inteligent-transcription/temp_audio/audio_6830014fc4446_Enregistrement de l'écran 2025-05-20 153217_1_preprocessed.mp3
+            [original_size_mb] => 45.354099273682
+            [new_size_mb] => 15.124608039856
+            [bitrate_kbps] => 67
+            [message] => Fichier prétraité avec succès. Taille réduite de 45.35 Mo à 15.12 Mo
         )
 
 )

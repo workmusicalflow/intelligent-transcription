@@ -4,12 +4,12 @@ Array
         (
             [audio_file] => Array
                 (
-                    [name] => WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
-                    [full_path] => WhatsApp Ptt 2025-05-05 at 11.22.19.ogg
-                    [type] => audio/ogg
-                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpjVqUwx
+                    [name] => Enregistrement de l'écran 2025-05-20 153217_1.mp3
+                    [full_path] => Enregistrement de l'écran 2025-05-20 153217_1.mp3
+                    [type] => audio/mpeg
+                    [tmp_name] => /private/var/folders/jy/vprln8td7l7drlxtmsw39rkr0000gn/T/phpqiKcrv
                     [error] => 0
-                    [size] => 213140
+                    [size] => 47557220
                 )
 
         )
@@ -19,7 +19,7 @@ Array
             [language] => fr
         )
 
-    [upload_max_filesize] => 2M
-    [post_max_size] => 8M
+    [upload_max_filesize] => 100M
+    [post_max_size] => 100M
     [max_file_uploads] => 20
 )

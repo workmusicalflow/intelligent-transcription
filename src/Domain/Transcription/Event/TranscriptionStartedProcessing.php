@@ -2,9 +2,9 @@
 
 namespace Domain\Transcription\Event;
 
-use Domain\Common\Event\DomainEvent;
+use Domain\Common\Event\BaseEvent;
 
-final class TranscriptionStartedProcessing extends DomainEvent
+final class TranscriptionStartedProcessing extends BaseEvent
 {
     private string $processorType;
     private ?string $preprocessedPath;
@@ -12,9 +12,10 @@ final class TranscriptionStartedProcessing extends DomainEvent
     public function __construct(
         string $transcriptionId,
         string $processorType = 'whisper',
-        ?string $preprocessedPath = null
+        ?string $preprocessedPath = null,
+        array $metadata = []
     ) {
-        parent::__construct($transcriptionId);
+        parent::__construct($transcriptionId, 1, $metadata);
         $this->processorType = $processorType;
         $this->preprocessedPath = $preprocessedPath;
     }

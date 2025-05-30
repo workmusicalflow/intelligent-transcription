@@ -4,7 +4,7 @@ namespace Application\Event\Handler;
 
 use Domain\Common\Event\DomainEvent;
 use Domain\Transcription\Event\TranscriptionCreated;
-use Domain\Transcription\Event\TranscriptionStarted;
+use Domain\Transcription\Event\TranscriptionStartedProcessing;
 use Domain\Transcription\Event\TranscriptionCompleted;
 use Domain\Transcription\Event\TranscriptionFailed;
 
@@ -20,7 +20,7 @@ final class TranscriptionEventHandler extends AbstractEventHandler
     {
         match (get_class($event)) {
             TranscriptionCreated::class => $this->handleTranscriptionCreated($event),
-            TranscriptionStarted::class => $this->handleTranscriptionStarted($event),
+            TranscriptionStartedProcessing::class => $this->handleTranscriptionStartedProcessing($event),
             TranscriptionCompleted::class => $this->handleTranscriptionCompleted($event),
             TranscriptionFailed::class => $this->handleTranscriptionFailed($event),
             default => throw new \InvalidArgumentException('Unsupported event: ' . get_class($event))
@@ -31,7 +31,7 @@ final class TranscriptionEventHandler extends AbstractEventHandler
     {
         return [
             TranscriptionCreated::class,
-            TranscriptionStarted::class,
+            TranscriptionStartedProcessing::class,
             TranscriptionCompleted::class,
             TranscriptionFailed::class
         ];
@@ -56,7 +56,7 @@ final class TranscriptionEventHandler extends AbstractEventHandler
         $this->initializeProcessingTracking($event);
     }
     
-    private function handleTranscriptionStarted(TranscriptionStarted $event): void
+    private function handleTranscriptionStartedProcessing(TranscriptionStartedProcessing $event): void
     {
         // Actions à effectuer quand le processing commence
         
@@ -171,7 +171,7 @@ final class TranscriptionEventHandler extends AbstractEventHandler
         error_log("Processing status updated: {$transcriptionId} -> {$status}");
     }
     
-    private function estimateCompletionTime(TranscriptionStarted $event): void
+    private function estimateCompletionTime(TranscriptionStartedProcessing $event): void
     {
         // Calculer une estimation basée sur la taille du fichier et les performances historiques
         error_log("Completion time estimated for: {$event->aggregateId()}");

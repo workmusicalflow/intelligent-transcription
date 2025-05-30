@@ -2,12 +2,12 @@
 
 namespace Domain\Transcription\Event;
 
-use Domain\Common\Event\DomainEvent;
+use Domain\Common\Event\BaseEvent;
 use Domain\Common\ValueObject\UserId;
 use Domain\Transcription\ValueObject\AudioFile;
 use Domain\Transcription\ValueObject\Language;
 
-final class TranscriptionCreated extends DomainEvent
+final class TranscriptionCreated extends BaseEvent
 {
     private UserId $userId;
     private AudioFile $audioFile;
@@ -19,9 +19,10 @@ final class TranscriptionCreated extends DomainEvent
         UserId $userId,
         AudioFile $audioFile,
         Language $language,
-        ?string $youtubeUrl = null
+        ?string $youtubeUrl = null,
+        array $metadata = []
     ) {
-        parent::__construct($transcriptionId);
+        parent::__construct($transcriptionId, 1, $metadata);
         $this->userId = $userId;
         $this->audioFile = $audioFile;
         $this->language = $language;

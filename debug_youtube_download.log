@@ -1,8 +1,8 @@
 Array
 (
-    [youtube_url] => https://youtu.be/kbAHJ1aoMj4
-    [api_url] => https://loader.to/ajax/download.php?format=mp3&url=https%3A%2F%2Fyoutu.be%2FkbAHJ1aoMj4&api=6ac76ef3deb3bb8c2e9f8860938e86516291e90a
+    [youtube_url] => https://www.youtube.com/watch?v=GUJl9RWw7xs
+    [api_url] => https://loader.to/ajax/download.php?format=mp3&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DGUJl9RWw7xs&api=6ac76ef3deb3bb8c2e9f8860938e86516291e90a
     [http_code] => 200
-    [response] => {"success":true,"id":"ZL52R8Gpa5pr7pKheI5hr1Q","content":"","title":"Presentation Site Internet des ACD 2026","info":{"image":"https:\/\/i.ytimg.com\/vi\/kbAHJ1aoMj4\/hqdefault.jpg","title":"Presentation Site Internet des ACD 2026"},"repeat_download":false,"message":"If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https:\/\/video-download-api.com\/","cachehash":"3b4be03a396b0c28266f3ee2b4f174e2","additional_info":null,"progress_url":"https:\/\/p.oceansaver.in\/api\/progress?id=ZL52R8Gpa5pr7pKheI5hr1Q"}
+    [response] => {"success":true,"id":"En6wLDTUmJcMg7DhDK2RgPZ","content":"","title":"Taskmaster + Cline, RooCode, Windsurf & Cursor: 20X Lesser Errors & Better Workflow to do AI Coding!","info":{"image":"https:\/\/i.ytimg.com\/vi\/GUJl9RWw7xs\/hqdefault.jpg","title":"Taskmaster + Cline, RooCode, Windsurf & Cursor: 20X Lesser Errors & Better Workflow to do AI Coding!"},"repeat_download":false,"message":"If you want your application to use our API contact us: sp_golubev@protonmail.com or visit https:\/\/video-download-api.com\/","cachehash":"017500c725d247d9bd9c6b990ed4a0f4","additional_info":null,"progress_url":"https:\/\/p.oceansaver.in\/api\/progress?id=En6wLDTUmJcMg7DhDK2RgPZ"}
     [error] => 
 )

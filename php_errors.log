@@ -1273,3 +1273,177 @@ Trace: #0 {main}
 2025-05-06 00:37:46 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 43
 2025-05-06 00:37:46 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
 2025-05-06 00:37:46 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-09 19:58:54 - Exception: Call to undefined function getErrorMessage() dans /Users/ns2poportable/Desktop/inteligent-transcription/index.php à la ligne 26
+Trace: #0 {main}
+[30-May-2025 09:45:18 UTC] Showing login form with GET params: []
+[30-May-2025 09:45:23 UTC] Showing login form with GET params: []
+[30-May-2025 09:45:39 UTC] Authentication attempt: Username/Email: admin
+[30-May-2025 09:45:39 UTC] User found with ID: 1
+[30-May-2025 09:45:39 UTC] Password hash found for user: 1
+[30-May-2025 09:45:39 UTC] Password verification result: Success
+[30-May-2025 09:45:39 UTC] Authentication successful for user ID: 1
+2025-05-30 09:45:48 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 09:45:48 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 09:45:48 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 09:45:48 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 09:45:48 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 09:45:48 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 09:45:48 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 09:45:48 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 09:45:48 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 09:45:48 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 09:45:48 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 35
+2025-05-30 09:45:48 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 43
+2025-05-30 09:45:48 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 09:45:48 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 12:16:48 - Exception: Class "App\Services\PromptCacheManager" not found dans /Users/ns2poportable/Desktop/inteligent-transcription/test_prompt_caching.php à la ligne 24
+Trace: #0 {main}
+2025-05-30 12:17:23 - Exception: Class "App\Services\PromptCacheManager" not found dans /Users/ns2poportable/Desktop/inteligent-transcription/test_prompt_caching.php à la ligne 24
+Trace: #0 {main}
+2025-05-30 13:00:57 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 13:00:57 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 13:00:57 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 13:00:57 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 13:00:57 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 13:00:57 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 13:00:57 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 13:00:57 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 13:00:57 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 13:00:57 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 13:00:57 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 13:00:57 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 13:00:57 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 13:00:57 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 13:01:00 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 13:01:00 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 13:01:00 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 13:01:00 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 13:01:00 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 13:01:00 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 13:01:00 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 13:01:00 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 13:01:00 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 13:01:00 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 13:01:00 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 13:01:00 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 13:01:00 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 13:01:00 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 13:25:24 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 13:25:24 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 13:25:24 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 13:25:24 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 13:25:24 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 13:25:24 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 13:25:24 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 13:25:24 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 13:25:24 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 13:25:24 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 13:25:24 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 13:25:24 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 13:25:24 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 13:25:24 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 19:17:15 - Erreur fatale: Class Infrastructure\Repository\SQLite\SQLiteTranscriptionRepository contains 12 abstract methods and must therefore be declared abstract or implement the remaining methods (Domain\Transcription\Repository\TranscriptionRepository::findByUser, Domain\Transcription\Repository\TranscriptionRepository::findByUserPaginated, Domain\Transcription\Repository\TranscriptionRepository::findByStatus, ...) dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Repository/SQLite/SQLiteTranscriptionRepository.php à la ligne 24
+2025-05-30 20:09:46 - Exception: Class "Infrastructure\Template\TwigManager" not found dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Http/Controller/TranscriptionController.php à la ligne 27
+Trace: #0 /Users/ns2poportable/Desktop/inteligent-transcription/test_http_controller.php(27): Infrastructure\Http\Controller\TranscriptionController->__construct()
+#1 {main}
+2025-05-30 20:10:49 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:10:49 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:10:49 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:10:49 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:10:49 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:10:49 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:10:49 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:10:49 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:10:49 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:10:49 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:10:49 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:10:49 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:10:49 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:10:49 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 20:10:49 - Exception: Call to undefined method Domain\Transcription\Entity\Transcription::create() dans /Users/ns2poportable/Desktop/inteligent-transcription/test_http_controller.php à la ligne 89
+Trace: #0 {main}
+2025-05-30 20:11:00 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:11:00 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:11:00 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:11:00 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:11:00 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:11:00 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:11:00 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:11:00 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:11:00 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:11:00 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:11:00 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:11:00 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:11:00 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:11:00 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 20:11:00 - Exception: Call to undefined method Domain\Transcription\Entity\Transcription::create() dans /Users/ns2poportable/Desktop/inteligent-transcription/test_http_controller.php à la ligne 89
+Trace: #0 {main}
+2025-05-30 20:11:47 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:11:47 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:11:47 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:11:47 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:11:47 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:11:47 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:11:47 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:11:47 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:11:47 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:11:47 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:11:47 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:11:47 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:11:47 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:11:47 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 20:16:54 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:16:54 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:16:54 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:16:54 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:16:54 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:16:54 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:16:54 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:16:54 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:16:54 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:16:54 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:16:54 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:16:54 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:16:54 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:16:54 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 20:16:54 - Erreur 2: http_response_code(): Cannot set response code - headers already sent (output started at /Users/ns2poportable/Desktop/inteligent-transcription/tests/Integration/FullStackTest.php:17) dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Http/Controller/BaseController.php à la ligne 35
+2025-05-30 20:16:54 - Erreur 2: Cannot modify header information - headers already sent by (output started at /Users/ns2poportable/Desktop/inteligent-transcription/tests/Integration/FullStackTest.php:17) dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Http/Controller/BaseController.php à la ligne 36
+2025-05-30 20:16:54 - Erreur fatale: Class Domain\Transcription\Event\TranscriptionCreated cannot extend interface Domain\Common\Event\DomainEvent dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Domain/Transcription/Event/TranscriptionCreated.php à la ligne 10
+2025-05-30 20:41:32 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:41:32 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:41:32 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:41:32 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:41:32 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:41:32 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:41:32 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:41:32 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:41:32 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:41:32 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:41:32 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:41:32 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:41:32 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:41:32 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52
+2025-05-30 20:41:32 - Exception: Call to undefined method Domain\Transcription\Entity\Transcription::create() dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Application/Transcription/Handler/CreateTranscriptionHandler.php à la ligne 36
+Trace: #0 /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Http/Controller/TranscriptionController.php(77): Application\Transcription\Handler\CreateTranscriptionHandler->handle(Object(Application\Transcription\Command\CreateTranscriptionCommand))
+#1 /Users/ns2poportable/Desktop/inteligent-transcription/tests/Integration/FullStackTest.php(56): Infrastructure\Http\Controller\TranscriptionController->create()
+#2 /Users/ns2poportable/Desktop/inteligent-transcription/tests/Integration/FullStackTest.php(23): Tests\Integration\FullStackTest->testCompleteTranscriptionFlow()
+#3 /Users/ns2poportable/Desktop/inteligent-transcription/run_integration_tests.php(25): Tests\Integration\FullStackTest->run()
+#4 {main}
+2025-05-30 20:43:54 - Exception: Call to undefined method Domain\Transcription\Entity\Transcription::create() dans /Users/ns2poportable/Desktop/inteligent-transcription/test_integration_simple.php à la ligne 32
+Trace: #0 {main}
+2025-05-30 20:45:40 - Exception: Call to undefined method Domain\Transcription\Entity\Transcription::create() dans /Users/ns2poportable/Desktop/inteligent-transcription/test_integration_simple.php à la ligne 32
+Trace: #0 {main}
+2025-05-30 20:48:36 - Erreur 2: Constant BASE_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 8
+2025-05-30 20:48:36 - Erreur 2: Constant UPLOAD_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 9
+2025-05-30 20:48:36 - Erreur 2: Constant RESULT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 10
+2025-05-30 20:48:36 - Erreur 2: Constant PYTHON_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 11
+2025-05-30 20:48:36 - Erreur 2: Constant TEMP_AUDIO_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 12
+2025-05-30 20:48:36 - Erreur 2: Constant EXPORT_DIR already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 13
+2025-05-30 20:48:36 - Erreur 2: Constant MAX_UPLOAD_SIZE_MB already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 16
+2025-05-30 20:48:36 - Erreur 2: Constant MAX_UPLOAD_SIZE_BYTES already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 17
+2025-05-30 20:48:36 - Erreur 2: Constant DB_PATH already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 20
+2025-05-30 20:48:36 - Erreur 2: Constant OPENAI_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 27
+2025-05-30 20:48:36 - Erreur 2: Constant VIDEO_DOWNLOAD_API_KEY already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 38
+2025-05-30 20:48:36 - Erreur 2: Constant VIDEO_DOWNLOAD_API_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 46
+2025-05-30 20:48:36 - Erreur 2: Constant VIDEO_DOWNLOAD_PROGRESS_URL already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 49
+2025-05-30 20:48:36 - Erreur 2: Constant DEBUG_MODE already defined dans /Users/ns2poportable/Desktop/inteligent-transcription/config.php à la ligne 52

@@ -2,9 +2,9 @@
 
 namespace Domain\Transcription\Event;
 
-use Domain\Common\Event\DomainEvent;
+use Domain\Common\Event\BaseEvent;
 
-final class TranscriptionCompleted extends DomainEvent
+final class TranscriptionCompleted extends BaseEvent
 {
     private int $wordCount;
     private float $duration;
@@ -14,9 +14,10 @@ final class TranscriptionCompleted extends DomainEvent
         string $transcriptionId,
         int $wordCount,
         float $duration,
-        int $processingTimeSeconds
+        int $processingTimeSeconds,
+        array $metadata = []
     ) {
-        parent::__construct($transcriptionId);
+        parent::__construct($transcriptionId, 1, $metadata);
         $this->wordCount = $wordCount;
         $this->duration = $duration;
         $this->processingTimeSeconds = $processingTimeSeconds;

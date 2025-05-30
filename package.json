@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "npx tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --watch",
     "build": "npx tailwindcss -i ./assets/css/tailwind.css -o ./assets/css/style.css --minify",
+    "typecheck": "npx vue-tsc --noEmit --pretty",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

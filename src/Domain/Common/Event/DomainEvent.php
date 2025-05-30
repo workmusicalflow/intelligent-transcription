@@ -2,48 +2,38 @@
 
 namespace Domain\Common\Event;
 
-use DateTimeImmutable;
-
-abstract class DomainEvent
+/**
+ * Interface de base pour tous les événements du domaine
+ */
+interface DomainEvent
 {
-    private DateTimeImmutable $occurredAt;
-    private string $aggregateId;
-    private string $eventId;
+    /**
+     * ID unique de l'événement
+     */
+    public function eventId(): string;
     
-    public function __construct(string $aggregateId)
-    {
-        $this->aggregateId = $aggregateId;
-        $this->occurredAt = new DateTimeImmutable();
-        $this->eventId = uniqid('event_', true);
-    }
+    /**
+     * ID de l'agrégat concerné
+     */
+    public function aggregateId(): string;
     
-    public function aggregateId(): string
-    {
-        return $this->aggregateId;
-    }
+    /**
+     * Version de l'événement pour cet agrégat
+     */
+    public function eventVersion(): int;
     
-    public function occurredAt(): DateTimeImmutable
-    {
-        return $this->occurredAt;
-    }
+    /**
+     * Date et heure de l'occurrence de l'événement
+     */
+    public function occurredAt(): \DateTimeImmutable;
     
-    public function eventId(): string
-    {
-        return $this->eventId;
-    }
+    /**
+     * Métadonnées de l'événement (user ID, IP, etc.)
+     */
+    public function metadata(): array;
     
-    abstract public function eventName(): string;
-    
-    abstract public function payload(): array;
-    
-    public function toArray(): array
-    {
-        return [
-            'event_id' => $this->eventId,
-            'event_name' => $this->eventName(),
-            'aggregate_id' => $this->aggregateId,
-            'occurred_at' => $this->occurredAt->format('Y-m-d H:i:s.u'),
-            'payload' => $this->payload()
-        ];
-    }
+    /**
+     * Conversion en tableau pour la sérialisation
+     */
+    public function toArray(): array;
 }

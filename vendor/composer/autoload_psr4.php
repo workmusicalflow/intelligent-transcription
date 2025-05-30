@@ -9,4 +9,11 @@ return array(
     'Twig\\' => array($vendorDir . '/twig/twig/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
+    'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
+    'Laravel\\SerializableClosure\\' => array($vendorDir . '/laravel/serializable-closure/src'),
+    'Invoker\\' => array($vendorDir . '/php-di/invoker/src'),
+    'Infrastructure\\' => array($baseDir . '/src/Infrastructure'),
+    'Domain\\' => array($baseDir . '/src/Domain'),
+    'DI\\' => array($vendorDir . '/php-di/php-di/src'),
+    'Application\\' => array($baseDir . '/src/Application'),
 );
