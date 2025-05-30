@@ -23,7 +23,10 @@ spl_autoload_register(function ($class) {
         'Template\\',
         'Utils\\',
         'App\\Services\\',
-        'App\\'
+        'App\\',
+        'Domain\\',
+        'Application\\',
+        'Infrastructure\\'
     ];
     
     $namespaceFound = false;

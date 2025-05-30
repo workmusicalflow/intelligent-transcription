@@ -4,6 +4,8 @@
 
 Ce guide définit l'architecture cible du projet Intelligent Transcription, basée sur les principes Clean Architecture, SOLID et DDD (Domain-Driven Design).
 
+**Note** : Ce document est une référence technique détaillée destinée à l'équipe de développement. Pour la roadmap MVP veuillez consulter le document `MVP_ROADMAP.md`.
+
 ## 🎯 Objectifs Architecturaux
 
 1. **Découplage** : Indépendance entre domaine métier et détails techniques
@@ -73,6 +75,7 @@ intelligent-transcription/
 ### 1. Domain Layer (Entités et Logique Métier)
 
 #### Entités
+
 ```php
 namespace Domain\Transcription\Entity;
 
@@ -87,7 +90,7 @@ final class Transcription extends AggregateRoot
     private TranscriptionStatus $status;
     private ?TranscribedText $text = null;
     private array $metadata = [];
-    
+
     private function __construct(
         private TranscriptionId $id,
         private AudioFile $audioFile,
@@ -97,7 +100,7 @@ final class Transcription extends AggregateRoot
         $this->status = TranscriptionStatus::PENDING();
         $this->recordEvent(new TranscriptionCreated($id, $userId));
     }
-    
+
     public static function create(
         AudioFile $audioFile,
         Language $language,
@@ -110,24 +113,24 @@ final class Transcription extends AggregateRoot
             $userId
         );
     }
-    
+
     public function complete(TranscribedText $text, array $metadata = []): void
     {
         if (!$this->status->isPending()) {
             throw new DomainException('Cannot complete non-pending transcription');
         }
-        
+
         $this->text = $text;
         $this->metadata = $metadata;
         $this->status = TranscriptionStatus::COMPLETED();
-        
+
         $this->recordEvent(new TranscriptionCompleted(
             $this->id,
             $text->wordCount(),
             $text->duration()
         ));
     }
-    
+
     public function fail(string $reason): void
     {
         $this->status = TranscriptionStatus::FAILED();
@@ -137,6 +140,7 @@ final class Transcription extends AggregateRoot
 ```
 
 #### Value Objects
+
 ```php
 namespace Domain\Transcription\ValueObject;
 
@@ -144,49 +148,50 @@ final class TranscribedText
 {
     private string $content;
     private array $segments;
-    
+
     public function __construct(string $content, array $segments = [])
     {
         if (empty(trim($content))) {
             throw new InvalidArgumentException('Transcribed text cannot be empty');
         }
-        
+
         $this->content = $content;
         $this->segments = $segments;
     }
-    
+
     public function content(): string
     {
         return $this->content;
     }
-    
+
     public function wordCount(): int
     {
         return str_word_count($this->content);
     }
-    
+
     public function duration(): ?float
     {
         if (empty($this->segments)) {
             return null;
         }
-        
+
         $lastSegment = end($this->segments);
         return $lastSegment['end'] ?? null;
     }
-    
+
     public function excerpt(int $length = 100): string
     {
         if (strlen($this->content) <= $length) {
             return $this->content;
         }
-        
+
         return substr($this->content, 0, $length) . '...';
     }
 }
 ```
 
 #### Domain Services
+
 ```php
 namespace Domain\Transcription\Service;
 
@@ -203,7 +208,7 @@ final class StandardPricingService implements TranscriptionPricingService
 {
     private const BASE_RATE_PER_MINUTE = 0.006; // $0.006 per minute
     private const PRIORITY_MULTIPLIER = 2.5;
-    
+
     public function calculatePrice(
         AudioFile $file,
         Language $language,
@@ -211,18 +216,18 @@ final class StandardPricingService implements TranscriptionPricingService
     ): Money {
         $minutes = ceil($file->duration() / 60);
         $basePrice = $minutes * self::BASE_RATE_PER_MINUTE;
-        
+
         if ($isPriority) {
             $basePrice *= self::PRIORITY_MULTIPLIER;
         }
-        
+
         // Language complexity factor
         $languageFactor = $this->getLanguageFactor($language);
         $finalPrice = $basePrice * $languageFactor;
-        
+
         return Money::USD($finalPrice);
     }
-    
+
     private function getLanguageFactor(Language $language): float
     {
         return match($language->code()) {
@@ -237,6 +242,7 @@ final class StandardPricingService implements TranscriptionPricingService
 ### 2. Application Layer (Use Cases)
 
 #### Commands & Handlers
+
 ```php
 namespace Application\Transcription\Command;
 
@@ -260,7 +266,7 @@ final class TranscribeAudioHandler
         private EventBus $eventBus,
         private TranscriptionPricingService $pricingService
     ) {}
-    
+
     public function handle(TranscribeAudioCommand $command): TranscriptionId
     {
         // 1. Validate and prepare audio file
@@ -268,29 +274,29 @@ final class TranscribeAudioHandler
         if (!$audioFile->isValid()) {
             throw new InvalidAudioFileException();
         }
-        
+
         // 2. Detect or validate language
-        $language = $command->language 
+        $language = $command->language
             ? Language::fromCode($command->language)
             : $this->transcriber->detectLanguage($audioFile);
-            
+
         // 3. Calculate pricing
         $price = $this->pricingService->calculatePrice(
             $audioFile,
             $language,
             $command->priority
         );
-        
+
         // 4. Create transcription entity
         $transcription = Transcription::create(
             $audioFile,
             $language,
             UserId::fromString($command->userId)
         );
-        
+
         // 5. Persist
         $this->repository->save($transcription);
-        
+
         // 6. Dispatch for async processing
         $this->eventBus->dispatch(
             new ProcessTranscriptionCommand(
@@ -298,13 +304,14 @@ final class TranscribeAudioHandler
                 $command->priority
             )
         );
-        
+
         return $transcription->id();
     }
 }
 ```
 
 #### Queries & Handlers
+
 ```php
 namespace Application\Transcription\Query;
 
@@ -322,17 +329,17 @@ final class GetTranscriptionHandler
         private TranscriptionRepository $repository,
         private TranscriptionReadModel $readModel
     ) {}
-    
+
     public function handle(GetTranscriptionQuery $query): ?TranscriptionDTO
     {
         $transcription = $this->repository->findById(
             TranscriptionId::fromString($query->transcriptionId)
         );
-        
+
         if (!$transcription || !$transcription->belongsTo($query->userId)) {
             return null;
         }
-        
+
         // Use read model for optimized queries
         return $this->readModel->getDetails($transcription->id());
     }
@@ -342,6 +349,7 @@ final class GetTranscriptionHandler
 ### 3. Infrastructure Layer
 
 #### Repository Implementation
+
 ```php
 namespace Infrastructure\Persistence\Doctrine;
 
@@ -353,12 +361,12 @@ final class DoctrineTranscriptionRepository implements TranscriptionRepository
     public function __construct(
         private EntityManagerInterface $em
     ) {}
-    
+
     public function save(Transcription $transcription): void
     {
         $this->em->persist($transcription);
         $this->em->flush();
-        
+
         // Dispatch domain events
         foreach ($transcription->pullDomainEvents() as $event) {
             $this->em->getEventManager()->dispatchEvent(
@@ -367,12 +375,12 @@ final class DoctrineTranscriptionRepository implements TranscriptionRepository
             );
         }
     }
-    
+
     public function findById(TranscriptionId $id): ?Transcription
     {
         return $this->em->find(Transcription::class, $id);
     }
-    
+
     public function findByUser(UserId $userId, int $limit = 10): array
     {
         return $this->em->createQueryBuilder()
@@ -389,6 +397,7 @@ final class DoctrineTranscriptionRepository implements TranscriptionRepository
 ```
 
 #### External Service Adapter
+
 ```php
 namespace Infrastructure\External\OpenAI;
 
@@ -400,7 +409,7 @@ final class OpenAITranscriber implements TranscriberInterface
     private Client $client;
     private CacheInterface $cache;
     private MetricsCollector $metrics;
-    
+
     public function __construct(
         string $apiKey,
         string $organizationId,
@@ -411,11 +420,11 @@ final class OpenAITranscriber implements TranscriberInterface
         $this->cache = $cache;
         $this->metrics = $metrics;
     }
-    
+
     public function transcribe(AudioFile $audioFile): TranscriptionResult
     {
         $startTime = microtime(true);
-        
+
         try {
             $response = $this->client->audio()->transcriptions->create([
                 'model' => 'whisper-1',
@@ -423,19 +432,19 @@ final class OpenAITranscriber implements TranscriberInterface
                 'language' => $audioFile->detectedLanguage()?->code(),
                 'response_format' => 'verbose_json'
             ]);
-            
+
             $this->metrics->increment('openai.transcription.success');
             $this->metrics->histogram(
                 'openai.transcription.duration',
                 microtime(true) - $startTime
             );
-            
+
             return new TranscriptionResult(
                 $response->text,
                 $response->segments ?? [],
                 Language::fromCode($response->language)
             );
-            
+
         } catch (\Exception $e) {
             $this->metrics->increment('openai.transcription.error');
             throw new TranscriptionFailedException(
@@ -448,6 +457,7 @@ final class OpenAITranscriber implements TranscriberInterface
 ```
 
 #### API Controllers
+
 ```php
 namespace Infrastructure\API\REST;
 
@@ -461,7 +471,7 @@ final class TranscriptionController
         private CommandBus $commandBus,
         private QueryBus $queryBus
     ) {}
-    
+
     #[Route('', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
@@ -471,15 +481,15 @@ final class TranscriptionController
             language: $request->get('language'),
             priority: $request->get('priority', false)
         );
-        
+
         try {
             $transcriptionId = $this->commandBus->dispatch($command);
-            
+
             return new JsonResponse([
                 'id' => $transcriptionId->toString(),
                 'status' => 'processing'
             ], 202);
-            
+
         } catch (InvalidAudioFileException $e) {
             return new JsonResponse([
                 'error' => 'Invalid audio file',
@@ -487,7 +497,7 @@ final class TranscriptionController
             ], 400);
         }
     }
-    
+
     #[Route('/{id}', methods: ['GET'])]
     public function get(string $id, Request $request): JsonResponse
     {
@@ -495,13 +505,13 @@ final class TranscriptionController
             transcriptionId: $id,
             userId: $request->attributes->get('user_id')
         );
-        
+
         $transcription = $this->queryBus->ask($query);
-        
+
         if (!$transcription) {
             return new JsonResponse(['error' => 'Not found'], 404);
         }
-        
+
         return new JsonResponse($transcription);
     }
 }
@@ -510,6 +520,7 @@ final class TranscriptionController
 ## 🔧 Patterns et Pratiques
 
 ### Dependency Injection avec PHP-DI
+
 ```php
 // config/container.php
 use DI\ContainerBuilder;
@@ -519,10 +530,10 @@ $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions([
     // Domain Services
     TranscriptionPricingService::class => DI\create(StandardPricingService::class),
-    
+
     // Repositories
     TranscriptionRepository::class => DI\autowire(DoctrineTranscriptionRepository::class),
-    
+
     // External Services
     TranscriberInterface::class => DI\factory(function ($c) {
         return new OpenAITranscriber(
@@ -532,7 +543,7 @@ $containerBuilder->addDefinitions([
             $c->get(MetricsCollector::class)
         );
     }),
-    
+
     // Command Bus
     CommandBus::class => DI\factory(function ($c) {
         $bus = new SimpleCommandBus();
@@ -545,6 +556,7 @@ return $containerBuilder->build();
 ```
 
 ### Tests Unitaires (Domain)
+
 ```php
 namespace Tests\Unit\Domain\Transcription;
 
@@ -562,32 +574,32 @@ class TranscriptionTest extends TestCase
             Language::FRENCH(),
             UserId::fromString('user-123')
         );
-        
+
         $text = new TranscribedText('Bonjour le monde', [
             ['start' => 0, 'end' => 2, 'text' => 'Bonjour le monde']
         ]);
-        
+
         // Act
         $transcription->complete($text);
-        
+
         // Assert
         $this->assertTrue($transcription->isCompleted());
         $this->assertEquals('Bonjour le monde', $transcription->text()->content());
         $this->assertEquals(3, $transcription->text()->wordCount());
-        
+
         $events = $transcription->pullDomainEvents();
         $this->assertCount(2, $events); // Created + Completed
         $this->assertInstanceOf(TranscriptionCompleted::class, $events[1]);
     }
-    
+
     public function test_cannot_complete_already_completed_transcription(): void
     {
         // Arrange
         $transcription = $this->createCompletedTranscription();
-        
+
         // Assert
         $this->expectException(DomainException::class);
-        
+
         // Act
         $transcription->complete(new TranscribedText('New text'));
     }
@@ -595,6 +607,7 @@ class TranscriptionTest extends TestCase
 ```
 
 ### Tests d'Intégration
+
 ```php
 namespace Tests\Integration\Application;
 
@@ -612,18 +625,18 @@ class TranscribeAudioTest extends IntegrationTestCase
             userId: 'test-user',
             language: 'fr'
         );
-        
+
         // Act
         $transcriptionId = $this->commandBus->dispatch($command);
-        
+
         // Assert
         $this->assertNotNull($transcriptionId);
-        
+
         // Verify in database
         $transcription = $this->repository->findById($transcriptionId);
         $this->assertNotNull($transcription);
         $this->assertTrue($transcription->isPending());
-        
+
         // Verify event was dispatched
         $this->assertEventDispatched(ProcessTranscriptionCommand::class);
     }
@@ -633,6 +646,7 @@ class TranscribeAudioTest extends IntegrationTestCase
 ## 📊 Métriques et Monitoring
 
 ### Complexité Cyclomatique
+
 ```php
 // Utiliser PHPStan ou Psalm
 // phpstan.neon
@@ -642,7 +656,7 @@ parameters:
         - src
     excludePaths:
         - src/Infrastructure/Migrations
-    
+
     # Règles de complexité
     complexityLimit: 10
     methodLengthLimit: 20
@@ -650,6 +664,7 @@ parameters:
 ```
 
 ### Code Coverage
+
 ```xml
 <!-- phpunit.xml -->
 <phpunit>
@@ -671,21 +686,25 @@ parameters:
 ## 🚀 Migration depuis l'Architecture Actuelle
 
 ### Phase 1 : Extraction du Domain (2 semaines)
+
 1. Créer les Value Objects pour remplacer les arrays
 2. Extraire les entités depuis les Services actuels
 3. Définir les interfaces Repository
 
 ### Phase 2 : Application Layer (1 semaine)
+
 1. Transformer les Controllers en Commands/Queries
 2. Implémenter les Handlers
 3. Ajouter le Command/Query Bus
 
 ### Phase 3 : Infrastructure (2 semaines)
+
 1. Adapter les Services existants comme Infrastructure
 2. Implémenter les Repository avec Doctrine
 3. Configurer PHP-DI
 
 ### Phase 4 : API & Frontend (3 semaines)
+
 1. GraphQL avec GraphQLite
 2. Migration progressive vers Vue 3
 3. TypeScript et tests E2E
