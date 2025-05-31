@@ -29,6 +29,14 @@ if (strpos($path, '/api/') === 0) {
             require __DIR__ . '/api/auth/me.php';
             return true;
             
+        case $apiPath === '/transcriptions/list':
+            require __DIR__ . '/api/transcriptions/list.php';
+            return true;
+            
+        case $apiPath === '/transcriptions/detail':
+            require __DIR__ . '/api/transcriptions/detail.php';
+            return true;
+            
         case preg_match('#^/v2/(.+)$#', $apiPath, $matches):
             // Router vers l'API v2
             $_SERVER['PATH_INFO'] = '/' . $matches[1];

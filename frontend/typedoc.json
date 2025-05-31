@@ -1,0 +1,30 @@
+{
+  "entryPoints": [
+    "src/types/index.ts",
+    "src/api/",
+    "src/stores/",
+    "src/composables/"
+  ],
+  "out": "docs/api",
+  "name": "Intelligent Transcription Frontend API",
+  "theme": "default",
+  "readme": "none",
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  "excludeExternals": true,
+  "includeVersion": true,
+  "sort": ["source-order"],
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "API",
+    "Stores",
+    "Composables",
+    "Types",
+    "*"
+  ],
+  "plugin": ["typedoc-plugin-markdown"]
+}

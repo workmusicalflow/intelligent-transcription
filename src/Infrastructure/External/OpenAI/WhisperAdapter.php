@@ -28,7 +28,8 @@ class WhisperAdapter implements TranscriberInterface
         $this->model = $model;
         $this->defaultOptions = [
             'response_format' => 'verbose_json',
-            'timestamp_granularities' => ['word']
+            'timestamp_granularities' => ['segment', 'word'], // Support segments ET mots
+            'temperature' => 0  // Plus de cohérence
         ];
     }
     
@@ -46,6 +47,9 @@ class WhisperAdapter implements TranscriberInterface
             // Ajouter la langue seulement si elle est spécifiée
             if ($language !== null) {
                 $params['language'] = $language->code();
+                
+                // Ajouter un prompt contextuel pour améliorer la qualité
+                $params['prompt'] = $this->getLanguagePrompt($language);
             }
             
             $response = $this->client->post('audio/transcriptions', $params);
@@ -134,7 +138,8 @@ class WhisperAdapter implements TranscriberInterface
         $segments = $data['segments'] ?? [];
         $words = $data['words'] ?? [];
         
-        $transcribedText = TranscribedText::fromContent($text);
+        // Créer TranscribedText avec les segments
+        $transcribedText = TranscribedText::fromContentWithSegments($text, $segments);
         
         // Déterminer la langue détectée
         $detectedLanguageCode = $data['language'] ?? 'en';
@@ -239,5 +244,22 @@ class WhisperAdapter implements TranscriberInterface
     public function getName(): string
     {
         return 'OpenAI Whisper';
+    }
+    
+    /**
+     * Génère un prompt contextuel pour améliorer la qualité selon la langue
+     */
+    private function getLanguagePrompt(Language $language): string
+    {
+        $prompts = [
+            'fr' => 'Transcription précise en français avec ponctuation correcte et accents appropriés.',
+            'en' => 'Accurate English transcription with proper punctuation and formatting.',
+            'es' => 'Transcripción precisa en español con puntuación y acentos correctos.',
+            'de' => 'Präzise deutsche Transkription mit korrekter Interpunktion und Umlauten.',
+            'it' => 'Trascrizione precisa in italiano con punteggiatura e accenti corretti.',
+            'pt' => 'Transcrição precisa em português com pontuação e acentos corretos.'
+        ];
+        
+        return $prompts[$language->code()] ?? 'Accurate transcription with proper punctuation.';
     }
 }

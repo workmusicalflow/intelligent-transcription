@@ -1,160 +1,137 @@
 # Intelligent Transcription
 
-A powerful application for transcribing audio and video files to text with smart paraphrasing and contextual chat capabilities, powered by OpenAI.
+> Une application moderne de transcription audio et vidéo utilisant l'IA
 
-## 📋 Overview
+[![Documentation](https://img.shields.io/badge/docs-auto--generated-blue)](https://docs.intelligent-transcription.dev)
+[![Tests](https://img.shields.io/github/workflow/status/your-org/intelligent-transcription/Tests)](https://github.com/your-org/intelligent-transcription/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/your-org/intelligent-transcription)](https://codecov.io/gh/your-org/intelligent-transcription)
+[![License](https://img.shields.io/github/license/your-org/intelligent-transcription)](LICENSE)
 
-Intelligent Transcription helps you convert spoken content from audio files, video files, and YouTube videos into accurate text transcriptions. It also offers advanced features like AI-powered paraphrasing to improve readability and contextual chat to interact with the transcribed content.
+## 🎯 Fonctionnalités
 
-### Key Features
+- **Transcription IA** : Conversion audio/vidéo vers texte avec OpenAI Whisper
+- **Chat Contextuel** : Discussion intelligente sur vos transcriptions
+- **Interface Moderne** : Interface Vue.js 3 responsive et intuitive
+- **Temps Réel** : Suivi en direct du processus de transcription
+- **Multi-formats** : Support audio, vidéo et URLs YouTube
+- **API GraphQL** : API moderne avec subscriptions en temps réel
 
-- 🎵 **Audio/Video Transcription**: Upload files and get accurate text transcriptions
-- 📺 **YouTube Integration**: Transcribe content directly from YouTube URLs (including Shorts)
-- 🌍 **Multi-language Support**: Automatic language detection and translation options
-- ✍️ **Smart Paraphrasing**: Improve clarity with AI-powered reformulation
-- 💬 **Contextual Chat**: Ask questions about the transcribed content
-- 🔐 **User Authentication**: Secure account management with role-based access control
-- 📥 **Export Options**: Download transcriptions and conversation histories
+## 🚀 Démarrage Rapide
 
-## 🚀 Quick Start
+### Prérequis
 
-### Prerequisites
-- PHP 8.1 or higher
-- Python 3.9 or higher
-- SQLite3 support for PHP
-- OpenAI API key
-- Video Download API key (for YouTube functionality)
+- PHP 8.2+
+- Node.js 18+
+- Composer
+- SQLite
 
 ### Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://your-repository-url.git
-   cd intelligent-transcription
-   ```
+```bash
+# Cloner le projet
+git clone https://github.com/your-org/intelligent-transcription.git
+cd intelligent-transcription
 
-2. **Create and configure .env file**:
-   ```
-   OPENAI_API_KEY=your_openai_api_key
-   VIDEO_DOWNLOAD_API_KEY=your_video_download_api_key
-   ```
+# Backend
+composer install
+cp config.example.php config.php
+# Configurer les clés API dans config.php
 
-3. **Run the setup script**:
-   ```bash
-   ./setup_env.sh
-   ```
+# Frontend
+cd frontend
+npm install
 
-4. **Initialize the database**:
-   ```bash
-   php migrate.php
-   ```
-
-5. **Install authentication system**:
-   ```bash
-   php install_auth.php
-   ```
-   This creates an admin user with username `admin` and password `admin123`.
-
-6. **Start the server**:
-   ```bash
-   php -S localhost:8000 -c php.ini
-   ```
-
-7. **Access the application**:
-   Open your browser and go to `http://localhost:8000`
-
-## 📚 Documentation
-
-Our comprehensive documentation covers all aspects of the application:
-
-- [**Detailed Project Overview**](docs/README.md) - Complete features, setup, and usage guide
-- [**Authentication System**](docs/authentication.md) - User management and access control
-- [**Backend Architecture**](docs/architecture.md) - Backend components and data flow diagrams
-- [**API Documentation**](docs/api.md) - Internal and external API endpoints
-- [**Frontend Architecture**](docs/frontend.md) - UI components and frontend design
-- [**Database Integration**](docs/database.md) - SQLite database schema and implementation
-- [**User Workflows**](docs/workflows.md) - Common usage patterns with sequence diagrams
-- [**Contribution Guidelines**](docs/contributing.md) - How to contribute to the project
-
-## 📊 Project Structure
-
-The application follows a modified MVC architecture:
-
-```
-/
-├── assets/                # CSS and JavaScript files
-├── database/              # SQLite database files
-├── docs/                  # Project documentation
-├── results/               # Transcription results (JSON)
-├── src/                   # Application source code
-│   ├── Controllers/       # Request handlers
-│   ├── Database/          # Database management
-│   ├── Services/          # Business logic
-│   ├── Utils/             # Helper functions
-│   └── Template/          # Template management
-├── templates/             # Twig templates
-├── uploads/               # Uploaded files
-├── temp_audio/            # Preprocessed audio
-├── config.php             # Configuration file
-├── migrate.php            # Database migration script
-├── transcribe.py          # Python transcription script
-├── paraphrase.py          # Python paraphrasing script
-└── setup_env.sh           # Environment setup script
+# Démarrer les serveurs
+./start-servers.sh
 ```
 
-## 🔍 Usage Examples
+### Configuration
 
-### File Transcription
-1. Go to the homepage
-2. Upload an audio/video file
-3. Select language options
-4. Click "Transcribe"
-5. View and download the transcription
+1. **OpenAI API** : Obtenir une clé API sur [OpenAI](https://platform.openai.com/)
+2. **Base de données** : SQLite configuré automatiquement
+3. **Variables d'environnement** : Copier et modifier `config.example.php`
 
-### YouTube Transcription
-1. Go to the homepage
-2. Enter a YouTube URL
-3. Select language options
-4. Click "Transcribe YouTube"
-5. View and download the transcription
+## 📖 Documentation
 
-### Using Contextual Chat
-1. After transcription, click "Chat with Assistant"
-2. Ask questions about the transcribed content
-3. Get AI-powered responses based on the context
-4. Export the conversation if needed
+| Section | Description | Lien |
+|---------|-------------|------|
+| 🏗️ **Architecture** | Design du système et structure | [Architecture](docs/architecture/) |
+| 🔧 **API Reference** | Documentation REST & GraphQL | [API Docs](docs/backend/api/) |
+| 🎨 **Components** | Composants UI et Storybook | [Components](docs/components/) |
+| 🧪 **Testing** | Tests et couverture | [Testing Guide](docs/testing/) |
+| 🚀 **Deployment** | Guide de déploiement | [Deployment](docs/deployment/) |
+| 📋 **ADRs** | Décisions architecturales | [ADRs](docs/adr/) |
 
-## ⚠️ Limitations
+> 📚 **Documentation complète** : [docs.intelligent-transcription.dev](https://docs.intelligent-transcription.dev)
 
-- Maximum file size: 100MB
-- Supported formats: MP3, WAV, MP4, AVI, MOV, etc.
-- API rate limits may apply
+## 🏗️ Architecture
 
-## 🔧 Troubleshooting
+### Backend (Clean Architecture)
 
-If you encounter issues:
+```
+src/
+├── Domain/          # Entités et logique métier
+├── Application/     # Services et cas d'usage
+├── Infrastructure/  # Base de données, APIs externes
+└── Controllers/     # Points d'entrée HTTP/GraphQL
+```
 
-- Check API keys in your .env file
-- Verify Python environment setup
-- Check debug logs for detailed error information
-- Ensure file permissions are correct for upload directories
+### Frontend (Vue.js 3)
 
-## 🔮 Future Development
+```
+src/
+├── components/      # Composants réutilisables
+├── views/          # Pages de l'application
+├── stores/         # Gestion d'état Pinia
+├── composables/    # Logique réutilisable
+└── api/           # Clients API
+```
 
-- Enhanced user profile management
-- Advanced file management and sharing
-- Real-time streaming responses
-- Batch processing
-- Additional language options
-- Data migration utilities
-- User groups and team collaboration
+## 🧪 Tests
 
-## 📝 License
+```bash
+# Tests Backend PHP
+php vendor/bin/phpunit
 
-This project is licensed under the [MIT License](LICENSE).
+# Tests Frontend
+cd frontend
+npm run test
+npm run test:coverage
 
-## 🙏 Acknowledgements
+# Tests E2E
+npm run cypress:run
+```
 
-- OpenAI for the powerful AI models
-- Loader.to for YouTube download functionality
-- All contributors to the project
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
+3. Commit les changements (`git commit -m 'Add amazing feature'`)
+4. Push la branche (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
+
+Voir le [Guide de Contribution](docs/contributing.md) pour plus de détails.
+
+## 📋 Roadmap
+
+- [ ] Interface d'administration avancée
+- [ ] Support multi-langues
+- [ ] Intégration avec plus de services de stockage
+- [ ] API mobile dédiée
+- [ ] Amélioration de l'IA contextuelle
+
+## 📄 Licence
+
+Distribué sous la licence MIT. Voir `LICENSE` pour plus d'informations.
+
+## 🙏 Remerciements
+
+- [OpenAI](https://openai.com/) pour l'API Whisper
+- [Vue.js](https://vuejs.org/) pour le framework frontend
+- [Tailwind CSS](https://tailwindcss.com/) pour le styling
+
+---
+
+<div align="center">
+  <strong>⚡ Propulsé par l'IA et développé avec ❤️</strong>
+</div>

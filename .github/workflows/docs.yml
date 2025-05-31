@@ -1,0 +1,93 @@
+name: Documentation Auto-Update
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  generate-docs:
+    name: Generate and Deploy Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json
+    
+    - name: Install PHP dependencies
+      run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+    
+    - name: Generate API Documentation
+      run: |
+        cd frontend
+        npm run docs:api
+    
+    - name: Generate Component Documentation
+      run: |
+        cd frontend
+        npm run docs:components
+    
+    - name: Build Storybook
+      run: |
+        cd frontend
+        npm run build-storybook
+    
+    - name: Generate Test Coverage Report
+      run: |
+        cd frontend
+        npm run test:coverage
+    
+    - name: Generate PHP Documentation
+      run: |
+        ./scripts/generate-php-docs.sh
+    
+    - name: Generate Architecture Documentation
+      run: |
+        ./scripts/generate-architecture-docs.sh
+    
+    - name: Build Documentation Site
+      run: |
+        ./scripts/build-docs-site.sh
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs-dist
+        cname: docs.intelligent-transcription.dev
+    
+    - name: Update Documentation Index
+      if: github.ref == 'refs/heads/main'
+      run: |
+        ./scripts/update-docs-index.sh
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/
+        git diff --staged --quiet || git commit -m "docs: Auto-update documentation [skip ci]"
+        git push
