@@ -5,7 +5,9 @@
  */
 
 // Chemins de base
-define('BASE_DIR', dirname(__DIR__));
+if (!defined('BASE_DIR')) {
+    define('BASE_DIR', dirname(__DIR__));
+}
 define('SRC_DIR', __DIR__);
 define('TEMPLATES_DIR', BASE_DIR . '/templates');
 define('UPLOAD_DIR', BASE_DIR . '/uploads');

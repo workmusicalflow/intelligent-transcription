@@ -43,11 +43,9 @@ class GraphQLService
             $this->container
         );
 
-        // Configuration des namespaces
-        // Note: Les méthodes addControllerNamespace et addTypeNamespace sont dépréciées
-        // Utiliser les annotations ou attributes directement dans les classes
-        $factory->addControllerNamespace('Infrastructure\\GraphQL\\Controller');
-        $factory->addTypeNamespace('Infrastructure\\GraphQL\\Type');
+        // Configuration des namespaces (nouvelle méthode non dépréciée)
+        $factory->addNamespace('Infrastructure\\GraphQL\\Controller');
+        $factory->addNamespace('Infrastructure\\GraphQL\\Type');
 
         // Configuration de production vs développement
         if ($_ENV['APP_ENV'] === 'production') {
