@@ -97,10 +97,10 @@ const strengthScore = computed(() => {
 const strengthPercentage = computed(() => strengthScore.value)
 
 const strengthLevel = computed(() => {
-  if (strengthScore.value < 40) return 'very-weak'
-  if (strengthScore.value < 60) return 'weak'
-  if (strengthScore.value < 80) return 'medium'
-  if (strengthScore.value < 100) return 'strong'
+  if (strengthScore.value < 20) return 'very-weak'
+  if (strengthScore.value < 40) return 'weak'
+  if (strengthScore.value < 70) return 'medium'
+  if (strengthScore.value < 90) return 'strong'
   return 'very-strong'
 })
 

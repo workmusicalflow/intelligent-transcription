@@ -32,9 +32,9 @@ describe('Register.vue', () => {
     })
 
     expect(wrapper.find('[data-testid="register-form"]').exists()).toBe(true)
-    expect(wrapper.find('input[type="text"]').exists()).toBe(true) // Name
-    expect(wrapper.find('input[type="email"]').exists()).toBe(true) // Email
-    expect(wrapper.find('input[type="password"]').exists()).toBe(true) // Password
+    expect(wrapper.find('[data-testid="name-input"]').exists()).toBe(true) // Name
+    expect(wrapper.find('[data-testid="email-input"]').exists()).toBe(true) // Email  
+    expect(wrapper.find('[data-testid="password-input"]').exists()).toBe(true) // Password
     expect(wrapper.find('button[type="submit"]').exists()).toBe(true)
   })
 
@@ -67,9 +67,9 @@ describe('Register.vue', () => {
     })
 
     // Fill form with invalid email
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
-    const passwordInput = wrapper.find('input[type="password"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
 
     await nameInput.setValue('Test User')
     await emailInput.setValue('invalid-email')
@@ -93,7 +93,7 @@ describe('Register.vue', () => {
       }
     })
 
-    const passwordInput = wrapper.find('input[type="password"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
     
     // Test weak password
     await passwordInput.setValue('123')
@@ -123,8 +123,8 @@ describe('Register.vue', () => {
       }
     })
 
-    const passwordInput = wrapper.find('input[type="password"]')
-    const confirmPasswordInput = wrapper.find('input[placeholder*="confirmer"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
+    const confirmPasswordInput = wrapper.find('[data-testid="confirm-password-input"]')
 
     await passwordInput.setValue('Password123!')
     await confirmPasswordInput.setValue('DifferentPassword123!')
@@ -148,10 +148,10 @@ describe('Register.vue', () => {
     })
 
     // Fill form but don't accept terms
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
-    const passwordInput = wrapper.find('input[type="password"]')
-    const confirmPasswordInput = wrapper.find('input[placeholder*="confirmer"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
+    const confirmPasswordInput = wrapper.find('[data-testid="confirm-password-input"]')
 
     await nameInput.setValue('Test User')
     await emailInput.setValue('test@example.com')
@@ -185,11 +185,11 @@ describe('Register.vue', () => {
     })
 
     // Fill form with valid data
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
-    const passwordInput = wrapper.find('input[type="password"]')
-    const confirmPasswordInput = wrapper.find('input[placeholder*="confirmer"]')
-    const termsCheckbox = wrapper.find('input[type="checkbox"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
+    const confirmPasswordInput = wrapper.find('[data-testid="confirm-password-input"]')
+    const termsCheckbox = wrapper.find('[data-testid="terms-checkbox"]')
 
     await nameInput.setValue('Test User')
     await emailInput.setValue('test@example.com')
@@ -225,11 +225,11 @@ describe('Register.vue', () => {
     })
 
     // Fill form with valid data
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
-    const passwordInput = wrapper.find('input[type="password"]')
-    const confirmPasswordInput = wrapper.find('input[placeholder*="confirmer"]')
-    const termsCheckbox = wrapper.find('input[type="checkbox"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
+    const confirmPasswordInput = wrapper.find('[data-testid="confirm-password-input"]')
+    const termsCheckbox = wrapper.find('[data-testid="terms-checkbox"]')
 
     await nameInput.setValue('Test User')
     await emailInput.setValue('test@example.com')
@@ -266,11 +266,11 @@ describe('Register.vue', () => {
     })
 
     // Fill and submit form
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
-    const passwordInput = wrapper.find('input[type="password"]')
-    const confirmPasswordInput = wrapper.find('input[placeholder*="confirmer"]')
-    const termsCheckbox = wrapper.find('input[type="checkbox"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
+    const passwordInput = wrapper.find('[data-testid="password-input"]')
+    const confirmPasswordInput = wrapper.find('[data-testid="confirm-password-input"]')
+    const termsCheckbox = wrapper.find('[data-testid="terms-checkbox"]')
 
     await nameInput.setValue('Test User')
     await emailInput.setValue('test@example.com')
@@ -351,8 +351,8 @@ describe('Register.vue', () => {
     })
 
     // Fill form
-    const nameInput = wrapper.find('input[placeholder*="nom"]')
-    const emailInput = wrapper.find('input[type="email"]')
+    const nameInput = wrapper.find('[data-testid="name-input"]')
+    const emailInput = wrapper.find('[data-testid="email-input"]')
     
     await nameInput.setValue('Test User')
     await emailInput.setValue('test@example.com')

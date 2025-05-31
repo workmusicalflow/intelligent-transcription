@@ -16,10 +16,7 @@ export function setupSentry(app: App, router: Router) {
         Sentry.browserTracingIntegration({ router }),
         Sentry.replayIntegration({
           maskAllText: false,
-          blockAllMedia: false,
-          // Only record sessions with errors
-          sessionSampleRate: 0,
-          errorSampleRate: 1.0
+          blockAllMedia: false
         })
       ],
       
@@ -28,9 +25,6 @@ export function setupSentry(app: App, router: Router) {
         ? parseFloat(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE) 
         : 0.1,
       
-      // Capture replay on errors
-      replaysSessionSampleRate: 0,
-      replaysOnErrorSampleRate: 1.0,
       
       // Additional options
       beforeSend(event, hint) {

@@ -86,7 +86,7 @@
     </div>
     
     <!-- Zone de messages -->
-    <div class="flex-1 flex flex-col min-h-0">
+    <div class="flex-1 flex flex-col min-h-0" data-testid="chat-area">
       <!-- Messages -->
       <div 
         ref="messagesContainer"
@@ -141,6 +141,16 @@
         
         <!-- Indicateur d'écriture IA -->
         <TypingIndicator v-if="aiTyping" />
+        
+        <!-- Indicateur d'envoi -->
+        <div v-if="sending" class="flex justify-start" data-testid="sending-indicator">
+          <div class="bg-blue-100 dark:bg-blue-900/20 rounded-lg px-4 py-2 max-w-xs">
+            <div class="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+              <LoadingSpinner size="sm" />
+              <span>Envoi en cours...</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- Zone de saisie -->
@@ -157,6 +167,7 @@
               :maxlength="2000"
               class="w-full resize-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all"
               style="min-height: 44px; max-height: 120px;"
+              data-testid="message-input"
               @input="adjustTextareaHeight"
               @keydown="handleKeyDown"
             ></textarea>
@@ -175,6 +186,7 @@
             :disabled="!messageText.trim() || sending || !conversation"
             :loading="sending"
             class="self-end px-6"
+            data-testid="send-message"
           >
             <svg v-if="!sending" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>

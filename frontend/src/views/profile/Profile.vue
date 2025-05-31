@@ -1,5 +1,5 @@
 <template>
-  <div class="container-app section-padding max-w-4xl">
+  <div class="container-app section-padding max-w-4xl" data-testid="profile-container">
     <!-- En-tête -->
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -11,12 +11,13 @@
     </div>
 
     <!-- Navigation onglets -->
-    <div class="border-b border-gray-200 dark:border-gray-700 mb-8">
+    <div class="border-b border-gray-200 dark:border-gray-700 mb-8" data-testid="profile-tabs">
       <nav class="-mb-px flex space-x-8">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           @click="activeTab = tab.id"
+          :data-testid="`${tab.id}-tab`"
           :class="[
             'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
             activeTab === tab.id
@@ -35,7 +36,7 @@
     <!-- Contenu des onglets -->
     <div class="space-y-8">
       <!-- Onglet Informations personnelles -->
-      <div v-show="activeTab === 'personal'">
+      <div v-show="activeTab === 'personal'" data-testid="personal-info-section">
         <PersonalInfoSection
           :user="user"
           :loading="loading.personal"
@@ -45,7 +46,7 @@
       </div>
 
       <!-- Onglet Sécurité -->
-      <div v-show="activeTab === 'security'">
+      <div v-show="activeTab === 'security'" data-testid="security-section">
         <SecuritySection
           :loading="loading.security"
           @change-password="handleChangePassword"
@@ -53,7 +54,7 @@
       </div>
 
       <!-- Onglet Préférences -->
-      <div v-show="activeTab === 'preferences'">
+      <div v-show="activeTab === 'preferences'" data-testid="preferences-section">
         <PreferencesSection
           :preferences="user?.preferences"
           :loading="loading.preferences"

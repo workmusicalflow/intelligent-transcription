@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { config } from '@vue/test-utils'
-import { vi } from 'vitest'
+import { vi, beforeAll, afterAll, afterEach } from 'vitest'
 
 // Configure Vue Test Utils
 config.global.mocks = {

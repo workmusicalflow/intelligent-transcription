@@ -1,5 +1,5 @@
 <template>
-  <div class="container-app section-padding">
+  <div class="container-app section-padding" data-testid="chat-container">
     <!-- En-tête avec actions -->
     <div class="flex justify-between items-center mb-6">
       <div>
@@ -19,6 +19,7 @@
             type="text"
             placeholder="Rechercher..."
             class="input-base pl-10 w-64"
+            data-testid="conversation-search"
             @input="debouncedSearch"
           >
           <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,6 +33,7 @@
           size="md"
           @click="showCreateModal = true"
           :disabled="loading"
+          data-testid="new-conversation"
         >
           <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -64,8 +66,18 @@
     <!-- État de chargement -->
     <GlobalLoading v-if="loading && conversations.length === 0" class="py-12" />
 
+    <!-- État d'erreur -->
+    <div v-else-if="error" class="text-center py-12" data-testid="error-state">
+      <div class="text-red-500 text-4xl mb-4">⚠️</div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Erreur</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">{{ error }}</p>
+      <Button variant="primary" @click="loadConversations">
+        Réessayer
+      </Button>
+    </div>
+
     <!-- Liste des conversations -->
-    <div v-else-if="conversations.length > 0" class="space-y-4">
+    <div v-else-if="conversations.length > 0" class="space-y-4" data-testid="conversations-list">
       <ConversationCard
         v-for="conversation in filteredConversations"
         :key="conversation.id"
@@ -153,6 +165,7 @@ const uiStore = useUIStore()
 
 // State réactif
 const loading = ref(false)
+const error = ref('')
 const conversations = ref<Conversation[]>([])
 const searchQuery = ref('')
 const activeFilter = ref('all')
@@ -230,6 +243,7 @@ const debouncedSearch = debounce(() => {
 async function loadConversations() {
   try {
     loading.value = true
+    error.value = ''
     
     const response = await ChatAPI.getConversations({
       page: pagination.value.page,
@@ -241,8 +255,9 @@ async function loadConversations() {
       conversations.value = response.data.data
       pagination.value = response.data.pagination
     }
-  } catch (error) {
-    console.error('Erreur lors du chargement des conversations:', error)
+  } catch (err: any) {
+    console.error('Erreur lors du chargement des conversations:', err)
+    error.value = 'Impossible de charger les conversations'
     uiStore.showNotification({
       type: 'error',
       title: 'Erreur',

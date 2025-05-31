@@ -28,7 +28,7 @@
         :is="inputComponent"
         :id="inputId"
         ref="inputRef"
-        :type="type"
+        :type="currentInputType"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
@@ -46,20 +46,40 @@
         @keydown="handleKeydown"
       />
 
-      <!-- Icon right / Clear button -->
+      <!-- Icon right / Clear button / Password toggle -->
       <div
-        v-if="iconRight || (clearable && modelValue)"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center"
+        v-if="iconRight || (clearable && modelValue) || (showPasswordToggle && type === 'password')"
+        class="absolute inset-y-0 right-0 pr-3 flex items-center space-x-1"
       >
+        <!-- Password toggle -->
+        <button
+          v-if="showPasswordToggle && type === 'password'"
+          type="button"
+          class="text-gray-400 hover:text-gray-600 focus:text-gray-600 transition-colors"
+          data-testid="password-toggle"
+          @click="togglePasswordVisibility"
+        >
+          <svg v-if="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+          </svg>
+          <svg v-else class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+        
+        <!-- Clear button -->
         <button
           v-if="clearable && modelValue && !disabled"
           type="button"
           class="text-gray-400 hover:text-gray-600 focus:text-gray-600 transition-colors"
+          data-testid="clear-button"
           @click="handleClear"
         >
           <XMarkIcon class="h-5 w-5" />
         </button>
         
+        <!-- Icon right -->
         <component
           v-else-if="iconRight"
           :is="iconRight"
@@ -72,7 +92,7 @@
         v-if="loading"
         class="absolute inset-y-0 right-0 pr-3 flex items-center"
       >
-        <LoadingSpinner size="sm" />
+        <LoadingSpinner size="sm" data-testid="loading-spinner" />
       </div>
     </div>
 
@@ -125,6 +145,7 @@ interface Props {
   loading?: boolean
   clearable?: boolean
   showCount?: boolean
+  showPasswordToggle?: boolean
   size?: 'sm' | 'md' | 'lg'
   variant?: 'default' | 'filled' | 'underlined'
   iconLeft?: any
@@ -146,6 +167,7 @@ const props = withDefaults(defineProps<Props>(), {
   rows: 3,
   clearable: false,
   showCount: false,
+  showPasswordToggle: false,
   disabled: false,
   readonly: false,
   required: false,
@@ -164,9 +186,17 @@ const emit = defineEmits<{
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement>()
 const inputId = `input-${nanoid(6)}`
 const isFocused = ref(false)
+const showPassword = ref(false)
 
 // Computed
 const inputComponent = computed(() => props.inputType === 'textarea' ? 'textarea' : 'input')
+
+const currentInputType = computed(() => {
+  if (props.type === 'password' && props.showPasswordToggle) {
+    return showPassword.value ? 'text' : 'password'
+  }
+  return props.type
+})
 
 const containerClasses = computed(() => [
   'space-y-1'
@@ -283,6 +313,10 @@ const handleClear = () => {
 
 const handleKeydown = (event: KeyboardEvent) => {
   emit('keydown', event)
+}
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
 }
 
 // Public methods

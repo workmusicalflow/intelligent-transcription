@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Loading state -->
-    <div v-if="loading" class="flex items-center justify-center min-h-screen">
+    <div v-if="loading" class="flex items-center justify-center min-h-screen" data-testid="loading">
       <div class="text-center">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         <p class="text-gray-500 dark:text-gray-400 mt-4">Chargement de la transcription...</p>
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="container-app section-padding">
+    <div v-else-if="error" class="container-app section-padding" data-testid="error">
       <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
         <div class="text-red-500 text-4xl mb-4">❌</div>
         <h2 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-2">Erreur</h2>
@@ -176,6 +176,7 @@
                 @click="exportTranscription(format.key)"
                 :disabled="exportLoading === format.key"
                 class="flex items-center justify-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                :data-testid="`export-${format.key}`"
               >
                 <span v-if="exportLoading === format.key" class="animate-spin mr-2">⏳</span>
                 {{ format.icon }} {{ format.label }}
@@ -231,6 +232,7 @@
                       ? 'bg-blue-500 text-white'
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                   ]"
+                  data-testid="edit-mode-btn"
                 >
                   ✏️ Édition
                 </button>
@@ -243,6 +245,7 @@
                       ? 'bg-blue-500 text-white'
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                   ]"
+                  data-testid="segments-mode-btn"
                 >
                   🎯 Segments
                 </button>
@@ -257,12 +260,14 @@
                 <button
                   @click="adjustFontSize(-1)"
                   class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  data-testid="decrease-font"
                 >
                   A-
                 </button>
                 <button
                   @click="adjustFontSize(1)"
                   class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  data-testid="increase-font"
                 >
                   A+
                 </button>
@@ -291,7 +296,7 @@
         <!-- Content area -->
         <div class="flex-1 overflow-auto">
           <!-- Reading mode -->
-          <div v-if="viewMode === 'read'" class="p-8">
+          <div v-if="viewMode === 'read'" class="p-8" data-testid="read-mode">
             <div
               ref="textContainer"
               class="prose prose-lg max-w-none dark:prose-invert"
@@ -301,7 +306,7 @@
           </div>
 
           <!-- Edit mode -->
-          <div v-else-if="viewMode === 'edit'" class="p-8">
+          <div v-else-if="viewMode === 'edit'" class="p-8" data-testid="edit-mode">
             <div class="mb-4 flex items-center justify-between">
               <h3 class="text-lg font-medium text-gray-900 dark:text-white">Édition du texte</h3>
               <div class="space-x-2">
@@ -309,6 +314,7 @@
                   @click="saveChanges"
                   :disabled="!hasChanges || saving"
                   class="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white px-4 py-2 rounded-md text-sm transition-colors"
+                  data-testid="save-changes"
                 >
                   {{ saving ? '⏳ Enregistrement...' : '💾 Enregistrer' }}
                 </button>
@@ -328,7 +334,7 @@
           </div>
 
           <!-- Segments mode -->
-          <div v-else-if="viewMode === 'segments' && segments" class="p-8">
+          <div v-else-if="viewMode === 'segments' && segments" class="p-8" data-testid="segments-mode">
             <div class="mb-6">
               <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Navigation par segments</h3>
               <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -490,6 +496,10 @@ const highlightedText = computed(() => {
 
 // Fonctions utilitaires
 const getLanguageName = (code: string): string => {
+  if (!code || typeof code !== 'string') {
+    return 'N/A'
+  }
+  
   const languages: Record<string, string> = {
     'fr': 'Français',
     'en': 'Anglais',

@@ -4,6 +4,7 @@
     :type="tag === 'button' ? type : undefined"
     :disabled="disabled || loading"
     :class="buttonClasses"
+    data-testid="button"
     v-bind="$attrs"
     @click="handleClick"
   >
@@ -13,6 +14,7 @@
         v-if="loading"
         :size="spinnerSize"
         class="mr-2"
+        data-testid="loading-spinner"
       />
     </transition>
 

@@ -7,6 +7,7 @@ import { authApi } from '@/api/auth'
 // Mock the API
 vi.mock('@/api/auth', () => ({
   authApi: {
+    me: vi.fn(),
     updateProfile: vi.fn(),
     updatePassword: vi.fn(),
     uploadAvatar: vi.fn(),
@@ -23,6 +24,21 @@ const mockRouter = {
 describe('Profile.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    
+    // Setup default mocks
+    vi.mocked(authApi.me).mockResolvedValue({
+      success: true,
+      data: {
+        user: {
+          id: '1',
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          avatar: null,
+          createdAt: '2023-01-01T00:00:00Z',
+          updatedAt: '2023-01-01T00:00:00Z'
+        }
+      }
+    })
   })
 
   it('renders profile interface correctly', () => {
