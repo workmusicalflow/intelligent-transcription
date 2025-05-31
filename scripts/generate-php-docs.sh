@@ -26,7 +26,9 @@ if command -v phpdoc &> /dev/null; then
         --template responsive-twig \
         --ignore "*/vendor/*,*/tests/*,*/cache/*"
 else
-    echo "⚠️  PHPDoc not found, skipping PHP documentation generation"
+    echo "⚠️  PHPDoc not found, creating basic backend documentation"
+    mkdir -p docs/backend/phpdoc
+    echo "<h1>Backend Documentation</h1><p>PHPDoc documentation will be generated here when PHPDoc is installed.</p>" > docs/backend/phpdoc/index.html
 fi
 
 # Generate Domain Layer Documentation

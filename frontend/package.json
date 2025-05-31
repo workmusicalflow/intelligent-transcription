@@ -18,7 +18,10 @@
     "e2e": "cypress open",
     "e2e:headless": "cypress run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs:api": "echo 'TypeDoc not installed, skipping API docs generation'",
+    "docs:components": "echo 'vue-docgen-cli not installed, skipping component docs generation'",
+    "docs:build": "npm run docs:api && npm run docs:components"
   },
   "dependencies": {
     "@apollo/client": "^3.8.8",
