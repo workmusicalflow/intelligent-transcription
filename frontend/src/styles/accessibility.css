@@ -1,0 +1,320 @@
+/* Styles d'accessibilité et optimisations */
+
+/* Screen reader only - texte visible uniquement pour les lecteurs d'écran */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Afficher le texte sr-only au focus (utile pour les liens de navigation) */
+.sr-only:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border-radius: 0.375rem !important;
+  z-index: 50 !important;
+}
+
+/* Focus visible amélioré */
+.focus-visible:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Indicateur de focus au clavier uniquement */
+.using-keyboard *:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Masquer l'outline pour les clics souris */
+:not(.using-keyboard) *:focus {
+  outline: none;
+}
+
+/* Styles pour contraste élevé */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    --tw-bg-opacity: 1;
+    --tw-text-opacity: 1;
+  }
+  
+  .high-contrast .bg-white {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000;
+  }
+  
+  .high-contrast .bg-gray-50 {
+    background-color: #f8f9fa !important;
+    color: #000000 !important;
+  }
+  
+  .high-contrast .text-gray-600 {
+    color: #000000 !important;
+  }
+  
+  .high-contrast .border-gray-200 {
+    border-color: #000000 !important;
+  }
+  
+  .high-contrast .btn-primary {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+  
+  .high-contrast .btn-primary:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* Styles pour mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-spin,
+  .animate-ping,
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+}
+
+/* Styles pour connexions lentes */
+.slow-connection * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+.slow-connection .animate-spin,
+.slow-connection .animate-ping,
+.slow-connection .animate-pulse,
+.slow-connection .animate-bounce {
+  animation: none !important;
+}
+
+/* Styles pour économie de données */
+.save-data .bg-gradient-to-r,
+.save-data .bg-gradient-to-br,
+.save-data .bg-gradient-to-bl {
+  background: var(--fallback-bg-color, #f3f4f6) !important;
+}
+
+.save-data img:not(.critical) {
+  display: none !important;
+}
+
+.save-data video,
+.save-data .video-background {
+  display: none !important;
+}
+
+/* Améliorations pour les tailles de police */
+:root {
+  --base-font-size: 16px;
+}
+
+html {
+  font-size: var(--base-font-size);
+}
+
+/* Styles de focus pour les éléments interactifs */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* États désactivés accessibles */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Indicateurs de chargement accessibles */
+.loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    animation: none;
+    border: 2px solid currentColor;
+    border-top: 2px solid transparent;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animations d'entrée optimisées */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.4s ease-out;
+}
+
+/* Skip links pour la navigation au clavier */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #1f2937;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 1000;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Amélioration des contrastes pour les liens */
+a {
+  text-decoration-skip-ink: auto;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/* Styles pour les messages d'erreur accessibles */
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.error-message::before {
+  content: "⚠️ ";
+  speak: literal;
+}
+
+/* Styles pour les messages de succès accessibles */
+.success-message {
+  color: #059669;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.success-message::before {
+  content: "✓ ";
+  speak: literal;
+}
+
+/* Amélioration de la lisibilité */
+p, li, span {
+  line-height: 1.6;
+}
+
+/* Tables accessibles */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  font-weight: 600;
+  background-color: #f9fafb;
+}
+
+/* Responsive design pour l'accessibilité */
+@media (max-width: 640px) {
+  .responsive-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+  
+  button,
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

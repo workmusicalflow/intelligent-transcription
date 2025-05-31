@@ -1,5 +1,8 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Skip Links for Accessibility -->
+    <SkipLinks />
+    
     <!-- Global Loading -->
     <Transition name="fade">
       <GlobalLoading v-if="appStore.isLoading" />
@@ -30,7 +33,7 @@
       </Transition>
 
       <!-- Main Content -->
-      <main class="flex-1 flex flex-col overflow-hidden">
+      <main id="main-content" class="flex-1 flex flex-col overflow-hidden" tabindex="-1">
         <!-- Top Navigation -->
         <TopNavigation v-if="authStore.isAuthenticated" />
 
@@ -41,8 +44,9 @@
               <Suspense>
                 <component :is="Component" :key="route.path" />
                 <template #fallback>
-                  <div class="flex items-center justify-center h-64">
+                  <div class="flex items-center justify-center h-64" role="status" aria-label="Chargement du contenu">
                     <LoadingSpinner size="lg" />
+                    <span class="sr-only">Chargement en cours...</span>
                   </div>
                 </template>
               </Suspense>
@@ -71,6 +75,7 @@ import GlobalLoading from '@components/ui/GlobalLoading.vue'
 import LoadingSpinner from '@components/ui/LoadingSpinner.vue'
 import NotificationContainer from '@components/ui/NotificationContainer.vue'
 import ModalContainer from '@components/ui/ModalContainer.vue'
+import SkipLinks from '@components/ui/SkipLinks.vue'
 
 // Stores
 import { useAppStore } from '@stores/app'

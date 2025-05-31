@@ -2,10 +2,10 @@
   <div class="container-app section-padding">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2" v-animate="'animate-fade-in-up'">
         Tableau de bord
       </h1>
-      <p class="text-gray-600 dark:text-gray-400">
+      <p class="text-gray-600 dark:text-gray-400" v-animate.delay="'animate-fade-in-up'">
         Bienvenue {{ authStore.user?.name }}! Voici un aperçu de votre activité.
       </p>
     </div>
@@ -166,6 +166,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { format, formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { useSEO, seoConfigs } from '@/composables/useSEO'
 
 // Components
 import Button from '@components/ui/Button.vue'
@@ -190,6 +191,7 @@ import type { Transcription, UserStats } from '@/types'
 const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUIStore()
+const { updateSEO } = useSEO()
 
 // State
 const stats = ref<UserStats | null>(null)
@@ -381,6 +383,9 @@ const closeWelcomeModal = () => {
 
 // Lifecycle
 onMounted(async () => {
+  // Setup SEO
+  updateSEO(seoConfigs.dashboard)
+  
   // Check if user is new
   const hasSeenWelcome = localStorage.getItem('welcome-modal-seen')
   if (!hasSeenWelcome && authStore.user) {

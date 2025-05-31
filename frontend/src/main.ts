@@ -4,6 +4,8 @@ import router from './router'
 import { apolloClient } from './api/apollo'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import { setupSentry, captureException } from './plugins/sentry'
+import performancePlugin from './plugins/performance'
+import { accessibilityDirectives } from './composables/useAccessibility'
 
 import App from './App.vue'
 import './style.css'
@@ -17,6 +19,12 @@ const pinia = createPinia()
 // Use plugins
 app.use(pinia)
 app.use(router)
+app.use(performancePlugin)
+
+// Register accessibility directives
+Object.keys(accessibilityDirectives).forEach(name => {
+  app.directive(name, accessibilityDirectives[name as keyof typeof accessibilityDirectives])
+})
 
 // Setup Sentry error tracking
 setupSentry(app, router)
