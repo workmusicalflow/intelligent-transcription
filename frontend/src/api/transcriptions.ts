@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import { authApi } from './auth'
 import type { 
   ApiResponse, 
   PaginatedResponse,
@@ -23,10 +24,44 @@ export interface CreateTranscriptionRequest {
   title?: string
 }
 
+export interface CreateTranscriptionData {
+  file?: File
+  youtubeUrl?: string
+  language?: string
+  title?: string
+}
+
+export interface YouTubeValidationResponse {
+  videoId: string
+  title: string
+  channel: string
+  thumbnail: string
+  duration: string
+  url: string
+  isValid: boolean
+  accessibility: {
+    isPublic: boolean
+    hasSubtitles: boolean | null
+    language: string | null
+  }
+}
+
+export interface TranscriptionCreationResponse {
+  transcriptionId: string
+  fileName: string
+  sourceType: 'file' | 'youtube'
+  language: string
+  status: string
+  createdAt: string
+  estimatedProcessingTime: number
+}
+
 /**
  * API client pour les transcriptions
  */
 export class TranscriptionAPI {
+  private static baseUrl = '/api/transcriptions'
+
   /**
    * Obtenir la liste des transcriptions
    */
@@ -42,9 +77,81 @@ export class TranscriptionAPI {
   }
 
   /**
-   * Créer une nouvelle transcription
+   * Créer une nouvelle transcription (nouvelle implémentation)
    */
-  static async createTranscription(data: FormData): Promise<ApiResponse<{ transcription_id: string }>> {
+  static async createTranscription(data: CreateTranscriptionData): Promise<ApiResponse<TranscriptionCreationResponse>> {
+    try {
+      const formData = new FormData()
+      
+      if (data.file) {
+        formData.append('audio_file', data.file)
+        if (data.title) {
+          formData.append('title', data.title)
+        }
+      } else if (data.youtubeUrl) {
+        formData.append('youtube_url', data.youtubeUrl)
+      } else {
+        throw new Error('Fichier ou URL YouTube requis')
+      }
+      
+      if (data.language) {
+        formData.append('language', data.language)
+      }
+
+      const token = authApi.getToken()
+      if (!token) {
+        throw new Error('Token d\'authentification requis')
+      }
+
+      const response = await fetch(`${this.baseUrl}/create.php`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erreur lors de la création de la transcription')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la création de transcription:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Valider une URL YouTube
+   */
+  static async validateYouTubeUrl(url: string): Promise<ApiResponse<YouTubeValidationResponse>> {
+    try {
+      const response = await fetch(`${this.baseUrl}/validate-youtube.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erreur lors de la validation de l\'URL')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la validation YouTube:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Créer une nouvelle transcription (ancienne implémentation)
+   */
+  static async createTranscriptionLegacy(data: FormData): Promise<ApiResponse<{ transcription_id: string }>> {
     return apiClient.post('/api/v2/transcriptions', data, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -78,6 +185,77 @@ export class TranscriptionAPI {
     totalCost: number
   }>> {
     return apiClient.get('/api/v2/transcriptions/stats')
+  }
+
+  /**
+   * Récupérer la liste des transcriptions avec la nouvelle API
+   */
+  static async listTranscriptions(params: {
+    page?: number
+    limit?: number
+    search?: string
+    language?: string
+    status?: string
+    sort?: string
+    order?: 'asc' | 'desc'
+  } = {}): Promise<ApiResponse<any>> {
+    try {
+      const token = authApi.getToken()
+      if (!token) {
+        throw new Error('Token d\'authentification requis')
+      }
+
+      const searchParams = new URLSearchParams()
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          searchParams.append(key, value.toString())
+        }
+      })
+
+      const response = await fetch(`${this.baseUrl}/list.php?${searchParams}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erreur lors de la récupération des transcriptions')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la récupération des transcriptions:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Récupérer les détails d'une transcription
+   */
+  static async getTranscriptionDetails(id: string): Promise<ApiResponse<any>> {
+    try {
+      const token = authApi.getToken()
+      if (!token) {
+        throw new Error('Token d\'authentification requis')
+      }
+
+      const response = await fetch(`${this.baseUrl}/detail.php?id=${encodeURIComponent(id)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erreur lors de la récupération des détails')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails:', error)
+      throw error
+    }
   }
 }
 
