@@ -3,6 +3,8 @@
     :to="item.href"
     :class="itemClasses"
     :title="collapsed ? item.name : undefined"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- Icon -->
     <component
