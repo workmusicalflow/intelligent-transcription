@@ -1465,3 +1465,6 @@ Trace: #0 /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructu
 2025-05-31 12:10:12 - Erreur fatale: Declaration of Infrastructure\Cache\PSRCacheAdapter::get($key, $default = null) must be compatible with Psr\SimpleCache\CacheInterface::get(string $key, mixed $default = null): mixed dans /Users/ns2poportable/Desktop/inteligent-transcription/src/Infrastructure/Cache/PSRCacheAdapter.php à la ligne 19
 2025-05-31 12:17:41 - Erreur 16384: Using SchemaFactory::addControllerNamespace() is deprecated in favor of SchemaFactory::addNamespace(). dans /Users/ns2poportable/Desktop/inteligent-transcription/vendor/thecodingmachine/graphqlite/src/SchemaFactory.php à la ligne 146
 2025-05-31 12:17:41 - Erreur 16384: Using SchemaFactory::addTypeNamespace() is deprecated in favor of SchemaFactory::addNamespace(). dans /Users/ns2poportable/Desktop/inteligent-transcription/vendor/thecodingmachine/graphqlite/src/SchemaFactory.php à la ligne 161
+2025-05-31 13:12:38 - Exception: SQLSTATE[HY000]: General error: 1 no such column: role dans /Users/ns2poportable/Desktop/inteligent-transcription/create-test-users.php à la ligne 109
+Trace: #0 /Users/ns2poportable/Desktop/inteligent-transcription/create-test-users.php(109): PDO->query('SELECT id, user...')
+#1 {main}
