@@ -71,8 +71,13 @@ export interface UserPreferences {
     push: boolean
     transcriptionComplete: boolean
     transcriptionFailed: boolean
+    weeklyReport: boolean
   }
   defaultTranscriptionLanguage: string
+  defaultExportFormat: string
+  autoDeleteAudio: boolean
+  enableTimestamps: boolean
+  enableSpeakerDetection: boolean
 }
 
 // Authentication types
