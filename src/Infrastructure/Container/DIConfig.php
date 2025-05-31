@@ -5,6 +5,10 @@ namespace Infrastructure\Container;
 use DI\ContainerBuilder;
 use DI\Container;
 use Psr\Container\ContainerInterface;
+use Psr\SimpleCache\CacheInterface;
+use function DI\factory;
+use function DI\get;
+use function DI\autowire;
 
 // Domain Interfaces
 use Domain\Transcription\Repository\TranscriptionRepository;
@@ -27,6 +31,7 @@ use Infrastructure\External\YouTube\YouTubeDownloader;
 use Infrastructure\EventSourcing\SQLiteEventStore;
 use Infrastructure\Persistence\SQLiteConnection;
 use Infrastructure\Cache\MultiLevelCache;
+use Infrastructure\Cache\PSRCacheAdapter;
 
 /**
  * Configuration centralisée pour l'injection de dépendances
@@ -95,6 +100,13 @@ class DIConfig
             // YouTube Downloader
             YouTubeDownloader::class => \DI\factory(function (ContainerInterface $c) {
                 return new YouTubeDownloader();
+            }),
+            
+            // PSR Cache pour GraphQL
+            \Psr\SimpleCache\CacheInterface::class => \DI\get(PSRCacheAdapter::class),
+            
+            PSRCacheAdapter::class => \DI\factory(function (ContainerInterface $c) {
+                return new PSRCacheAdapter($c->get(MultiLevelCache::class));
             }),
             
             // Application Handlers (avec auto-wiring)

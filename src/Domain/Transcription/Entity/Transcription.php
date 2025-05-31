@@ -61,6 +61,22 @@ final class Transcription extends AggregateRoot
         ));
     }
     
+    public static function create(
+        TranscriptionId $id,
+        UserId $userId,
+        AudioFile $audioFile,
+        Language $language,
+        TranscriptionStatus $status,
+        ?TranscribedText $text = null,
+        ?YouTubeMetadata $youtubeMetadata = null,
+        $cost = null
+    ): self {
+        $instance = new self($id, $userId, $audioFile, $language, $youtubeMetadata);
+        $instance->status = $status;
+        $instance->text = $text;
+        return $instance;
+    }
+
     public static function createFromFile(
         AudioFile $audioFile,
         Language $language,
@@ -210,6 +226,22 @@ final class Transcription extends AggregateRoot
     public function text(): ?TranscribedText
     {
         return $this->text;
+    }
+    
+    public function transcribedText(): ?string
+    {
+        return $this->text?->content();
+    }
+    
+    public function cost(): ?array
+    {
+        // Return cost information if available
+        return $this->metadata['cost'] ?? null;
+    }
+    
+    public function updatedAt(): DateTimeImmutable
+    {
+        return $this->completedAt ?? $this->createdAt;
     }
     
     public function youtubeMetadata(): ?YouTubeMetadata

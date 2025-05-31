@@ -63,6 +63,11 @@ final class TranscriptionStatus extends ValueObject
         return new self(self::CANCELLED);
     }
     
+    public static function fromString(string $status): self
+    {
+        return new self($status);
+    }
+    
     public function value(): string
     {
         return $this->status;

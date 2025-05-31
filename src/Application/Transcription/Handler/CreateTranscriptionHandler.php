@@ -51,8 +51,8 @@ class CreateTranscriptionHandler
         $event = new TranscriptionCreated(
             $transcriptionId,
             $command->userId,
-            $command->audioFile->path(),
-            $command->language->code()
+            $command->audioFile,
+            $command->language
         );
         
         $this->eventDispatcher->dispatch($event);

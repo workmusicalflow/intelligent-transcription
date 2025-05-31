@@ -35,6 +35,11 @@ final class Money extends ValueObject
         return new self(0.0, $currency);
     }
     
+    public static function fromAmount(float $amount, string $currency = 'USD'): self
+    {
+        return new self($amount, $currency);
+    }
+    
     private function validateAmount(float $amount): void
     {
         if ($amount < 0) {

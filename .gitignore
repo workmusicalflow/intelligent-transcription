@@ -39,3 +39,5 @@ debug_*.log
 # Temporary files
 *.tmp
 *.bak
+*storybook.log
+storybook-static

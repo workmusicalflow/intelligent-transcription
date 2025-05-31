@@ -257,4 +257,60 @@ class SQLiteChatRepository implements ConversationRepository
         
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     }
+    
+    public function findByUser(\Domain\Common\ValueObject\UserId $userId): \Domain\Chat\Collection\ConversationCollection
+    {
+        return $this->findByUserId($userId);
+    }
+    
+    public function findByTranscription(\Domain\Transcription\ValueObject\TranscriptionId $transcriptionId): \Domain\Chat\Collection\ConversationCollection
+    {
+        return $this->findByTranscriptionId($transcriptionId->value());
+    }
+    
+    public function findRecentByUser(\Domain\Common\ValueObject\UserId $userId, int $limit = 10): \Domain\Chat\Collection\ConversationCollection
+    {
+        return $this->findRecent($userId, $limit);
+    }
+    
+    public function delete(\Domain\Chat\ValueObject\ConversationId $id): void
+    {
+        $this->remove($id);
+    }
+    
+    public function countByUser(\Domain\Common\ValueObject\UserId $userId): int
+    {
+        $sql = "SELECT COUNT(*) FROM chat_conversations WHERE user_id = ?";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$userId->value()]);
+        
+        return (int) $stmt->fetchColumn();
+    }
+    
+    public function nextIdentity(): \Domain\Chat\ValueObject\ConversationId
+    {
+        return \Domain\Chat\ValueObject\ConversationId::generate();
+    }
+    
+    public function findConversationsNeedingSummarization(int $limit = 10): \Domain\Chat\Collection\ConversationCollection
+    {
+        $sql = "SELECT * FROM chat_conversations WHERE message_count > 10 ORDER BY updated_at DESC LIMIT ?";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([$limit]);
+        
+        $conversations = [];
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $conversations[] = $this->hydrateConversation($data);
+        }
+        
+        return new \Domain\Chat\Collection\ConversationCollection($conversations);
+    }
+    
+    public function getCacheStatsByUser(\Domain\Common\ValueObject\UserId $userId): array
+    {
+        return [
+            'total_conversations' => $this->countByUser($userId),
+            'avg_messages' => 0
+        ];
+    }
 }

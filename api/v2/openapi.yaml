@@ -1,0 +1,472 @@
+openapi: 3.0.3
+info:
+  title: Intelligent Transcription API
+  description: |
+    API REST pour le service de transcription audio/vidéo intelligente.
+    
+    ## Authentification
+    L'API utilise des tokens JWT. Obtenez un token via `/auth/login` et incluez-le dans l'header:
+    ```
+    Authorization: Bearer YOUR_TOKEN
+    ```
+    
+    ## Rate Limiting
+    - 60 requêtes par minute
+    - 1000 requêtes par heure
+    
+    ## Formats supportés
+    - Audio: MP3, WAV, MP4, M4A
+    - Vidéo: MP4, YouTube URLs
+    - Langues: fr, en, es, de, it, pt, nl, pl, ru, ja, zh, ar
+    
+  version: 2.0.0
+  contact:
+    email: api@transcription.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: /api/v2
+    description: Production API
+
+tags:
+  - name: auth
+    description: Authentification et gestion des tokens
+  - name: transcriptions
+    description: Gestion des transcriptions
+  - name: chat
+    description: Chat contextuel avec les transcriptions
+  - name: analytics
+    description: Statistiques et analyses
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+          
+    Transcription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        language:
+          type: object
+          properties:
+            code:
+              type: string
+              example: fr
+            name:
+              type: string
+              example: Français
+        text:
+          type: string
+          description: Texte transcrit (disponible si status = completed)
+        cost:
+          type: object
+          properties:
+            amount:
+              type: number
+              format: float
+            currency:
+              type: string
+              example: USD
+        youtube:
+          type: object
+          properties:
+            title:
+              type: string
+            video_id:
+              type: string
+            duration:
+              type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Connexion utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      tokens:
+                        type: object
+                        properties:
+                          access_token:
+                            type: string
+                          refresh_token:
+                            type: string
+                          token_type:
+                            type: string
+                            example: Bearer
+                          expires_in:
+                            type: integer
+                            example: 3600
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Inscription utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+      responses:
+        '201':
+          description: Inscription réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      tokens:
+                        type: object
+        '409':
+          description: Email déjà utilisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Rafraîchir le token d'accès
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: Token rafraîchi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      tokens:
+                        type: object
+                        
+  /transcriptions:
+    get:
+      tags:
+        - transcriptions
+      summary: Lister les transcriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: Liste des transcriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transcription'
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      per_page:
+                        type: integer
+                      current_page:
+                        type: integer
+                      total_pages:
+                        type: integer
+                        
+    post:
+      tags:
+        - transcriptions
+      summary: Créer une transcription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - language
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: Fichier audio (requis si youtube_url absent)
+                youtube_url:
+                  type: string
+                  description: URL YouTube (requis si audio absent)
+                language:
+                  type: string
+                  description: Code de langue (fr, en, es, etc.)
+      responses:
+        '201':
+          description: Transcription créée
+          headers:
+            Location:
+              description: URL de la nouvelle ressource
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        
+  /transcriptions/{id}:
+    get:
+      tags:
+        - transcriptions
+      summary: Obtenir une transcription
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails de la transcription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transcription'
+        '404':
+          description: Transcription non trouvée
+          
+    delete:
+      tags:
+        - transcriptions
+      summary: Supprimer une transcription
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Transcription supprimée
+        '404':
+          description: Transcription non trouvée
+          
+  /transcriptions/{id}/process:
+    post:
+      tags:
+        - transcriptions
+      summary: Lancer le traitement
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Traitement lancé
+        '409':
+          description: Transcription déjà traitée
+          
+  /transcriptions/{id}/download:
+    get:
+      tags:
+        - transcriptions
+      summary: Télécharger une transcription
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [txt, json, srt]
+            default: txt
+      responses:
+        '200':
+          description: Fichier de transcription
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transcription'
+                
+  /health:
+    get:
+      tags:
+        - system
+      summary: Vérifier l'état de l'API
+      responses:
+        '200':
+          description: API opérationnelle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  version:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time

@@ -66,6 +66,11 @@ abstract class Collection implements IteratorAggregate, Countable
         return $this->items;
     }
     
+    public function items(): array
+    {
+        return $this->items;
+    }
+    
     public function first()
     {
         return reset($this->items) ?: null;

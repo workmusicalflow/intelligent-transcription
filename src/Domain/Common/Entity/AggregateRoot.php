@@ -25,5 +25,13 @@ abstract class AggregateRoot
         return count($this->domainEvents) > 0;
     }
     
+    /**
+     * Alias pour pullDomainEvents pour compatibilité
+     */
+    public function releaseEvents(): array
+    {
+        return $this->pullDomainEvents();
+    }
+    
     abstract public function id(): string;
 }

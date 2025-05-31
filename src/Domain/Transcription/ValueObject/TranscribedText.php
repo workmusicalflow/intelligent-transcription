@@ -49,6 +49,11 @@ final class TranscribedText extends ValueObject
         return $validatedSegments;
     }
     
+    public static function fromContent(string $content, array $segments = []): self
+    {
+        return new self($content, $segments);
+    }
+    
     public function content(): string
     {
         return $this->content;

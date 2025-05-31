@@ -6,7 +6,9 @@ use Services\TranscriptionService;
 use Services\YouTubeService;
 use Services\AsyncProcessingService;
 use Services\AuthService;
+use Services\ProcessingService;
 use Utils\ResponseUtils;
+use Utils\FileUtils;
 use Middleware\ValidationMiddleware;
 
 /**
@@ -28,6 +30,11 @@ class TranscriptionController
      * @var AsyncProcessingService
      */
     private $asyncService;
+    
+    /**
+     * @var ProcessingService
+     */
+    private $processingService;
 
     /**
      * Taille limite en octets pour le traitement synchrone
@@ -43,6 +50,7 @@ class TranscriptionController
         $this->transcriptionService = new TranscriptionService();
         $this->youtubeService = new YouTubeService();
         $this->asyncService = new AsyncProcessingService();
+        $this->processingService = new ProcessingService();
         
         // Initialize authentication
         AuthService::init();

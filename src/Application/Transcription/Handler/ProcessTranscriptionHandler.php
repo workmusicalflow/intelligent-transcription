@@ -45,7 +45,7 @@ class ProcessTranscriptionHandler
         
         // Publier l'événement de début
         $this->eventDispatcher->dispatch(
-            new TranscriptionProcessingStarted($transcription->id())
+            new TranscriptionProcessingStarted($transcription->id(), 'whisper')
         );
         
         try {
@@ -58,7 +58,7 @@ class ProcessTranscriptionHandler
             // Mettre à jour avec le résultat
             $transcription->complete(
                 $result->text(),
-                new Money($result->cost(), 'USD')
+                ['cost' => $result->cost(), 'currency' => 'USD']
             );
             
             // Sauvegarder
@@ -68,8 +68,9 @@ class ProcessTranscriptionHandler
             $this->eventDispatcher->dispatch(
                 new TranscriptionCompleted(
                     $transcription->id(),
-                    $result->text()->value(),
-                    $result->cost()
+                    $result->text()->wordCount(),
+                    $result->text()->duration() ?? 0,
+                    0 // processing time
                 )
             );
             

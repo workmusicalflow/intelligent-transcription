@@ -34,7 +34,7 @@ class SQLiteTranscriptionRepository implements TranscriptionRepository
     
     public function save(Transcription $transcription): void
     {
-        $sql = $this->exists($transcription->id()) ? $this->getUpdateQuery() : $this->getInsertQuery();
+        $sql = $this->exists($transcription->transcriptionId()) ? $this->getUpdateQuery() : $this->getInsertQuery();
         
         $stmt = $this->connection->prepare($sql);
         $this->bindTranscriptionData($stmt, $transcription);
@@ -274,12 +274,12 @@ class SQLiteTranscriptionRepository implements TranscriptionRepository
     {
         $audioFile = $transcription->audioFile();
         $status = $transcription->status();
-        $cost = $transcription->estimatedCost();
+        $cost = $transcription->cost();
         $youtubeMetadata = $transcription->youtubeMetadata();
         $transcribedText = $transcription->transcribedText();
         
         $params = [
-            $transcription->id()->value(),
+            $transcription->id(),
             $transcription->userId()->value(),
             $audioFile->originalName(),
             $audioFile->path(),
@@ -287,9 +287,9 @@ class SQLiteTranscriptionRepository implements TranscriptionRepository
             $audioFile->duration(),
             $transcription->language()->code(),
             $status->value(),
-            $transcribedText ? $transcribedText->content() : null,
-            $cost->amount(),
-            $cost->currency(),
+            $transcribedText,
+            $cost['amount'] ?? null,
+            $cost['currency'] ?? 'USD',
             $youtubeMetadata?->originalUrl(),
             $youtubeMetadata?->title(),
             $youtubeMetadata?->videoId(),
@@ -325,6 +325,17 @@ class SQLiteTranscriptionRepository implements TranscriptionRepository
         );
         
         $language = Language::fromCode($data['language']);
+        $status = TranscriptionStatus::fromString($data['status']);
+        
+        $youtubeMetadata = null;
+        if ($data['youtube_url']) {
+            $youtubeMetadata = YouTubeMetadata::create(
+                $data['youtube_url'],
+                $data['youtube_title'] ?? '',
+                $data['youtube_video_id'] ?? '',
+                (float) ($data['youtube_duration'] ?? 0)
+            );
+        }
         
         // Créer la transcription
         $transcription = Transcription::create(
@@ -332,28 +343,24 @@ class SQLiteTranscriptionRepository implements TranscriptionRepository
             $userId,
             $audioFile,
             $language,
-            $data['youtube_url'] ? YouTubeMetadata::create(
-                $data['youtube_url'],
-                $data['youtube_title'] ?? '',
-                $data['youtube_video_id'] ?? '',
-                (float) ($data['youtube_duration'] ?? 0)
-            ) : null
+            $status,
+            null, // text - will be set below if present
+            $youtubeMetadata
         );
-        
-        // Restaurer le statut
-        $status = TranscriptionStatus::fromString($data['status']);
-        $this->setPrivateProperty($transcription, 'status', $status);
         
         // Restaurer le texte transcrit si présent
         if (!empty($data['transcribed_text'])) {
             $transcribedText = TranscribedText::fromContent($data['transcribed_text']);
-            $this->setPrivateProperty($transcription, 'transcribedText', $transcribedText);
+            $this->setPrivateProperty($transcription, 'text', $transcribedText);
         }
         
         // Restaurer le coût estimé
         if ($data['cost_amount'] && $data['cost_currency']) {
-            $cost = Money::fromAmount((float) $data['cost_amount'], $data['cost_currency']);
-            $this->setPrivateProperty($transcription, 'estimatedCost', $cost);
+            $costData = [
+                'amount' => (float) $data['cost_amount'],
+                'currency' => $data['cost_currency']
+            ];
+            $this->setPrivateProperty($transcription, 'metadata', ['cost' => $costData]);
         }
         
         return $transcription;

@@ -91,4 +91,9 @@ interface TranscriptionRepository
      * Trouve les transcriptions qui satisfont une spécification
      */
     public function findBySpecification(\Domain\Common\Specification\Specification $specification): TranscriptionCollection;
+    
+    /**
+     * Trouve toutes les transcriptions
+     */
+    public function findAll(): TranscriptionCollection;
 }

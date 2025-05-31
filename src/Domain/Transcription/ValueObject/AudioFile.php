@@ -63,6 +63,17 @@ final class AudioFile extends ValueObject
         return new self($path, $originalName, $mimeType, $size, $duration);
     }
     
+    public static function fromContent(string $content, string $originalName): self
+    {
+        $tempPath = tempnam(sys_get_temp_dir(), 'audio_');
+        file_put_contents($tempPath, $content);
+        
+        $size = strlen($content);
+        $mimeType = 'application/octet-stream'; // Default, could be improved
+        
+        return new self($tempPath, $originalName, $mimeType, $size);
+    }
+    
     private function validatePath(string $path): void
     {
         if (empty(trim($path))) {
