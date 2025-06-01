@@ -97,8 +97,8 @@ export class TranscriptionAPI {
         formData.append('language', data.language)
       }
 
-      // Utiliser l'API v2 moderne avec apiClient (gère automatiquement l'auth)
-      const response = await apiClient.post('/api/v2/transcriptions', formData, {
+      // Utiliser temporairement l'ancienne API qui fonctionne
+      const response = await apiClient.post('/api/transcriptions/create.php', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
