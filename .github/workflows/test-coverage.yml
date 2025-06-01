@@ -29,7 +29,7 @@ jobs:
     - name: Run tests with coverage
       run: |
         cd frontend
-        npx vitest run --coverage --reporter=verbose --reporter=html
+        npx vitest run --coverage --coverage.provider=istanbul --reporter=verbose --reporter=html
         
     - name: Update coverage documentation
       run: |
