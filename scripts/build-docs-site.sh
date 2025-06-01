@@ -264,6 +264,121 @@ if [ -d "docs" ]; then
     cp -r docs/* docs-dist/ 2>/dev/null || echo "⚠️  No existing docs to copy"
 fi
 
+# Create missing documentation files to avoid 404s
+echo "📝 Creating missing documentation files..."
+
+# Create architecture documentation files as HTML
+mkdir -p docs-dist/architecture
+for file in overview frontend backend deployment; do
+    if [ -f "docs/architecture/${file}.md" ]; then
+        # Convert markdown to HTML
+        cat > docs-dist/architecture/${file}.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$(head -n1 docs/architecture/${file}.md | sed 's/^# //')</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 4xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        ul { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+$(sed 's/^# \(.*\)/<h1>\1<\/h1>/' docs/architecture/${file}.md | sed 's/^## \(.*\)/<h2>\1<\/h2>/' | sed 's/^### \(.*\)/<h3>\1<\/h3>/' | sed 's/^\([^<#].*\)/<p>\1<\/p>/')
+        </div>
+    </div>
+</body>
+</html>
+EOF
+    fi
+done
+
+# Create placeholder files for missing sections
+mkdir -p docs-dist/components docs-dist/testing docs-dist/deployment docs-dist/quality docs-dist/setup docs-dist/contributing docs-dist/workflows
+
+# Components documentation
+cat > docs-dist/components/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Component Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="max-w-4xl mx-auto p-8">
+        <a href="../index.html" class="text-blue-600 hover:text-blue-800 mb-8 inline-block">← Retour à la documentation</a>
+        <h1 class="text-3xl font-bold mb-6">Component Documentation</h1>
+        <p class="mb-4">Documentation des composants Vue.js avec exemples interactifs.</p>
+        <p class="text-gray-600 dark:text-gray-400">Cette section sera complétée avec la documentation automatique des composants.</p>
+    </div>
+</body>
+</html>
+EOF
+
+# Testing documentation
+cat > docs-dist/testing/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testing Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="max-w-4xl mx-auto p-8">
+        <a href="../index.html" class="text-blue-600 hover:text-blue-800 mb-8 inline-block">← Retour à la documentation</a>
+        <h1 class="text-3xl font-bold mb-6">Testing Guide</h1>
+        <p class="mb-4">Guide complet pour les tests unitaires, d'intégration et end-to-end.</p>
+        <p class="text-gray-600 dark:text-gray-400">Cette section sera complétée avec les guides de test détaillés.</p>
+    </div>
+</body>
+</html>
+EOF
+
+# Deployment documentation
+cat > docs-dist/deployment/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="max-w-4xl mx-auto p-8">
+        <a href="../index.html" class="text-blue-600 hover:text-blue-800 mb-8 inline-block">← Retour à la documentation</a>
+        <h1 class="text-3xl font-bold mb-6">Deployment Guide</h1>
+        <p class="mb-4">Guide de déploiement pour les environnements de développement et production.</p>
+        <p class="text-gray-600 dark:text-gray-400">Cette section sera complétée avec les instructions de déploiement détaillées.</p>
+    </div>
+</body>
+</html>
+EOF
+
+# Fix links in main index.html to point to .html files instead of directories
+if [ -f "docs-dist/index.html" ]; then
+    sed -i 's/href="architecture\/overview\.md"/href="architecture\/overview.html"/g' docs-dist/index.html
+    sed -i 's/href="architecture\/frontend\.md"/href="architecture\/frontend.html"/g' docs-dist/index.html
+    sed -i 's/href="architecture\/backend\.md"/href="architecture\/backend.html"/g' docs-dist/index.html
+    sed -i 's/href="architecture\/deployment\.md"/href="architecture\/deployment.html"/g' docs-dist/index.html
+    sed -i 's/href="components\/"/href="components\/index.html"/g' docs-dist/index.html
+    sed -i 's/href="testing\/"/href="testing\/index.html"/g' docs-dist/index.html
+    sed -i 's/href="deployment\/"/href="deployment\/index.html"/g' docs-dist/index.html
+fi
+
 # Copy Storybook build if it exists
 if [ -d "frontend/storybook-static" ]; then
     echo "📚 Copying Storybook build..."
