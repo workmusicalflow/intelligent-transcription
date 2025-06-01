@@ -58,7 +58,7 @@ export const useAppStore = defineStore('app', () => {
   
   const checkConnectivity = async () => {
     try {
-      const response = await fetch('/api/v2/health', {
+      const response = await fetch('/api/transcriptions/list.php', {
         method: 'HEAD',
         cache: 'no-cache'
       })

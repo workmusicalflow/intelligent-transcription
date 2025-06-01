@@ -98,7 +98,7 @@ export class TranscriptionAPI {
       }
 
       // Utiliser temporairement l'ancienne API qui fonctionne
-      const response = await apiClient.post('/api/transcriptions/create.php', formData, {
+      const response = await apiClient.post('/transcriptions/create.php', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
