@@ -9,15 +9,19 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: ['./src/tests/setup.ts'],
     coverage: {
-      provider: 'c8',
-      reporter: ['text', 'json', 'html'],
+      provider: 'istanbul',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
         'src/tests/',
         '**/*.d.ts',
         '**/*.config.*',
         '**/mockData.ts',
-        'src/main.ts'
+        'src/main.ts',
+        'src/env.d.ts',
+        'src/**/index.ts',
+        'src/**/*.types.ts'
       ],
       include: ['src/**/*.{ts,vue}'],
       all: true,
