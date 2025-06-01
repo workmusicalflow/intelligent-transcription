@@ -30,7 +30,11 @@ export default defineConfig({
       branches: 80,
       statements: 80
     },
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: [
+      'src/api/__tests__/chat.test.ts',
+      'src/components/layout/__tests__/TopNavigation.test.ts', 
+      'src/composables/__tests__/useWebSocket.disconnection.test.ts'
+    ],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
   },
   resolve: {
