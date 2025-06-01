@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Component Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Component Documentation</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Documentation des composants Vue.js réutilisables d'Intelligent Transcription.</p>
+
+<h2>🎨 Architecture des Composants</h2>
+
+<h3>Structure</h3>
+<p>```</p>
+<p>src/components/</p>
+<p>├── ui/              # Composants UI génériques</p>
+<p>│   ├── Button.vue   # Boutons avec variantes</p>
+<p>│   ├── Input.vue    # Champs de saisie</p>
+<p>│   └── LoadingSpinner.vue</p>
+<p>├── layout/          # Composants de mise en page</p>
+<p>│   ├── Sidebar.vue  # Navigation latérale</p>
+<p>│   ├── TopNavigation.vue</p>
+<p>│   └── UserMenu.vue</p>
+<p>├── auth/            # Composants d'authentification</p>
+<p>│   ├── PasswordStrengthIndicator.vue</p>
+<p>│   ├── TermsModal.vue</p>
+<p>│   └── PrivacyModal.vue</p>
+<p>└── transcription/   # Composants de transcription</p>
+<p>    ├── TranscriptionCard.vue</p>
+<p>    ├── TranscriptionProgress.vue</p>
+<p>    └── TranscriptionActions.vue</p>
+<p>```</p>
+
+<h2>🧩 Composants UI</h2>
+
+<h3>Button</h3>
+
+<p>**Fichier :** `src/components/ui/Button.vue`</p>
+
+<p>**Description :** Composant bouton avec variantes, tailles et états.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'</p>
+<p>  size?: 'sm' | 'md' | 'lg'</p>
+<p>  loading?: boolean</p>
+<p>  disabled?: boolean</p>
+<p>  type?: 'button' | 'submit' | 'reset'</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Utilisation :**</p>
+<p>```vue</p>
+<template>
+<p>  <!-- Bouton primaire --></p>
+<p>  <Button variant="primary" size="lg"></p>
+<p>    Créer une transcription</p>
+<p>  </Button></p>
+<p>  </p>
+<p>  <!-- Bouton avec loading --></p>
+<p>  <Button :loading="isLoading" @click="handleSubmit"></p>
+<p>    {{ isLoading ? 'Traitement...' : 'Valider' }}</p>
+<p>  </Button></p>
+<p>  </p>
+<p>  <!-- Bouton danger --></p>
+<p>  <Button variant="danger" @click="deleteItem"></p>
+<p>    Supprimer</p>
+<p>  </Button></p>
+</template>
+<p>```</p>
+
+<h3>Input</h3>
+
+<p>**Fichier :** `src/components/ui/Input.vue`</p>
+
+<p>**Description :** Champ de saisie avec validation, icônes et états.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  modelValue?: string</p>
+<p>  type?: 'text' | 'email' | 'password' | 'number'</p>
+<p>  placeholder?: string</p>
+<p>  label?: string</p>
+<p>  error?: string</p>
+<p>  disabled?: boolean</p>
+<p>  required?: boolean</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Utilisation :**</p>
+<p>```vue</p>
+<template>
+<p>  <!-- Input basique --></p>
+<p>  <Input</p>
+<p>    v-model="email"</p>
+<p>    type="email"</p>
+<p>    placeholder="votre@email.com"</p>
+<p>    label="Adresse email"</p>
+<p>  /></p>
+<p>  </p>
+<p>  <!-- Input avec erreur --></p>
+<p>  <Input</p>
+<p>    v-model="password"</p>
+<p>    type="password"</p>
+<p>    :error="passwordError"</p>
+<p>    data-testid="password-input"</p>
+<p>  ></p>
+<p>    <template #prefix></p>
+<p>      <LockIcon class="h-5 w-5" /></p>
+<p>    </template></p>
+<p>  </Input></p>
+</template>
+<p>```</p>
+
+<h3>LoadingSpinner</h3>
+
+<p>**Fichier :** `src/components/ui/LoadingSpinner.vue`</p>
+
+<p>**Description :** Indicateur de chargement animé.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  size?: 'sm' | 'md' | 'lg'</p>
+<p>  color?: 'primary' | 'white' | 'gray'</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Utilisation :**</p>
+<p>```vue</p>
+<template>
+<p>  <!-- Spinner dans un bouton --></p>
+<p>  <Button :loading="isLoading"></p>
+<p>    <LoadingSpinner v-if="isLoading" size="sm" color="white" /></p>
+<p>    Charger</p>
+<p>  </Button></p>
+<p>  </p>
+<p>  <!-- Spinner pleine page --></p>
+<p>  <div v-if="loading" class="flex justify-center"></p>
+<p>    <LoadingSpinner size="lg" /></p>
+<p>  </div></p>
+</template>
+<p>```</p>
+
+<h2>🏗️ Composants Layout</h2>
+
+<h3>Sidebar</h3>
+
+<p>**Fichier :** `src/components/layout/Sidebar.vue`</p>
+
+<p>**Description :** Navigation latérale principale de l'application.</p>
+
+<p>**Fonctionnalités :**</p>
+<p>- Navigation responsive</p>
+<p>- Indicateurs d'état actif</p>
+<p>- Support des icônes</p>
+<p>- Gestion des permissions utilisateur</p>
+
+<h3>TopNavigation</h3>
+
+<p>**Fichier :** `src/components/layout/TopNavigation.vue`</p>
+
+<p>**Description :** Barre de navigation supérieure.</p>
+
+<p>**Fonctionnalités :**</p>
+<p>- Menu utilisateur</p>
+<p>- Notifications</p>
+<p>- Recherche globale</p>
+<p>- Toggle thème sombre</p>
+
+<h2>🔐 Composants Auth</h2>
+
+<h3>PasswordStrengthIndicator</h3>
+
+<p>**Fichier :** `src/components/auth/PasswordStrengthIndicator.vue`</p>
+
+<p>**Description :** Indicateur visuel de la force du mot de passe.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  password: string</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Fonctionnalités :**</p>
+<p>- Calcul de force en temps réel</p>
+<p>- Critères de validation visuels</p>
+<p>- Barre de progression colorée</p>
+<p>- Messages d'aide</p>
+
+<p>**Utilisation :**</p>
+<p>```vue</p>
+<template>
+<p>  <div></p>
+<p>    <Input</p>
+<p>      v-model="password"</p>
+<p>      type="password"</p>
+<p>      placeholder="Mot de passe"</p>
+<p>    /></p>
+<p>    </p>
+<p>    <PasswordStrengthIndicator </p>
+<p>      v-if="password"</p>
+<p>      :password="password"</p>
+<p>      class="mt-2"</p>
+<p>    /></p>
+<p>  </div></p>
+</template>
+<p>```</p>
+
+<h2>📝 Composants Transcription</h2>
+
+<h3>TranscriptionCard</h3>
+
+<p>**Fichier :** `src/components/transcription/TranscriptionCard.vue`</p>
+
+<p>**Description :** Carte d'affichage d'une transcription.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  transcription: Transcription</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Fonctionnalités :**</p>
+<p>- Affichage des métadonnées</p>
+<p>- Actions contextuelles</p>
+<p>- Indicateur de statut</p>
+<p>- Prévisualisation du contenu</p>
+
+<h3>TranscriptionProgress</h3>
+
+<p>**Fichier :** `src/components/transcription/TranscriptionProgress.vue`</p>
+
+<p>**Description :** Indicateur de progression de transcription.</p>
+
+<p>**Props :**</p>
+<p>```typescript</p>
+<p>interface Props {</p>
+<p>  progress: number  // 0-100</p>
+<p>  status: TranscriptionStatus</p>
+<p>  estimatedTime?: number</p>
+<p>}</p>
+<p>```</p>
+
+<h2>📏 Conventions de Développement</h2>
+
+<h3>Structure de Composant</h3>
+<p>```vue</p>
+<template>
+<p>  <!-- Template avec data-testid pour les tests --></p>
+<p>  <div class="component-name" data-testid="component-name"></p>
+<p>    <!-- Contenu --></p>
+<p>  </div></p>
+</template>
+
+<script setup lang="ts">
+<p>/**</p>
+<p> * Description du composant</p>
+<p> * </p>
+<p> * @example</p>
+<p> * ```vue</p>
+<p> * <ComponentName :prop="value" /></p>
+<p> * ```</p>
+<p> */</p>
+
+<p>// Imports</p>
+<p>import { ref, computed } from 'vue'</p>
+<p>import type { ComponentProps } from '@/types'</p>
+
+<p>// Props avec interface TypeScript</p>
+<p>interface Props {</p>
+<p>  /** Description de la prop */</p>
+<p>  prop: string</p>
+<p>}</p>
+
+<p>const props = defineProps<Props>()</p>
+
+<p>// Emits</p>
+<p>const emit = defineEmits<{</p>
+<p>  'update:modelValue': [value: string]</p>
+<p>  'action': [data: any]</p>
+<p>}>()</p>
+
+<p>// Reactive state</p>
+<p>const state = ref('')</p>
+
+<p>// Computed</p>
+<p>const computedValue = computed(() => {</p>
+<p>  return state.value.toUpperCase()</p>
+<p>})</p>
+
+<p>// Methods</p>
+<p>function handleAction(): void {</p>
+<p>  emit('action', { data: 'example' })</p>
+<p>}</p>
+</script>
+
+<style scoped>
+<p>/* Styles scopés si nécessaires */</p>
+<p>.component-name {</p>
+<p>  /* Utiliser Tailwind CSS en priorité */</p>
+<p>}</p>
+</style>
+<p>```</p>
+
+<h3>Tests de Composants</h3>
+<p>```typescript</p>
+<p>// ComponentName.test.ts</p>
+<p>import { describe, it, expect } from 'vitest'</p>
+<p>import { mount } from '@vue/test-utils'</p>
+<p>import ComponentName from './ComponentName.vue'</p>
+
+<p>describe('ComponentName', () => {</p>
+<p>  it('renders correctly', () => {</p>
+<p>    const wrapper = mount(ComponentName, {</p>
+<p>      props: {</p>
+<p>        prop: 'test value'</p>
+<p>      }</p>
+<p>    })</p>
+<p>    </p>
+<p>    expect(wrapper.find('[data-testid="component-name"]').exists()).toBe(true)</p>
+<p>  })</p>
+<p>  </p>
+<p>  it('emits events correctly', async () => {</p>
+<p>    const wrapper = mount(ComponentName)</p>
+<p>    </p>
+<p>    await wrapper.find('[data-testid="action-button"]').trigger('click')</p>
+<p>    </p>
+<p>    expect(wrapper.emitted('action')).toBeTruthy()</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<h2>🎨 Design System</h2>
+
+<h3>Couleurs</h3>
+<p>```css</p>
+<p>/* Couleurs principales */</p>
+<p>--color-primary: #3B82F6;     /* blue-500 */</p>
+<p>--color-secondary: #6B7280;   /* gray-500 */</p>
+<p>--color-success: #10B981;     /* emerald-500 */</p>
+<p>--color-warning: #F59E0B;     /* amber-500 */</p>
+<p>--color-danger: #EF4444;      /* red-500 */</p>
+<p>```</p>
+
+<h3>Espacements</h3>
+<p>```css</p>
+<p>/* Espacements standardisés */</p>
+<p>--spacing-xs: 0.25rem;  /* 4px */</p>
+<p>--spacing-sm: 0.5rem;   /* 8px */</p>
+<p>--spacing-md: 1rem;     /* 16px */</p>
+<p>--spacing-lg: 1.5rem;   /* 24px */</p>
+<p>--spacing-xl: 2rem;     /* 32px */</p>
+<p>```</p>
+
+<h3>Typographie</h3>
+<p>```css</p>
+<p>/* Tailles de texte */</p>
+<p>--text-xs: 0.75rem;     /* 12px */</p>
+<p>--text-sm: 0.875rem;    /* 14px */</p>
+<p>--text-base: 1rem;      /* 16px */</p>
+<p>--text-lg: 1.125rem;    /* 18px */</p>
+<p>--text-xl: 1.25rem;     /* 20px */</p>
+<p>```</p>
+
+<h2>🔧 Outils de Développement</h2>
+
+<h3>Storybook</h3>
+<p>```bash</p>
+<h1>Lancer Storybook</h1>
+<p>npm run storybook</p>
+
+<h1>Build Storybook</h1>
+<p>npm run build-storybook</p>
+<p>```</p>
+
+<h3>Tests</h3>
+<p>```bash</p>
+<h1>Tests unitaires</h1>
+<p>npm run test</p>
+
+<h1>Tests en mode watch</h1>
+<p>npm run test:watch</p>
+
+<h1>Couverture de code</h1>
+<p>npm run test:coverage</p>
+<p>```</p>
+
+<h3>Linting</h3>
+<p>```bash</p>
+<h1>ESLint</h1>
+<p>npm run lint</p>
+
+<h1>TypeScript check</h1>
+<p>npm run type-check</p>
+<p>```</p>
+
+<h2>📚 Ressources</h2>
+
+<p>- [Vue 3 Composition API](https://vuejs.org/guide/)</p>
+<p>- [TypeScript avec Vue](https://vuejs.org/guide/typescript/)</p>
+<p>- [Tailwind CSS](https://tailwindcss.com/docs)</p>
+<p>- [Vue Test Utils](https://vue-test-utils.vuejs.org/)</p>
+<p>- [Storybook pour Vue](https://storybook.js.org/docs/vue/get-started/introduction)</p>
+        </div>
+    </div>
+</body>
+</html>

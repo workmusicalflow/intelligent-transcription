@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sécurité de l'Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Sécurité de l'Application</h1>
+
+<p>Ce document décrit les mesures de sécurité implémentées dans l'application Intelligent Transcription pour protéger les données sensibles, assurer l'intégrité du système et prévenir les vulnérabilités courantes.</p>
+
+<h2>Table des Matières</h2>
+
+<p>1. [Gestion des Variables d'Environnement](#1-gestion-des-variables-denvironnement)</p>
+<p>2. [Validation des Entrées](#2-validation-des-entrées)</p>
+<p>3. [Sécurité des Fichiers Uploadés](#3-sécurité-des-fichiers-uploadés)</p>
+<p>4. [Gestion des Erreurs](#4-gestion-des-erreurs)</p>
+<p>5. [Traitement Asynchrone](#5-traitement-asynchrone)</p>
+<p>6. [Communication PHP-Python](#6-communication-php-python)</p>
+<p>7. [Bonnes Pratiques Générales](#7-bonnes-pratiques-générales)</p>
+
+<h2>1. Gestion des Variables d'Environnement</h2>
+
+<h3>Protection du Fichier .env</h3>
+
+<p>Le fichier `.env` contient des données sensibles comme les clés API. Les mesures suivantes ont été mises en place pour sa protection :</p>
+
+<h4>Options de Stockage</h4>
+
+<p>**Option 1 (Recommandée) : Stockage hors du répertoire web**</p>
+<p>- Le fichier `.env` est stocké dans un répertoire parent hors de la racine web</p>
+<p>- Chemin : `/chemin/vers/inteligent-transcription-env/.env`</p>
+
+<p>**Option 2 : Dans le répertoire du projet avec protections**</p>
+<p>- Protection par règles `.htaccess`</p>
+<p>- Permissions de fichier strictes (600 - uniquement lecture/écriture par le propriétaire)</p>
+
+<h4>Implémentation dans le Code</h4>
+
+<p>**PHP**</p>
+<p>```php</p>
+<p>// Fonction pour charger les variables d'environnement</p>
+<p>function loadEnvFile($envFilePath) {</p>
+<p>    if (file_exists($envFilePath)) {</p>
+<p>        $envFile = file_get_contents($envFilePath);</p>
+<p>        $lines = explode("\n", $envFile);</p>
+<p>        foreach ($lines as $line) {</p>
+<p>            // Code de traitement...</p>
+<p>        }</p>
+<p>        return true;</p>
+<p>    }</p>
+<p>    return false;</p>
+<p>}</p>
+
+<p>// Essayer de charger .env en dehors du répertoire web d'abord</p>
+<p>$envLoaded = loadEnvFile(ENV_FILE);</p>
+
+<p>// Si le fichier .env externe n'existe pas, essayer avec le fichier dans le répertoire du projet</p>
+<p>if (!$envLoaded) {</p>
+<p>    loadEnvFile(BASE_DIR . '/.env');</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Python**</p>
+<p>```python</p>
+<h1>Charger les variables d'environnement depuis différents emplacements possibles</h1>
+<p>env_paths = [</p>
+<p>    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))), </p>
+<p>                'inteligent-transcription-env', '.env'),</p>
+<p>    os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')</p>
+<p>]</p>
+
+<p>for env_path in env_paths:</p>
+<p>    if os.path.exists(env_path):</p>
+<p>        load_dotenv(env_path)</p>
+<p>        break</p>
+<p>```</p>
+
+<h4>Configuration .htaccess</h4>
+
+<p>```apache</p>
+<h1>Protéger les fichiers sensibles</h1>
+<FilesMatch "^\.env|config\.php\.bak">
+<p>    Order allow,deny</p>
+<p>    Deny from all</p>
+</FilesMatch>
+
+<h1>Protéger les répertoires sensibles</h1>
+<DirectoryMatch "^/(?:logs|cache|venv)/">
+<p>    Order allow,deny</p>
+<p>    Deny from all</p>
+</DirectoryMatch>
+
+<h1>Désactiver la navigation dans les répertoires</h1>
+<p>Options -Indexes</p>
+
+<h1>Protéger contre les inclusions de fichiers distants</h1>
+<p>php_flag allow_url_fopen off</p>
+<p>php_flag allow_url_include off</p>
+<p>```</p>
+
+<h3>Fichier .env.example</h3>
+
+<p>Un fichier `.env.example` a été créé comme modèle pour les développeurs, contenant la structure attendue sans les valeurs sensibles :</p>
+
+<p>```</p>
+<h1>Configuration de l'application Intelligent Transcription</h1>
+<h1>NE JAMAIS COMMIT LE FICHIER .env AVEC LES VRAIES CLÉS API !</h1>
+
+<h1>Clé API OpenAI pour Whisper et paraphrasage</h1>
+<p>OPENAI_API_KEY=your_openai_api_key_here</p>
+
+<h1>ID de l'assistant OpenAI pour la paraphrase</h1>
+<p>PARAPHRASER_ASSISTANT_ID=</p>
+
+<h1>Clé API pour video-download-api.com</h1>
+<p>VIDEO_DOWNLOAD_API_KEY=your_video_download_api_key_here</p>
+
+<h1>Configuration de l'environnement</h1>
+<p>APP_ENV=development</p>
+<p>APP_DEBUG=true</p>
+<p>...</p>
+<p>```</p>
+
+<h2>2. Validation des Entrées</h2>
+
+<h3>Class ValidationUtils</h3>
+
+<p>Une classe centralisée de validation a été implémentée pour assurer que toutes les entrées utilisateur sont vérifiées avant traitement :</p>
+
+<p>```php</p>
+<p>class ValidationUtils {</p>
+<p>    // Types de fichiers supportés </p>
+<p>    const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', ...];</p>
+<p>    const SUPPORTED_VIDEO_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', ...];</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide un fichier uploadé</p>
+<p>     */</p>
+<p>    public static function validateUploadedFile($file, $options = []) {</p>
+<p>        // Validation du type de fichier, taille, intégrité, etc.</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide une URL YouTube</p>
+<p>     */</p>
+<p>    public static function validateYoutubeUrl($url) {</p>
+<p>        // Validation du format d'URL YouTube</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide un message texte</p>
+<p>     */</p>
+<p>    public static function validateTextMessage($message, $options = []) {</p>
+<p>        // Validation du contenu texte</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Autres méthodes de validation spécifiques...</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Middleware de Validation</h3>
+
+<p>Un middleware de validation assure que toutes les requêtes sont validées de manière cohérente avant d'atteindre les contrôleurs :</p>
+
+<p>```php</p>
+<p>class ValidationMiddleware {</p>
+<p>    /**</p>
+<p>     * Valide les données d'une route spécifique</p>
+<p>     */</p>
+<p>    public static function validateRoute($controller, $action, $data) {</p>
+<p>        $rules = self::getValidationRules($controller, $action);</p>
+<p>        </p>
+<p>        if (!$rules) {</p>
+<p>            return ['success' => true, 'sanitized' => $data];</p>
+<p>        }</p>
+<p>        </p>
+<p>        return self::validate($data, $rules);</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Règles de validation par contrôleur/action</p>
+<p>    private static function getValidationRules($controller, $action) {</p>
+<p>        $validationRules = [</p>
+<p>            'TranscriptionController' => [</p>
+<p>                'uploadFile' => [ /* règles */ ],</p>
+<p>                // Autres actions...</p>
+<p>            ],</p>
+<p>            // Autres contrôleurs...</p>
+<p>        ];</p>
+<p>        </p>
+<p>        // Retourne les règles spécifiques</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>3. Sécurité des Fichiers Uploadés</h2>
+
+<p>La sécurité des fichiers uploadés est assurée par plusieurs mesures :</p>
+
+<h3>Noms de Fichiers Aléatoires</h3>
+
+<p>```php</p>
+<p>public static function secureFileName($originalName, $includeTimestamp = true) {</p>
+<p>    // Extract file extension</p>
+<p>    $extension = pathinfo($originalName, PATHINFO_EXTENSION);</p>
+<p>    </p>
+<p>    // Ensure extension is valid and secure</p>
+<p>    if (empty($extension) || !preg_match('/^[a-zA-Z0-9]{1,5}$/', $extension)) {</p>
+<p>        $extension = 'bin'; // Default if invalid</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Generate random identifier</p>
+<p>    $randomPart = bin2hex(random_bytes(8)); // 16 hex characters</p>
+<p>    </p>
+<p>    // Optionally add timestamp</p>
+<p>    $timestamp = $includeTimestamp ? '_' . date('Ymd_His') : '';</p>
+<p>    </p>
+<p>    // Assemble secure filename</p>
+<p>    return $randomPart . $timestamp . '.' . $extension;</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Structure de Répertoires Imbriqués</h3>
+
+<p>```php</p>
+<p>public static function getSecureStoragePath($baseDir, $fileName, $createDirs = true) {</p>
+<p>    // Generate hash from filename</p>
+<p>    $hash = md5($fileName);</p>
+<p>    </p>
+<p>    // Use first 2 characters of hash as subdirectory</p>
+<p>    $subDir1 = substr($hash, 0, 2);</p>
+<p>    $subDir2 = substr($hash, 2, 2);</p>
+<p>    </p>
+<p>    // Build complete path</p>
+<p>    $storagePath = $baseDir . '/' . $subDir1 . '/' . $subDir2;</p>
+<p>    </p>
+<p>    // Create directories if requested</p>
+<p>    if ($createDirs && !is_dir($storagePath)) {</p>
+<p>        mkdir($storagePath, 0755, true);</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Return complete path to file</p>
+<p>    return $storagePath . '/' . $fileName;</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Validation du Contenu</h3>
+
+<p>Les fichiers sont validés en profondeur :</p>
+<p>- Type MIME vérification</p>
+<p>- Analyse des en-têtes de fichiers</p>
+<p>- Vérification des extensions</p>
+<p>- Limites de taille configurables</p>
+<p>- Détection de contenu malveillant</p>
+
+<h2>4. Gestion des Erreurs</h2>
+
+<p>Un système standardisé de gestion des erreurs a été implémenté pour capturer et gérer efficacement les erreurs, en particulier dans la communication PHP-Python.</p>
+
+<h3>Catégories d'Erreurs Normalisées</h3>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Catégories d'erreurs standardisées</p>
+<p> */</p>
+<p>const ERROR_CATEGORIES = [</p>
+<p>    'api_key' => [</p>
+<p>        'pattern' => ['api_key', 'authentication', 'auth', 'credential'],</p>
+<p>        'message' => "Erreur d'authentification API. Vérifiez votre clé API.",</p>
+<p>        'advice' => "Veuillez vérifier que votre clé API est correctement configurée."</p>
+<p>    ],</p>
+<p>    'file_access' => [</p>
+<p>        'pattern' => ['file not found', 'no such file', 'cannot access', 'permission denied'],</p>
+<p>        'message' => "Erreur d'accès au fichier.",</p>
+<p>        'advice' => "Vérifiez que le fichier existe et que les permissions sont correctes."</p>
+<p>    ],</p>
+<p>    // Autres catégories...</p>
+<p>];</p>
+<p>```</p>
+
+<h3>Journalisation des Erreurs</h3>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Journalise une erreur dans un fichier de log</p>
+<p> */</p>
+<p>public static function logError($errorType, $errorMessage, $context = []) {</p>
+<p>    $logDir = self::getLogDirectory($errorType);</p>
+<p>    $timestamp = date('Y-m-d H:i:s');</p>
+<p>    $logEntry = "[{$timestamp}] [{$errorType}] {$errorMessage}";</p>
+<p>    </p>
+<p>    // Ajouter le contexte si disponible</p>
+<p>    if (!empty($context)) {</p>
+<p>        $logEntry .= " | Context: " . json_encode($context);</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Écrire dans le fichier de log spécifique à ce type d'erreur</p>
+<p>    file_put_contents(</p>
+<p>        $logDir . "/error_{$errorType}.log", </p>
+<p>        $logEntry . PHP_EOL, </p>
+<p>        FILE_APPEND</p>
+<p>    );</p>
+<p>}</p>
+<p>```</p>
+
+<h2>5. Traitement Asynchrone</h2>
+
+<p>Pour les opérations longues comme la transcription de fichiers volumineux, un système de traitement asynchrone a été mis en place :</p>
+
+<h3>AsyncProcessingService</h3>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Crée une tâche de traitement de fichier</p>
+<p> */</p>
+<p>public function createFileProcessingTask($filePath, $outputDir, $language = 'auto', $forceLanguage = false, $metadata = []) {</p>
+<p>    // Génération d'un ID de tâche unique</p>
+<p>    $jobId = uniqid('job_', true);</p>
+<p>    </p>
+<p>    // Création d'un objet de tâche</p>
+<p>    $job = [</p>
+<p>        'id' => $jobId,</p>
+<p>        'type' => 'file_transcription',</p>
+<p>        'status' => 'pending',</p>
+<p>        'created_at' => date('Y-m-d H:i:s'),</p>
+<p>        'file_path' => $filePath,</p>
+<p>        'output_dir' => $outputDir,</p>
+<p>        'language' => $language,</p>
+<p>        'force_language' => $forceLanguage,</p>
+<p>        'metadata' => $metadata</p>
+<p>    ];</p>
+<p>    </p>
+<p>    // Enregistrement de la tâche dans le système</p>
+<p>    $this->saveJobData($jobId, $job);</p>
+<p>    </p>
+<p>    // Lancement du traitement en arrière-plan</p>
+<p>    $this->executeTaskInBackground($jobId);</p>
+<p>    </p>
+<p>    return ['success' => true, 'job_id' => $jobId];</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Worker en Arrière-plan</h3>
+
+<p>Un script worker.php exécute les tâches en arrière-plan, évitant les timeouts HTTP et améliorant l'expérience utilisateur pour les traitements longs.</p>
+
+<h2>6. Communication PHP-Python</h2>
+
+<p>La communication sécurisée entre PHP et Python est assurée par un système standardisé :</p>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Exécute un script Python avec des arguments sécurisés</p>
+<p> */</p>
+<p>public static function executePythonScript($scriptPath, $args = [], $timeoutSeconds = 60) {</p>
+<p>    // Validation du chemin du script</p>
+<p>    if (!file_exists($scriptPath)) {</p>
+<p>        return ['success' => false, 'error' => "Script not found: {$scriptPath}"];</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Construction de la commande avec échappement des arguments</p>
+<p>    $command = PYTHON_PATH . ' ' . escapeshellarg($scriptPath);</p>
+<p>    </p>
+<p>    // Ajout sécurisé des arguments</p>
+<p>    foreach ($args as $key => $value) {</p>
+<p>        if (is_bool($value)) {</p>
+<p>            // Option booléenne (flag)</p>
+<p>            if ($value) {</p>
+<p>                $command .= ' --' . escapeshellarg($key);</p>
+<p>            }</p>
+<p>        } else {</p>
+<p>            // Option avec valeur</p>
+<p>            $command .= ' --' . escapeshellarg($key) . ' ' . escapeshellarg($value);</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Exécution sécurisée avec capture du résultat</p>
+<p>    $descriptorSpec = [</p>
+<p>        0 => ["pipe", "r"],  // stdin</p>
+<p>        1 => ["pipe", "w"],  // stdout</p>
+<p>        2 => ["pipe", "w"]   // stderr</p>
+<p>    ];</p>
+<p>    </p>
+<p>    $process = proc_open($command, $descriptorSpec, $pipes);</p>
+<p>    </p>
+<p>    if (!is_resource($process)) {</p>
+<p>        return ['success' => false, 'error' => "Failed to execute Python script"];</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Configuration des timeouts et lecture des résultats</p>
+<p>    // ...</p>
+<p>    </p>
+<p>    // Fermeture du processus et analyse du résultat</p>
+<p>    $exitCode = proc_close($process);</p>
+<p>    $result = json_decode($output, true);</p>
+<p>    </p>
+<p>    // Vérification et retour standardisé</p>
+<p>    // ...</p>
+<p>    </p>
+<p>    return $result;</p>
+<p>}</p>
+<p>```</p>
+
+<h2>7. Bonnes Pratiques Générales</h2>
+
+<p>Plusieurs bonnes pratiques de sécurité sont implémentées globalement :</p>
+
+<h3>Échappement des Sorties</h3>
+
+<p>- Utilisation de Twig avec auto-échappement activé par défaut</p>
+<p>- Fonction `htmlspecialchars` pour les sorties directes en PHP</p>
+
+<h3>Protection contre les Attaques CSRF</h3>
+
+<p>- Tokens de formulaire</p>
+<p>- Validation des origines de requête</p>
+
+<h3>Gestion des Sessions</h3>
+
+<p>- Configuration sécurisée des cookies (httpOnly, secure)</p>
+<p>- Régénération des IDs de session</p>
+
+<h3>Contrôle d'Accès</h3>
+
+<p>- Validation des permissions avant chaque action sensible</p>
+<p>- Isolation des fonctionnalités d'administration</p>
+
+<h3>Gestion des Dépendances</h3>
+
+<p>- Bibliothèques tierces maintenues à jour</p>
+<p>- Audit régulier des vulnérabilités</p>
+
+<p>---</p>
+
+<h2>Références</h2>
+
+<p>Pour plus d'informations sur l'implémentation spécifique de ces mesures de sécurité, consultez les fichiers suivants :</p>
+
+<p>- `/src/Utils/ValidationUtils.php` - Validation des entrées</p>
+<p>- `/src/Utils/FileUtils.php` - Gestion sécurisée des fichiers</p>
+<p>- `/src/Utils/PythonErrorUtils.php` - Gestion des erreurs</p>
+<p>- `/src/Services/AsyncProcessingService.php` - Traitement asynchrone</p>
+<p>- `/.htaccess` - Protection des ressources sensibles</p>
+<p>- `/ENVIRONMENT_SETUP.md` - Configuration de l'environnement</p>
+        </div>
+    </div>
+</body>
+</html>

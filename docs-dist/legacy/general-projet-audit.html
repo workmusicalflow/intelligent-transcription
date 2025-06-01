@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audit et Recommandations Prioritaires - Intelligent Transcription MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Audit et Recommandations Prioritaires - Intelligent Transcription MVP</h1>
+
+<p>Ce document résume l'audit initial du projet "Intelligent Transcription" basé sur la documentation fournie et définit les priorités pour la consolidation avant les tests utilisateurs locaux.</p>
+
+<h2>Audit Général du Projet (Basé sur la Documentation)</h2>
+
+<p>**Points Forts:**</p>
+
+<p>1.  **Vision Claire du MVP:** Périmètre bien défini (transcription, paraphrase, chat).</p>
+<p>2.  **Architecture Hybride Pertinente:** PHP (web) + Python (IA) judicieux.</p>
+<p>3.  **Documentation Structurée:** Bon point de départ (`docs/`).</p>
+<p>4.  **Intégration d'APIs Externes:** Utilisation d'OpenAI et Loader.to.</p>
+<p>5.  **Interface Moderne:** Base solide avec Twig, Tailwind, JS vanilla.</p>
+<p>6.  **Anticipation de la Performance:** Planification du cache documentée.</p>
+<p>7.  **Intégration Base de Données:** Amélioration par rapport au stockage fichier.</p>
+<p>8.  **Facilité de Démarrage (Dev):** Script `setup_env.sh` et `README.md`.</p>
+
+<p>**Points Faibles / Zones de Risque pour un MVP:**</p>
+
+<p>1.  **Complexité/Fragilité Communication PHP/Python:** Appels système potentiels.</p>
+<p>2.  **Gestion des Erreurs Inter-Processus:** Robustesse non garantie.</p>
+<p>3.  **Sécurité:** Uploads, validation d'entrées, clés API.</p>
+<p>4.  **Traitement Synchrone:** Risque de timeouts HTTP pour tâches longues.</p>
+<p>5.  **Tests:** Couverture et automatisation incertaines.</p>
+<p>6.  **Déploiement:** Stratégie non documentée (Cpanel + Filezilla + terminal Cpanel).</p>
+<p>7.  **Configuration Mixte:** `define` vs `.env`.</p>
+
+<h2>Recommandations Prioritaires avant Test Utilisateur Local</h2>
+
+<p>L'objectif est d'assurer la **fiabilité fonctionnelle**, la **stabilité** et la **sécurité de base** pour les tests locaux.</p>
+
+<p>**Priorité Haute (Essentiel) :** ✅ Complété</p>
+
+<p>1.  **Fiabiliser les Workflows Principaux :** ✅</p>
+<p>    - **Gestion d'Erreurs PHP/Python :** ✅ Implémenté dans `PythonErrorUtils.php` avec catégorisation des erreurs.</p>
+<p>    - **Validation Stricte des Entrées :** ✅ Implémenté dans `ValidationUtils.php` et `ValidationMiddleware.php`.</p>
+<p>    - **Traitement Asynchrone :** ✅ Implémenté dans `AsyncProcessingService.php` avec worker.php pour les traitements lourds.</p>
+<p>2.  **Sécurité de Base (Impact Local) :** ✅</p>
+<p>    - **Uploads de Fichiers :** ✅ Noms aléatoires et stockage imbriqué implémentés dans `FileUtils.php`.</p>
+<p>    - **Protection `.env` :** ✅ Protection par .htaccess et stockage optionnel hors du répertoire web.</p>
+<p>    - **Échappement des Sorties (Twig) :** ✅ Auto-échappement confirmé actif par défaut.</p>
+<p>3.  **Configuration :** ✅</p>
+<p>    - **Centraliser la Configuration (`.env`) :** ✅ Configuration centralisée avec chargement sécurisé et flexibilité de stockage.</p>
+
+<p>**Priorité Moyenne (Important, mais peut suivre le premier test) :**</p>
+
+<p>4.  **Validation du Cache :** Vérifier que le cache actif ne casse pas les fonctionnalités.</p>
+
+<p>**Priorité Basse (Après les tests utilisateurs) :**</p>
+
+<p>1.  Tests Automatisés Complets</p>
+<p>2.  Refactoring Approfondi / Linters</p>
+<p>3.  Documentation de Déploiement</p>
+<p>4.  Optimisations Avancées du Cache</p>
+<p>5.  Sécurité Renforcée pour la Production</p>
+
+<p>Ce plan vise à rendre l'application suffisamment stable et fonctionnelle pour recueillir des retours utilisateurs pertinents lors des tests locaux.</p>
+        </div>
+    </div>
+</body>
+</html>

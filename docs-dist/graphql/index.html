@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .prose { max-width: none; }
+        .prose h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .prose h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose p { margin-bottom: 1rem; line-height: 1.7; }
+        .prose pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        .prose code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 2rem; }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.6; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        .prose th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <div class="prose max-w-none">
+<h1>GraphQL API Documentation</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Documentation de l'API GraphQL d'Intelligent Transcription avec schémas, queries et mutations.</p>
+
+<h2>🔗 Endpoint</h2>
+
+<p><code></code>`</p>
+<p>Production: https://yourdomain.com/graphql</p>
+<p>Développement: http://localhost:8000/graphql</p>
+<p><code></code>`</p>
+
+<h2>📊 Schéma GraphQL</h2>
+
+<h3>Types de Base</h3>
+
+<p><code></code>`graphql</p>
+<h1>Types scalaires personnalisés</h1>
+<p>scalar DateTime</p>
+<p>scalar Upload</p>
+<p>scalar JSON</p>
+
+<h1>Énumérations</h1>
+<p>enum TranscriptionStatus {</p>
+<p>  PENDING</p>
+<p>  PROCESSING</p>
+<p>  COMPLETED</p>
+<p>  FAILED</p>
+<p>}</p>
+
+<p>enum UserRole {</p>
+<p>  ADMIN</p>
+<p>  USER</p>
+<p>  GUEST</p>
+<p>}</p>
+
+<p>enum Language {</p>
+<p>  FR</p>
+<p>  EN</p>
+<p>  ES</p>
+<p>  DE</p>
+<p>  IT</p>
+<p>  PT</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Types d'Entités</h3>
+
+<p><code></code>`graphql</p>
+<h1>Utilisateur</h1>
+<p>type User {</p>
+<p>  id: ID!</p>
+<p>  name: String!</p>
+<p>  email: String!</p>
+<p>  role: UserRole!</p>
+<p>  avatar: String</p>
+<p>  preferences: UserPreferences!</p>
+<p>  stats: UserStats!</p>
+<p>  createdAt: DateTime!</p>
+<p>  updatedAt: DateTime!</p>
+<p>}</p>
+
+<p>type UserPreferences {</p>
+<p>  language: Language!</p>
+<p>  theme: String!</p>
+<p>  notifications: NotificationSettings!</p>
+<p>  transcription: TranscriptionSettings!</p>
+<p>}</p>
+
+<p>type NotificationSettings {</p>
+<p>  email: Boolean!</p>
+<p>  push: Boolean!</p>
+<p>  transcriptionComplete: Boolean!</p>
+<p>  weeklySummary: Boolean!</p>
+<p>}</p>
+
+<p>type TranscriptionSettings {</p>
+<p>  autoDetectLanguage: Boolean!</p>
+<p>  defaultLanguage: Language!</p>
+<p>  enhanceAudio: Boolean!</p>
+<p>  detectSpeakers: Boolean!</p>
+<p>}</p>
+
+<p>type UserStats {</p>
+<p>  transcriptionsCount: Int!</p>
+<p>  totalDuration: Int!</p>
+<p>  totalWords: Int!</p>
+<p>  lastActivity: DateTime!</p>
+<p>  plan: UserPlan!</p>
+<p>}</p>
+
+<p>type UserPlan {</p>
+<p>  name: String!</p>
+<p>  quotaUsed: Int!</p>
+<p>  quotaLimit: Int!</p>
+<p>  resetDate: DateTime!</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Transcriptions</h3>
+
+<p><code></code>`graphql</p>
+<h1>Transcription</h1>
+<p>type Transcription {</p>
+<p>  id: ID!</p>
+<p>  title: String!</p>
+<p>  status: TranscriptionStatus!</p>
+<p>  language: Language!</p>
+<p>  content: TranscriptionContent</p>
+<p>  metadata: TranscriptionMetadata!</p>
+<p>  processing: ProcessingInfo</p>
+<p>  analytics: TranscriptionAnalytics</p>
+<p>  user: User!</p>
+<p>  createdAt: DateTime!</p>
+<p>  updatedAt: DateTime!</p>
+<p>  completedAt: DateTime</p>
+<p>}</p>
+
+<p>type TranscriptionContent {</p>
+<p>  text: String!</p>
+<p>  segments: [TranscriptionSegment!]!</p>
+<p>  summary: String</p>
+<p>  keywords: [String!]</p>
+<p>  chapters: [Chapter!]</p>
+<p>}</p>
+
+<p>type TranscriptionSegment {</p>
+<p>  id: Int!</p>
+<p>  start: Float!</p>
+<p>  end: Float!</p>
+<p>  text: String!</p>
+<p>  confidence: Float!</p>
+<p>  speaker: String</p>
+<p>  words: [Word!]</p>
+<p>}</p>
+
+<p>type Word {</p>
+<p>  word: String!</p>
+<p>  start: Float!</p>
+<p>  end: Float!</p>
+<p>  confidence: Float!</p>
+<p>}</p>
+
+<p>type Chapter {</p>
+<p>  id: Int!</p>
+<p>  title: String!</p>
+<p>  start: Float!</p>
+<p>  end: Float!</p>
+<p>  summary: String!</p>
+<p>}</p>
+
+<p>type TranscriptionMetadata {</p>
+<p>  duration: Int!</p>
+<p>  fileSize: Int!</p>
+<p>  fileType: String!</p>
+<p>  fileName: String!</p>
+<p>  sampleRate: Int</p>
+<p>  channels: Int</p>
+<p>  bitrate: Int</p>
+<p>}</p>
+
+<p>type ProcessingInfo {</p>
+<p>  startedAt: DateTime!</p>
+<p>  completedAt: DateTime</p>
+<p>  durationSeconds: Int</p>
+<p>  modelUsed: String!</p>
+<p>  languageDetection: LanguageDetection</p>
+<p>  progress: Int</p>
+<p>  currentStep: String</p>
+<p>  estimatedCompletion: DateTime</p>
+<p>}</p>
+
+<p>type LanguageDetection {</p>
+<p>  detected: Language!</p>
+<p>  confidence: Float!</p>
+<p>  alternatives: [LanguageAlternative!]!</p>
+<p>}</p>
+
+<p>type LanguageAlternative {</p>
+<p>  language: Language!</p>
+<p>  confidence: Float!</p>
+<p>}</p>
+
+<p>type TranscriptionAnalytics {</p>
+<p>  wordCount: Int!</p>
+<p>  sentenceCount: Int!</p>
+<p>  speakingRate: Float!</p>
+<p>  pauseCount: Int!</p>
+<p>  averageConfidence: Float!</p>
+<p>  languageDistribution: JSON</p>
+<p>  sentiment: SentimentAnalysis</p>
+<p>}</p>
+
+<p>type SentimentAnalysis {</p>
+<p>  positive: Float!</p>
+<p>  negative: Float!</p>
+<p>  neutral: Float!</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Chat et Conversations</h3>
+
+<p><code></code>`graphql</p>
+<h1>Conversation</h1>
+<p>type Conversation {</p>
+<p>  id: ID!</p>
+<p>  title: String!</p>
+<p>  transcription: Transcription</p>
+<p>  messages: [Message!]!</p>
+<p>  context: ConversationContext</p>
+<p>  user: User!</p>
+<p>  createdAt: DateTime!</p>
+<p>  updatedAt: DateTime!</p>
+<p>}</p>
+
+<p>type Message {</p>
+<p>  id: ID!</p>
+<p>  role: MessageRole!</p>
+<p>  content: String!</p>
+<p>  metadata: MessageMetadata</p>
+<p>  conversation: Conversation!</p>
+<p>  timestamp: DateTime!</p>
+<p>}</p>
+
+<p>enum MessageRole {</p>
+<p>  USER</p>
+<p>  ASSISTANT</p>
+<p>  SYSTEM</p>
+<p>}</p>
+
+<p>type MessageMetadata {</p>
+<p>  modelUsed: String</p>
+<p>  tokensUsed: Int</p>
+<p>  responseTime: Int</p>
+<p>  confidence: Float</p>
+<p>  sources: [String!]</p>
+<p>}</p>
+
+<p>type ConversationContext {</p>
+<p>  transcriptionContent: String</p>
+<p>  userPreferences: JSON</p>
+<p>  conversationSummary: String</p>
+<p>  relevantSegments: [TranscriptionSegment!]</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📝 Queries</h2>
+
+<h3>Utilisateurs</h3>
+
+<p><code></code>`graphql</p>
+<h1>Obtenir l'utilisateur connecté</h1>
+<p>query Me {</p>
+<p>  me {</p>
+<p>    id</p>
+<p>    name</p>
+<p>    email</p>
+<p>    role</p>
+<p>    preferences {</p>
+<p>      language</p>
+<p>      theme</p>
+<p>      notifications {</p>
+<p>        email</p>
+<p>        push</p>
+<p>        transcriptionComplete</p>
+<p>      }</p>
+<p>      transcription {</p>
+<p>        autoDetectLanguage</p>
+<p>        defaultLanguage</p>
+<p>        enhanceAudio</p>
+<p>      }</p>
+<p>    }</p>
+<p>    stats {</p>
+<p>      transcriptionsCount</p>
+<p>      totalDuration</p>
+<p>      plan {</p>
+<p>        name</p>
+<p>        quotaUsed</p>
+<p>        quotaLimit</p>
+<p>        resetDate</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Obtenir un utilisateur par ID (admin uniquement)</h1>
+<p>query GetUser($id: ID!) {</p>
+<p>  user(id: $id) {</p>
+<p>    id</p>
+<p>    name</p>
+<p>    email</p>
+<p>    role</p>
+<p>    createdAt</p>
+<p>    stats {</p>
+<p>      transcriptionsCount</p>
+<p>      totalDuration</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Transcriptions</h3>
+
+<p><code></code>`graphql</p>
+<h1>Liste des transcriptions avec pagination et filtres</h1>
+<p>query GetTranscriptions(</p>
+<p>  $page: Int = 1</p>
+<p>  $limit: Int = 10</p>
+<p>  $status: TranscriptionStatus</p>
+<p>  $search: String</p>
+<p>  $language: Language</p>
+<p>  $dateFrom: DateTime</p>
+<p>  $dateTo: DateTime</p>
+<p>  $sortBy: String = "createdAt"</p>
+<p>  $sortOrder: String = "DESC"</p>
+<p>) {</p>
+<p>  transcriptions(</p>
+<p>    page: $page</p>
+<p>    limit: $limit</p>
+<p>    filters: {</p>
+<p>      status: $status</p>
+<p>      search: $search</p>
+<p>      language: $language</p>
+<p>      dateFrom: $dateFrom</p>
+<p>      dateTo: $dateTo</p>
+<p>    }</p>
+<p>    sort: {</p>
+<p>      field: $sortBy</p>
+<p>      order: $sortOrder</p>
+<p>    }</p>
+<p>  ) {</p>
+<p>    data {</p>
+<p>      id</p>
+<p>      title</p>
+<p>      status</p>
+<p>      language</p>
+<p>      metadata {</p>
+<p>        duration</p>
+<p>        fileSize</p>
+<p>        fileType</p>
+<p>      }</p>
+<p>      analytics {</p>
+<p>        wordCount</p>
+<p>        averageConfidence</p>
+<p>      }</p>
+<p>      createdAt</p>
+<p>      completedAt</p>
+<p>    }</p>
+<p>    pagination {</p>
+<p>      page</p>
+<p>      limit</p>
+<p>      totalPages</p>
+<p>      totalItems</p>
+<p>      hasNext</p>
+<p>      hasPrev</p>
+<p>    }</p>
+<p>    filters {</p>
+<p>      applied {</p>
+<p>        status</p>
+<p>        language</p>
+<p>      }</p>
+<p>      available {</p>
+<p>        statuses</p>
+<p>        languages</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Détails complets d'une transcription</h1>
+<p>query GetTranscription($id: ID!) {</p>
+<p>  transcription(id: $id) {</p>
+<p>    id</p>
+<p>    title</p>
+<p>    status</p>
+<p>    language</p>
+<p>    content {</p>
+<p>      text</p>
+<p>      segments {</p>
+<p>        id</p>
+<p>        start</p>
+<p>        end</p>
+<p>        text</p>
+<p>        confidence</p>
+<p>        speaker</p>
+<p>        words {</p>
+<p>          word</p>
+<p>          start</p>
+<p>          end</p>
+<p>          confidence</p>
+<p>        }</p>
+<p>      }</p>
+<p>      summary</p>
+<p>      keywords</p>
+<p>      chapters {</p>
+<p>        id</p>
+<p>        title</p>
+<p>        start</p>
+<p>        end</p>
+<p>        summary</p>
+<p>      }</p>
+<p>    }</p>
+<p>    metadata {</p>
+<p>      duration</p>
+<p>      fileSize</p>
+<p>      fileType</p>
+<p>      fileName</p>
+<p>      sampleRate</p>
+<p>      channels</p>
+<p>    }</p>
+<p>    processing {</p>
+<p>      startedAt</p>
+<p>      completedAt</p>
+<p>      durationSeconds</p>
+<p>      modelUsed</p>
+<p>      languageDetection {</p>
+<p>        detected</p>
+<p>        confidence</p>
+<p>        alternatives {</p>
+<p>          language</p>
+<p>          confidence</p>
+<p>        }</p>
+<p>      }</p>
+<p>      progress</p>
+<p>      currentStep</p>
+<p>    }</p>
+<p>    analytics {</p>
+<p>      wordCount</p>
+<p>      sentenceCount</p>
+<p>      speakingRate</p>
+<p>      pauseCount</p>
+<p>      averageConfidence</p>
+<p>      sentiment {</p>
+<p>        positive</p>
+<p>        negative</p>
+<p>        neutral</p>
+<p>      }</p>
+<p>    }</p>
+<p>    createdAt</p>
+<p>    updatedAt</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Statistiques des transcriptions</h1>
+<p>query GetTranscriptionStats(</p>
+<p>  $dateFrom: DateTime</p>
+<p>  $dateTo: DateTime</p>
+<p>  $groupBy: String = "day"</p>
+<p>) {</p>
+<p>  transcriptionStats(</p>
+<p>    dateFrom: $dateFrom</p>
+<p>    dateTo: $dateTo</p>
+<p>    groupBy: $groupBy</p>
+<p>  ) {</p>
+<p>    totalTranscriptions</p>
+<p>    totalDuration</p>
+<p>    totalWords</p>
+<p>    averageConfidence</p>
+<p>    successRate</p>
+<p>    languageDistribution {</p>
+<p>      language</p>
+<p>      count</p>
+<p>      percentage</p>
+<p>    }</p>
+<p>    dailyStats {</p>
+<p>      date</p>
+<p>      count</p>
+<p>      duration</p>
+<p>      successRate</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Conversations</h3>
+
+<p><code></code>`graphql</p>
+<h1>Liste des conversations</h1>
+<p>query GetConversations($limit: Int = 20) {</p>
+<p>  conversations(limit: $limit) {</p>
+<p>    id</p>
+<p>    title</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      title</p>
+<p>    }</p>
+<p>    messages {</p>
+<p>      id</p>
+<p>      role</p>
+<p>      content</p>
+<p>      timestamp</p>
+<p>    }</p>
+<p>    createdAt</p>
+<p>    updatedAt</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Détails d'une conversation</h1>
+<p>query GetConversation($id: ID!) {</p>
+<p>  conversation(id: $id) {</p>
+<p>    id</p>
+<p>    title</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      title</p>
+<p>      content {</p>
+<p>        text</p>
+<p>        summary</p>
+<p>      }</p>
+<p>    }</p>
+<p>    messages {</p>
+<p>      id</p>
+<p>      role</p>
+<p>      content</p>
+<p>      metadata {</p>
+<p>        modelUsed</p>
+<p>        tokensUsed</p>
+<p>        responseTime</p>
+<p>        confidence</p>
+<p>      }</p>
+<p>      timestamp</p>
+<p>    }</p>
+<p>    context {</p>
+<p>      transcriptionContent</p>
+<p>      conversationSummary</p>
+<p>      relevantSegments {</p>
+<p>        id</p>
+<p>        start</p>
+<p>        end</p>
+<p>        text</p>
+<p>      }</p>
+<p>    }</p>
+<p>    createdAt</p>
+<p>    updatedAt</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>🔄 Mutations</h2>
+
+<h3>Authentification</h3>
+
+<p><code></code>`graphql</p>
+<h1>Connexion</h1>
+<p>mutation Login($email: String!, $password: String!) {</p>
+<p>  login(input: { email: $email, password: $password }) {</p>
+<p>    user {</p>
+<p>      id</p>
+<p>      name</p>
+<p>      email</p>
+<p>      role</p>
+<p>    }</p>
+<p>    token</p>
+<p>    expiresAt</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Inscription</h1>
+<p>mutation Register($input: RegisterInput!) {</p>
+<p>  register(input: $input) {</p>
+<p>    user {</p>
+<p>      id</p>
+<p>      name</p>
+<p>      email</p>
+<p>    }</p>
+<p>    token</p>
+<p>    expiresAt</p>
+<p>  }</p>
+<p>}</p>
+
+<p>input RegisterInput {</p>
+<p>  name: String!</p>
+<p>  email: String!</p>
+<p>  password: String!</p>
+<p>  confirmPassword: String!</p>
+<p>  acceptTerms: Boolean!</p>
+<p>  newsletter: Boolean = false</p>
+<p>}</p>
+
+<h1>Mise à jour du profil</h1>
+<p>mutation UpdateProfile($input: UpdateProfileInput!) {</p>
+<p>  updateProfile(input: $input) {</p>
+<p>    user {</p>
+<p>      id</p>
+<p>      name</p>
+<p>      email</p>
+<p>      preferences {</p>
+<p>        language</p>
+<p>        theme</p>
+<p>        notifications {</p>
+<p>          email</p>
+<p>          push</p>
+<p>        }</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<p>input UpdateProfileInput {</p>
+<p>  name: String</p>
+<p>  email: String</p>
+<p>  currentPassword: String</p>
+<p>  newPassword: String</p>
+<p>  preferences: UserPreferencesInput</p>
+<p>}</p>
+
+<p>input UserPreferencesInput {</p>
+<p>  language: Language</p>
+<p>  theme: String</p>
+<p>  notifications: NotificationSettingsInput</p>
+<p>  transcription: TranscriptionSettingsInput</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Transcriptions</h3>
+
+<p><code></code>`graphql</p>
+<h1>Créer une transcription</h1>
+<p>mutation CreateTranscription($input: CreateTranscriptionInput!) {</p>
+<p>  createTranscription(input: $input) {</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      title</p>
+<p>      status</p>
+<p>      estimatedDuration</p>
+<p>      queuePosition</p>
+<p>      estimatedCompletion</p>
+<p>    }</p>
+<p>    upload {</p>
+<p>      fileSize</p>
+<p>      fileType</p>
+<p>      duration</p>
+<p>      uploadId</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<p>input CreateTranscriptionInput {</p>
+<p>  file: Upload!</p>
+<p>  title: String</p>
+<p>  language: Language</p>
+<p>  options: TranscriptionOptionsInput</p>
+<p>}</p>
+
+<p>input TranscriptionOptionsInput {</p>
+<p>  enhanceAudio: Boolean = false</p>
+<p>  detectSpeakers: Boolean = false</p>
+<p>  generateSummary: Boolean = false</p>
+<p>  extractKeywords: Boolean = false</p>
+<p>  formatOutput: String = "segments"</p>
+<p>  webhookUrl: String</p>
+<p>}</p>
+
+<h1>Mettre à jour une transcription</h1>
+<p>mutation UpdateTranscription($id: ID!, $input: UpdateTranscriptionInput!) {</p>
+<p>  updateTranscription(id: $id, input: $input) {</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      title</p>
+<p>      language</p>
+<p>      updatedAt</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<p>input UpdateTranscriptionInput {</p>
+<p>  title: String</p>
+<p>  language: Language</p>
+<p>}</p>
+
+<h1>Supprimer une transcription</h1>
+<p>mutation DeleteTranscription($id: ID!) {</p>
+<p>  deleteTranscription(id: $id) {</p>
+<p>    success</p>
+<p>    message</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Regénérer une transcription</h1>
+<p>mutation RegenerateTranscription($id: ID!, $options: TranscriptionOptionsInput) {</p>
+<p>  regenerateTranscription(id: $id, options: $options) {</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      status</p>
+<p>      estimatedCompletion</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Conversations</h3>
+
+<p><code></code>`graphql</p>
+<h1>Créer une conversation</h1>
+<p>mutation CreateConversation($input: CreateConversationInput!) {</p>
+<p>  createConversation(input: $input) {</p>
+<p>    conversation {</p>
+<p>      id</p>
+<p>      title</p>
+<p>      transcription {</p>
+<p>        id</p>
+<p>        title</p>
+<p>      }</p>
+<p>      createdAt</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<p>input CreateConversationInput {</p>
+<p>  title: String</p>
+<p>  transcriptionId: ID</p>
+<p>}</p>
+
+<h1>Envoyer un message</h1>
+<p>mutation SendMessage($conversationId: ID!, $content: String!) {</p>
+<p>  sendMessage(conversationId: $conversationId, content: $content) {</p>
+<p>    message {</p>
+<p>      id</p>
+<p>      role</p>
+<p>      content</p>
+<p>      timestamp</p>
+<p>    }</p>
+<p>    response {</p>
+<p>      id</p>
+<p>      role</p>
+<p>      content</p>
+<p>      metadata {</p>
+<p>        modelUsed</p>
+<p>        tokensUsed</p>
+<p>        responseTime</p>
+<p>      }</p>
+<p>      timestamp</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>Supprimer une conversation</h1>
+<p>mutation DeleteConversation($id: ID!) {</p>
+<p>  deleteConversation(id: $id) {</p>
+<p>    success</p>
+<p>    message</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📡 Subscriptions</h2>
+
+<h3>Temps Réel</h3>
+
+<p><code></code>`graphql</p>
+<h1>S'abonner aux mises à jour de transcription</h1>
+<p>subscription TranscriptionUpdates($transcriptionId: ID!) {</p>
+<p>  transcriptionUpdated(transcriptionId: $transcriptionId) {</p>
+<p>    id</p>
+<p>    status</p>
+<p>    processing {</p>
+<p>      progress</p>
+<p>      currentStep</p>
+<p>      estimatedCompletion</p>
+<p>    }</p>
+<p>    content {</p>
+<p>      text</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>S'abonner aux nouveaux messages de conversation</h1>
+<p>subscription ConversationMessages($conversationId: ID!) {</p>
+<p>  messageAdded(conversationId: $conversationId) {</p>
+<p>    id</p>
+<p>    role</p>
+<p>    content</p>
+<p>    metadata {</p>
+<p>      modelUsed</p>
+<p>      responseTime</p>
+<p>    }</p>
+<p>    timestamp</p>
+<p>  }</p>
+<p>}</p>
+
+<h1>S'abonner aux notifications utilisateur</h1>
+<p>subscription UserNotifications {</p>
+<p>  notificationAdded {</p>
+<p>    id</p>
+<p>    type</p>
+<p>    title</p>
+<p>    message</p>
+<p>    data</p>
+<p>    createdAt</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>🔧 Configuration Client</h2>
+
+<h3>Apollo Client Setup</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/apollo.ts</p>
+<p>import { ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client/core';</p>
+<p>import { getMainDefinition } from '@apollo/client/utilities';</p>
+<p>import { GraphQLWsLink } from '@apollo/client/link/subscriptions';</p>
+<p>import { createClient } from 'graphql-ws';</p>
+<p>import { setContext } from '@apollo/client/link/context';</p>
+<p>import { useAuthStore } from '@/stores/auth';</p>
+
+<p>// HTTP Link</p>
+<p>const httpLink = createHttpLink({</p>
+<p>  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:8000/graphql'</p>
+<p>});</p>
+
+<p>// WebSocket Link pour les subscriptions</p>
+<p>const wsLink = new GraphQLWsLink(</p>
+<p>  createClient({</p>
+<p>    url: import.meta.env.VITE_GRAPHQL_WS_URL || 'ws://localhost:8000/graphql',</p>
+<p>    connectionParams: () => {</p>
+<p>      const authStore = useAuthStore();</p>
+<p>      return {</p>
+<p>        Authorization: authStore.token ? <code>Bearer ${authStore.token}</code> : ''</p>
+<p>      };</p>
+<p>    }</p>
+<p>  })</p>
+<p>);</p>
+
+<p>// Auth Link</p>
+<p>const authLink = setContext((_, { headers }) => {</p>
+<p>  const authStore = useAuthStore();</p>
+<p>  return {</p>
+<p>    headers: {</p>
+<p>      ...headers,</p>
+<p>      Authorization: authStore.token ? <code>Bearer ${authStore.token}</code> : ''</p>
+<p>    }</p>
+<p>  };</p>
+<p>});</p>
+
+<p>// Split Link pour gérer HTTP et WebSocket</p>
+<p>const splitLink = split(</p>
+<p>  ({ query }) => {</p>
+<p>    const definition = getMainDefinition(query);</p>
+<p>    return (</p>
+<p>      definition.kind === 'OperationDefinition' &&</p>
+<p>      definition.operation === 'subscription'</p>
+<p>    );</p>
+<p>  },</p>
+<p>  wsLink,</p>
+<p>  authLink.concat(httpLink)</p>
+<p>);</p>
+
+<p>// Apollo Client</p>
+<p>export const apolloClient = new ApolloClient({</p>
+<p>  link: splitLink,</p>
+<p>  cache: new InMemoryCache({</p>
+<p>    typePolicies: {</p>
+<p>      Query: {</p>
+<p>        fields: {</p>
+<p>          transcriptions: {</p>
+<p>            keyArgs: ['filters', 'sort'],</p>
+<p>            merge(existing = { data: [] }, incoming) {</p>
+<p>              return {</p>
+<p>                ...incoming,</p>
+<p>                data: [...existing.data, ...incoming.data]</p>
+<p>              };</p>
+<p>            }</p>
+<p>          }</p>
+<p>        }</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }),</p>
+<p>  defaultOptions: {</p>
+<p>    watchQuery: {</p>
+<p>      errorPolicy: 'all'</p>
+<p>    },</p>
+<p>    query: {</p>
+<p>      errorPolicy: 'all'</p>
+<p>    }</p>
+<p>  }</p>
+<p>});</p>
+<p><code></code>`</p>
+
+<h3>Composables GraphQL</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/composables/useGraphQL.ts</p>
+<p>import { useQuery, useMutation, useSubscription } from '@vue/apollo-composable';</p>
+<p>import { computed } from 'vue';</p>
+<p>import type { DocumentNode } from 'graphql';</p>
+
+<p>export function useGraphQLQuery<TResult = any, TVariables = any>(</p>
+<p>  query: DocumentNode,</p>
+<p>  variables?: TVariables,</p>
+<p>  options?: any</p>
+<p>) {</p>
+<p>  const { result, loading, error, refetch } = useQuery(query, variables, options);</p>
+
+<p>  const data = computed(() => result.value?.data || null);</p>
+<p>  const hasError = computed(() => !!error.value);</p>
+<p>  const isEmpty = computed(() => !loading.value && !data.value);</p>
+
+<p>  return {</p>
+<p>    data,</p>
+<p>    loading,</p>
+<p>    error,</p>
+<p>    hasError,</p>
+<p>    isEmpty,</p>
+<p>    refetch</p>
+<p>  };</p>
+<p>}</p>
+
+<p>export function useGraphQLMutation<TResult = any, TVariables = any>(</p>
+<p>  mutation: DocumentNode,</p>
+<p>  options?: any</p>
+<p>) {</p>
+<p>  const { mutate, loading, error } = useMutation(mutation, options);</p>
+
+<p>  const execute = async (variables?: TVariables) => {</p>
+<p>    try {</p>
+<p>      const result = await mutate(variables);</p>
+<p>      return result?.data || null;</p>
+<p>    } catch (err) {</p>
+<p>      throw err;</p>
+<p>    }</p>
+<p>  };</p>
+
+<p>  return {</p>
+<p>    execute,</p>
+<p>    loading,</p>
+<p>    error</p>
+<p>  };</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📋 Exemples d'Utilisation</h2>
+
+<h3>Vue Component avec GraphQL</h3>
+
+<p><code></code>`vue</p>
+<template>
+<p>  <div></p>
+<p>    <div v-if="loading" class="text-center"></p>
+<p>      <LoadingSpinner /></p>
+<p>    </div></p>
+<p>    </p>
+<p>    <div v-else-if="error" class="text-red-600"></p>
+<p>      Erreur: {{ error.message }}</p>
+<p>    </div></p>
+<p>    </p>
+<p>    <div v-else-if="transcriptions"></p>
+<p>      <TranscriptionCard</p>
+<p>        v-for="transcription in transcriptions.data"</p>
+<p>        :key="transcription.id"</p>
+<p>        :transcription="transcription"</p>
+<p>      /></p>
+<p>    </div></p>
+<p>  </div></p>
+</template>
+
+<script setup lang="ts">
+<p>import { useGraphQLQuery } from '@/composables/useGraphQL';</p>
+<p>import { GET_TRANSCRIPTIONS } from '@/graphql/queries';</p>
+
+<p>const { data: transcriptions, loading, error } = useGraphQLQuery(</p>
+<p>  GET_TRANSCRIPTIONS,</p>
+<p>  {</p>
+<p>    page: 1,</p>
+<p>    limit: 10,</p>
+<p>    status: 'COMPLETED'</p>
+<p>  }</p>
+<p>);</p>
+</script>
+<p><code></code>`</p>
+
+<h3>Mutation avec Error Handling</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/composables/useTranscriptionMutations.ts</p>
+<p>import { useGraphQLMutation } from '@/composables/useGraphQL';</p>
+<p>import { CREATE_TRANSCRIPTION, UPDATE_TRANSCRIPTION } from '@/graphql/mutations';</p>
+<p>import { useUIStore } from '@/stores/ui';</p>
+
+<p>export function useTranscriptionMutations() {</p>
+<p>  const uiStore = useUIStore();</p>
+
+<p>  const { execute: createTranscription, loading: creating } = useGraphQLMutation(</p>
+<p>    CREATE_TRANSCRIPTION,</p>
+<p>    {</p>
+<p>      onCompleted: (data) => {</p>
+<p>        uiStore.showNotification({</p>
+<p>          type: 'success',</p>
+<p>          title: 'Transcription créée',</p>
+<p>          message: 'Votre transcription est en cours de traitement'</p>
+<p>        });</p>
+<p>      },</p>
+<p>      onError: (error) => {</p>
+<p>        uiStore.showNotification({</p>
+<p>          type: 'error',</p>
+<p>          title: 'Erreur',</p>
+<p>          message: error.message</p>
+<p>        });</p>
+<p>      }</p>
+<p>    }</p>
+<p>  );</p>
+
+<p>  return {</p>
+<p>    createTranscription,</p>
+<p>    creating</p>
+<p>  };</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📊 Schema Introspection</h2>
+
+<p><code></code>`bash</p>
+<h1>Télécharger le schéma GraphQL</h1>
+<p>curl -X POST \</p>
+<p>  -H "Content-Type: application/json" \</p>
+<p>  -d '{"query": "{ __schema { types { name } } }"}' \</p>
+<p>  http://localhost:8000/graphql</p>
+
+<h1>Générer les types TypeScript</h1>
+<p>npm run graphql:codegen</p>
+<p><code></code>`</p>
+
+<h2>🔍 Playground GraphQL</h2>
+
+<p>L'interface GraphQL Playground est disponible en développement :</p>
+
+<p><code></code>`</p>
+<p>http://localhost:8000/graphql-playground</p>
+<p><code></code>`</p>
+
+<p>Fonctionnalités :</p>
+<p>- Explorateur de schéma interactif</p>
+<p>- Éditeur de requêtes avec autocomplétion</p>
+<p>- Documentation automatique</p>
+<p>- Historique des requêtes</p>
+<p>- Variables et headers personnalisés</p>            </div>
+        </div>
+    </div>
+</body>
+</html>

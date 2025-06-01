@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Frontend Architecture</h1>
+
+<h2>🎨 Overview</h2>
+
+<p>The frontend of the Intelligent Transcription application is built using Twig as the templating engine, with Tailwind CSS for styling and vanilla JavaScript for interactivity. The interface is designed to be responsive, intuitive, and accessible across different devices.</p>
+
+<h2>🧩 Template Structure</h2>
+
+<h3>Template Organization</h3>
+
+<p>The application uses Twig templates organized in a hierarchical structure:</p>
+
+<p>```</p>
+<p>/templates/</p>
+<p>├── base/</p>
+<p>│   └── layout.twig        # Base layout template with common elements</p>
+<p>├── home/</p>
+<p>│   └── index.twig         # Homepage template with upload forms</p>
+<p>├── result/</p>
+<p>│   └── show.twig          # Result display template</p>
+<p>├── chat/</p>
+<p>│   └── index.twig         # Chat interface template</p>
+<p>└── processing/</p>
+<p>    └── show.twig          # Processing status template</p>
+<p>```</p>
+
+<h3>Template Inheritance</h3>
+
+<p>Templates follow an inheritance pattern with `layout.twig` serving as the base template. Each page extends this base template and overrides specific blocks:</p>
+
+<p>```twig</p>
+<p>{% extends 'base/layout.twig' %}</p>
+
+<p>{% block title %}Specific Page Title{% endblock %}</p>
+
+<p>{% block content %}</p>
+<p>    <!-- Page-specific content here --></p>
+<p>{% endblock %}</p>
+
+<p>{% block javascripts %}</p>
+<p>    {{ parent() }}</p>
+<p>    <!-- Page-specific scripts here --></p>
+<p>{% endblock %}</p>
+<p>```</p>
+
+<h2>📱 UI Components</h2>
+
+<h3>Core UI Components</h3>
+
+<p>The application includes several key UI components:</p>
+
+<h4>1. **File Upload Form**</h4>
+
+<p>- **Location**: `templates/home/index.twig`</p>
+<p>- **Description**: Form for uploading audio/video files</p>
+<p>- **Features**: </p>
+<p>  - Drag-and-drop file upload</p>
+<p>  - Language selection dropdown</p>
+<p>  - Force language translation option</p>
+
+<p>**Key HTML Structure:**</p>
+<p>```html</p>
+<form method="post" action="transcribe.php" enctype="multipart/form-data" class="upload-form">
+<p>    <div class="dropzone"></p>
+<p>        <!-- File drop area --></p>
+<p>    </div></p>
+<p>    <div class="language-options"></p>
+<p>        <!-- Language selection --></p>
+<p>    </div></p>
+<p>    <button type="submit" class="btn-primary">Transcrire</button></p>
+</form>
+<p>```</p>
+
+<h4>2. **YouTube URL Form**</h4>
+
+<p>- **Location**: `templates/home/index.twig`</p>
+<p>- **Description**: Form for entering YouTube URLs</p>
+<p>- **Features**:</p>
+<p>  - URL input field</p>
+<p>  - Language selection (shared with file upload form)</p>
+<p>  - Support for YouTube Shorts</p>
+
+<p>**Key HTML Structure:**</p>
+<p>```html</p>
+<form method="post" action="youtube_download.php" class="youtube-form">
+<p>    <div class="input-group"></p>
+<p>        <input type="url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." required></p>
+<p>    </div></p>
+<p>    <div class="language-options"></p>
+<p>        <!-- Language selection --></p>
+<p>    </div></p>
+<p>    <button type="submit" class="btn-primary">Transcrire YouTube</button></p>
+</form>
+<p>```</p>
+
+<h4>3. **Transcription Result Panel**</h4>
+
+<p>- **Location**: `templates/result/show.twig`</p>
+<p>- **Description**: Panel displaying transcription results</p>
+<p>- **Features**:</p>
+<p>  - Formatted text display</p>
+<p>  - Copy to clipboard functionality</p>
+<p>  - Download as text file option</p>
+<p>  - Paraphrase button</p>
+<p>  - Chat with context button</p>
+
+<p>**Key HTML Structure:**</p>
+<p>```html</p>
+<div class="result-panel">
+<p>    <div class="result-header"></p>
+<p>        <h2>Résultat de la transcription</h2></p>
+<p>        <div class="result-actions"></p>
+<p>            <!-- Action buttons --></p>
+<p>        </div></p>
+<p>    </div></p>
+<p>    <div class="result-content"></p>
+<p>        <!-- Transcription text --></p>
+<p>    </div></p>
+<p>    <div class="result-footer"></p>
+<p>        <!-- Additional actions --></p>
+<p>    </div></p>
+</div>
+<p>```</p>
+
+<h4>4. **Chat Interface**</h4>
+
+<p>- **Location**: `templates/chat/index.twig`</p>
+<p>- **Description**: Interactive chat interface for contextual conversations</p>
+<p>- **Features**:</p>
+<p>  - Message history display</p>
+<p>  - Message input form</p>
+<p>  - Export chat button</p>
+<p>  - Context indicators</p>
+
+<p>**Key HTML Structure:**</p>
+<p>```html</p>
+<div class="chat-container">
+<p>    <div class="chat-messages" id="chatMessages"></p>
+<p>        <!-- Message history --></p>
+<p>    </div></p>
+<p>    <form id="chatForm" class="chat-input-form"></p>
+<p>        <textarea name="message" placeholder="Posez une question sur le contenu transcrit..."></textarea></p>
+<p>        <button type="submit" class="btn-send">Envoyer</button></p>
+<p>    </form></p>
+<p>    <div class="chat-actions"></p>
+<p>        <!-- Export button --></p>
+<p>    </div></p>
+</div>
+<p>```</p>
+
+<h4>5. **Navigation Bar**</h4>
+
+<p>- **Location**: `templates/base/layout.twig`</p>
+<p>- **Description**: Main navigation bar</p>
+<p>- **Features**:</p>
+<p>  - Responsive design (mobile menu)</p>
+<p>  - Active page indicators</p>
+
+<p>**Key HTML Structure:**</p>
+<p>```html</p>
+<nav class="bg-gray-800 text-white shadow-md">
+<p>    <div class="container mx-auto px-4"></p>
+<p>        <div class="flex justify-between items-center py-3"></p>
+<p>            <div class="font-semibold text-xl">{{ app_name }}</div></p>
+<p>            <button class="md:hidden p-2" id="mobile-menu-button"></p>
+<p>                <!-- Mobile menu icon --></p>
+<p>            </button></p>
+<p>            <ul class="hidden md:flex space-x-4" id="main-menu"></p>
+<p>                <!-- Navigation links --></p>
+<p>            </ul></p>
+<p>        </div></p>
+<p>    </div></p>
+<p>    <div class="md:hidden" id="mobile-menu"></p>
+<p>        <!-- Mobile navigation --></p>
+<p>    </div></p>
+</nav>
+<p>```</p>
+
+<h2>🎭 CSS Architecture</h2>
+
+<h3>Tailwind CSS Integration</h3>
+
+<p>The application uses Tailwind CSS, a utility-first CSS framework. The main CSS files are:</p>
+
+<p>- `assets/css/tailwind.css`: Core Tailwind imports</p>
+<p>- `assets/css/style.css`: Custom styles and Tailwind extensions</p>
+
+<p>**Key Tailwind Configuration:**</p>
+<p>```js</p>
+<p>// tailwind.config.js</p>
+<p>module.exports = {</p>
+<p>  content: [</p>
+<p>    "./templates/**/*.twig",</p>
+<p>    "./assets/js/**/*.js"</p>
+<p>  ],</p>
+<p>  theme: {</p>
+<p>    extend: {</p>
+<p>      // Custom theme extensions</p>
+<p>    }</p>
+<p>  },</p>
+<p>  plugins: [</p>
+<p>    // Additional plugins</p>
+<p>  ]</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Custom Component Styles</h3>
+
+<p>Custom component styles are defined in `style.css` and follow this pattern:</p>
+
+<p>```css</p>
+<p>/* Example component styles */</p>
+<p>.alert-error {</p>
+<p>  @apply bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded;</p>
+<p>}</p>
+
+<p>.btn-primary {</p>
+<p>  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors;</p>
+<p>}</p>
+
+<p>.dropzone {</p>
+<p>  @apply border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors;</p>
+<p>}</p>
+<p>```</p>
+
+<h2>📊 JavaScript Components</h2>
+
+<h3>Core JavaScript Modules</h3>
+
+<p>The application uses vanilla JavaScript for frontend interactivity:</p>
+
+<h4>1. **Upload Form Handler**</h4>
+
+<p>- **Location**: `assets/js/app.js`</p>
+<p>- **Description**: Handles file uploads and form validation</p>
+<p>- **Features**:</p>
+<p>  - Drag and drop functionality</p>
+<p>  - File type validation</p>
+<p>  - File size validation</p>
+<p>  - Form submission handling</p>
+
+<h4>2. **Chat Interface Manager**</h4>
+
+<p>- **Location**: `assets/js/app.js`</p>
+<p>- **Description**: Manages the chat interface functionality</p>
+<p>- **Features**:</p>
+<p>  - Message submission</p>
+<p>  - Response display</p>
+<p>  - Message history management</p>
+<p>  - Chat export</p>
+
+<h4>3. **UI Utilities**</h4>
+
+<p>- **Location**: `assets/js/app.js`</p>
+<p>- **Description**: Utility functions for UI management</p>
+<p>- **Features**:</p>
+<p>  - Copy to clipboard functionality</p>
+<p>  - Mobile menu toggle</p>
+<p>  - Form validation</p>
+<p>  - Error message display</p>
+
+<h2>🔄 State Management</h2>
+
+<h3>Session-based State</h3>
+
+<p>The application uses PHP sessions for state management:</p>
+
+<p>- **Chat History**: Stored in `$_SESSION['chat_history']`</p>
+<p>- **Transcription Context**: Stored in `$_SESSION['transcription_context']`</p>
+<p>- **Error Messages**: Passed via URL parameters and session flash messages</p>
+
+<h3>Local State Management</h3>
+
+<p>Client-side state is managed through JavaScript:</p>
+
+<p>- DOM manipulation for UI updates</p>
+<p>- Form data handling</p>
+<p>- Temporary storage of chat messages before submission</p>
+
+<h2>🌐 Responsive Design</h2>
+
+<p>The application implements responsive design principles using Tailwind's responsive utilities:</p>
+
+<p>- Mobile-first approach</p>
+<p>- Breakpoint-specific classes (`md:`, `lg:`, etc.)</p>
+<p>- Flexible layouts using Flexbox and Grid</p>
+<p>- Responsive typography</p>
+<p>- Touch-friendly interaction elements for mobile users</p>
+
+<p>**Example responsive pattern:**</p>
+<p>```html</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<p>    <!-- Content adapts to screen size --></p>
+</div>
+<p>```</p>
+
+<h2>🔄 Page Transitions and Loading States</h2>
+
+<p>The application includes visual indicators for loading states:</p>
+
+<p>- Loading spinner for transcription processing</p>
+<p>- Chat message sending indicators</p>
+<p>- Button state changes during form submission</p>
+
+<p>**Loading Spinner Example:**</p>
+<p>```html</p>
+<div class="loading-spinner">
+<p>    <div class="spinner"></div></p>
+<p>    <p>Transcription en cours...</p></p>
+</div>
+<p>```</p>
+
+<h2>📱 Mobile Considerations</h2>
+
+<p>The mobile experience includes these optimizations:</p>
+
+<p>- Simplified forms on smaller screens</p>
+<p>- Touch-friendly button sizes (min 44×44px)</p>
+<p>- Collapsible navigation for small screens</p>
+<p>- Responsive font sizes</p>
+<p>- Limited horizontal scrolling</p>
+        </div>
+    </div>
+</body>
+</html>

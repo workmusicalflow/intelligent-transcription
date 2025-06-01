@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .prose { max-width: none; }
+        .prose h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .prose h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose p { margin-bottom: 1rem; line-height: 1.7; }
+        .prose pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        .prose code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 2rem; }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.6; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        .prose th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <div class="prose max-w-none">
+<h1>Design System</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Système de design d'Intelligent Transcription basé sur Tailwind CSS avec composants cohérents.</p>
+
+<h2>🎨 Palette de Couleurs</h2>
+
+<h3>Couleurs Primaires</h3>
+<p><code></code>`css</p>
+<p>/* Bleu - Couleur principale */</p>
+<p>--primary-50: #eff6ff;</p>
+<p>--primary-100: #dbeafe;</p>
+<p>--primary-200: #bfdbfe;</p>
+<p>--primary-300: #93c5fd;</p>
+<p>--primary-400: #60a5fa;</p>
+<p>--primary-500: #3b82f6;  /* Couleur principale */</p>
+<p>--primary-600: #2563eb;</p>
+<p>--primary-700: #1d4ed8;</p>
+<p>--primary-800: #1e40af;</p>
+<p>--primary-900: #1e3a8a;</p>
+<p><code></code>`</p>
+
+<h3>Couleurs Secondaires</h3>
+<p><code></code>`css</p>
+<p>/* Gris - Couleurs neutres */</p>
+<p>--gray-50: #f9fafb;</p>
+<p>--gray-100: #f3f4f6;</p>
+<p>--gray-200: #e5e7eb;</p>
+<p>--gray-300: #d1d5db;</p>
+<p>--gray-400: #9ca3af;</p>
+<p>--gray-500: #6b7280;   /* Gris secondaire */</p>
+<p>--gray-600: #4b5563;</p>
+<p>--gray-700: #374151;</p>
+<p>--gray-800: #1f2937;</p>
+<p>--gray-900: #111827;</p>
+<p><code></code>`</p>
+
+<h3>Couleurs Sémantiques</h3>
+<p><code></code>`css</p>
+<p>/* Succès */</p>
+<p>--success-50: #ecfdf5;</p>
+<p>--success-100: #d1fae5;</p>
+<p>--success-500: #10b981;</p>
+<p>--success-600: #059669;</p>
+<p>--success-700: #047857;</p>
+
+<p>/* Attention */</p>
+<p>--warning-50: #fffbeb;</p>
+<p>--warning-100: #fef3c7;</p>
+<p>--warning-500: #f59e0b;</p>
+<p>--warning-600: #d97706;</p>
+<p>--warning-700: #b45309;</p>
+
+<p>/* Erreur */</p>
+<p>--error-50: #fef2f2;</p>
+<p>--error-100: #fee2e2;</p>
+<p>--error-500: #ef4444;</p>
+<p>--error-600: #dc2626;</p>
+<p>--error-700: #b91c1c;</p>
+
+<p>/* Information */</p>
+<p>--info-50: #eff6ff;</p>
+<p>--info-100: #dbeafe;</p>
+<p>--info-500: #3b82f6;</p>
+<p>--info-600: #2563eb;</p>
+<p>--info-700: #1d4ed8;</p>
+<p><code></code>`</p>
+
+<h2>📝 Typographie</h2>
+
+<h3>Famille de Police</h3>
+<p><code></code>`css</p>
+<p>/* Police principale */</p>
+<p>font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;</p>
+
+<p>/* Police monospace (code) */</p>
+<p>font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;</p>
+<p><code></code>`</p>
+
+<h3>Échelle Typographique</h3>
+<p><code></code>`css</p>
+<p>/* Titres */</p>
+<p>.text-xs    { font-size: 0.75rem; line-height: 1rem; }     /* 12px */</p>
+<p>.text-sm    { font-size: 0.875rem; line-height: 1.25rem; } /* 14px */</p>
+<p>.text-base  { font-size: 1rem; line-height: 1.5rem; }     /* 16px */</p>
+<p>.text-lg    { font-size: 1.125rem; line-height: 1.75rem; } /* 18px */</p>
+<p>.text-xl    { font-size: 1.25rem; line-height: 1.75rem; }  /* 20px */</p>
+<p>.text-2xl   { font-size: 1.5rem; line-height: 2rem; }     /* 24px */</p>
+<p>.text-3xl   { font-size: 1.875rem; line-height: 2.25rem; } /* 30px */</p>
+<p>.text-4xl   { font-size: 2.25rem; line-height: 2.5rem; }  /* 36px */</p>
+<p>.text-5xl   { font-size: 3rem; line-height: 1; }          /* 48px */</p>
+<p><code></code>`</p>
+
+<h3>Poids de Police</h3>
+<p><code></code>`css</p>
+<p>.font-thin       { font-weight: 100; }</p>
+<p>.font-extralight { font-weight: 200; }</p>
+<p>.font-light      { font-weight: 300; }</p>
+<p>.font-normal     { font-weight: 400; }</p>
+<p>.font-medium     { font-weight: 500; }</p>
+<p>.font-semibold   { font-weight: 600; }</p>
+<p>.font-bold       { font-weight: 700; }</p>
+<p>.font-extrabold  { font-weight: 800; }</p>
+<p>.font-black      { font-weight: 900; }</p>
+<p><code></code>`</p>
+
+<h2>📏 Espacements</h2>
+
+<h3>Échelle d'Espacement</h3>
+<p><code></code>`css</p>
+<p>.p-0    { padding: 0; }</p>
+<p>.p-1    { padding: 0.25rem; }   /* 4px */</p>
+<p>.p-2    { padding: 0.5rem; }    /* 8px */</p>
+<p>.p-3    { padding: 0.75rem; }   /* 12px */</p>
+<p>.p-4    { padding: 1rem; }      /* 16px */</p>
+<p>.p-5    { padding: 1.25rem; }   /* 20px */</p>
+<p>.p-6    { padding: 1.5rem; }    /* 24px */</p>
+<p>.p-8    { padding: 2rem; }      /* 32px */</p>
+<p>.p-10   { padding: 2.5rem; }    /* 40px */</p>
+<p>.p-12   { padding: 3rem; }      /* 48px */</p>
+<p>.p-16   { padding: 4rem; }      /* 64px */</p>
+<p><code></code>`</p>
+
+<h3>Marges</h3>
+<p><code></code>`css</p>
+<p>.m-0    { margin: 0; }</p>
+<p>.m-1    { margin: 0.25rem; }    /* 4px */</p>
+<p>.m-2    { margin: 0.5rem; }     /* 8px */</p>
+<p>.m-4    { margin: 1rem; }       /* 16px */</p>
+<p>.m-6    { margin: 1.5rem; }     /* 24px */</p>
+<p>.m-8    { margin: 2rem; }       /* 32px */</p>
+<p>.m-auto { margin: auto; }</p>
+<p><code></code>`</p>
+
+<h2>🔲 Composants UI</h2>
+
+<h3>Boutons</h3>
+
+<h4>Variantes</h4>
+<p><code></code>`html</p>
+<!-- Bouton Principal -->
+<button class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+<p>  Action Principale</p>
+</button>
+
+<!-- Bouton Secondaire -->
+<button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors">
+<p>  Action Secondaire</p>
+</button>
+
+<!-- Bouton Danger -->
+<button class="bg-error-500 hover:bg-error-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+<p>  Action Destructive</p>
+</button>
+
+<!-- Bouton Ghost -->
+<button class="text-primary-600 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg transition-colors">
+<p>  Action Subtile</p>
+</button>
+<p><code></code>`</p>
+
+<h4>Tailles</h4>
+<p><code></code>`html</p>
+<!-- Petit -->
+<button class="text-sm py-1 px-3 rounded">
+<p>  Petit</p>
+</button>
+
+<!-- Moyen (par défaut) -->
+<button class="py-2 px-4 rounded-lg">
+<p>  Moyen</p>
+</button>
+
+<!-- Grand -->
+<button class="text-lg py-3 px-6 rounded-xl">
+<p>  Grand</p>
+</button>
+<p><code></code>`</p>
+
+<h3>Champs de Saisie</h3>
+
+<p><code></code>`html</p>
+<!-- Input Standard -->
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" 
+<p>       type="text" </p>
+<p>       placeholder="Entrez votre texte"></p>
+
+<!-- Input avec Erreur -->
+<input class="w-full px-3 py-2 border border-error-300 rounded-lg focus:ring-2 focus:ring-error-500 focus:border-error-500 transition-all" 
+<p>       type="text" </p>
+<p>       placeholder="Champ avec erreur"></p>
+
+<!-- Input Désactivé -->
+<input class="w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed" 
+<p>       type="text" </p>
+<p>       placeholder="Champ désactivé" </p>
+<p>       disabled></p>
+<p><code></code>`</p>
+
+<h3>Cartes</h3>
+
+<p><code></code>`html</p>
+<!-- Carte Standard -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+<p>  <h3 class="text-lg font-semibold text-gray-900 mb-2">Titre de la carte</h3></p>
+<p>  <p class="text-gray-600">Contenu de la carte</p></p>
+</div>
+
+<!-- Carte Interactive -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+<p>  <h3 class="text-lg font-semibold text-gray-900 mb-2">Carte Cliquable</h3></p>
+<p>  <p class="text-gray-600">Carte avec effet hover</p></p>
+</div>
+<p><code></code>`</p>
+
+<h2>🌙 Mode Sombre</h2>
+
+<h3>Couleurs Mode Sombre</h3>
+<p><code></code>`css</p>
+<p>/* Variables CSS pour le mode sombre */</p>
+<p>:root {</p>
+<p>  --bg-primary: #ffffff;</p>
+<p>  --bg-secondary: #f9fafb;</p>
+<p>  --text-primary: #111827;</p>
+<p>  --text-secondary: #6b7280;</p>
+<p>  --border-color: #e5e7eb;</p>
+<p>}</p>
+
+<p>.dark {</p>
+<p>  --bg-primary: #111827;</p>
+<p>  --bg-secondary: #1f2937;</p>
+<p>  --text-primary: #f9fafb;</p>
+<p>  --text-secondary: #d1d5db;</p>
+<p>  --border-color: #374151;</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Classes Utilitaires</h3>
+<p><code></code>`html</p>
+<!-- Background -->
+<div class="bg-white dark:bg-gray-800">
+
+<!-- Texte -->
+<p class="text-gray-900 dark:text-gray-100">
+
+<!-- Bordures -->
+<div class="border border-gray-200 dark:border-gray-700">
+<p><code></code>`</p>
+
+<h2>📐 Grille et Layout</h2>
+
+<h3>Conteneurs</h3>
+<p><code></code>`css</p>
+<p>.container     { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }</p>
+<p>.container-sm  { max-width: 768px; margin: 0 auto; padding: 0 1rem; }</p>
+<p>.container-lg  { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }</p>
+<p><code></code>`</p>
+
+<h3>Grille Responsive</h3>
+<p><code></code>`html</p>
+<!-- Grille 12 colonnes -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<p>  <div class="col-span-1">Colonne 1</div></p>
+<p>  <div class="col-span-1">Colonne 2</div></p>
+<p>  <div class="col-span-1">Colonne 3</div></p>
+</div>
+
+<!-- Flexbox -->
+<div class="flex flex-col md:flex-row gap-4">
+<p>  <div class="flex-1">Flexible</div></p>
+<p>  <div class="w-64">Largeur fixe</div></p>
+</div>
+<p><code></code>`</p>
+
+<h2>🎯 États et Interactions</h2>
+
+<h3>États des Composants</h3>
+<p><code></code>`css</p>
+<p>/* Hover */</p>
+<p>.hover\:bg-primary-600:hover { background-color: #2563eb; }</p>
+
+<p>/* Focus */</p>
+<p>.focus\:ring-2:focus { </p>
+<p>  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);</p>
+<p>}</p>
+
+<p>/* Active */</p>
+<p>.active\:bg-primary-700:active { background-color: #1d4ed8; }</p>
+
+<p>/* Disabled */</p>
+<p>.disabled\:opacity-50:disabled { opacity: 0.5; }</p>
+<p>.disabled\:cursor-not-allowed:disabled { cursor: not-allowed; }</p>
+<p><code></code>`</p>
+
+<h3>Transitions</h3>
+<p><code></code>`css</p>
+<p>.transition-all     { transition: all 150ms ease-in-out; }</p>
+<p>.transition-colors  { transition: color, background-color, border-color 150ms ease-in-out; }</p>
+<p>.transition-shadow  { transition: box-shadow 150ms ease-in-out; }</p>
+<p>.transition-transform { transition: transform 150ms ease-in-out; }</p>
+<p><code></code>`</p>
+
+<h2>🔧 Utilitaires Personnalisés</h2>
+
+<h3>Classes Personnalisées</h3>
+<p><code></code>`css</p>
+<p>/* Élévation (ombres) */</p>
+<p>.elevation-1 { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }</p>
+<p>.elevation-2 { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }</p>
+<p>.elevation-3 { box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }</p>
+<p>.elevation-4 { box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); }</p>
+
+<p>/* Bordures arrondies personnalisées */</p>
+<p>.rounded-card { border-radius: 12px; }</p>
+<p>.rounded-button { border-radius: 8px; }</p>
+<p>.rounded-input { border-radius: 6px; }</p>
+
+<p>/* Animations */</p>
+<p>.animate-fade-in {</p>
+<p>  animation: fadeIn 0.3s ease-in-out;</p>
+<p>}</p>
+
+<p>@keyframes fadeIn {</p>
+<p>  from { opacity: 0; transform: translateY(10px); }</p>
+<p>  to { opacity: 1; transform: translateY(0); }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📱 Responsive Design</h2>
+
+<h3>Breakpoints</h3>
+<p><code></code>`css</p>
+<p>/* Breakpoints Tailwind */</p>
+<p>sm: 640px   /* Small devices */</p>
+<p>md: 768px   /* Medium devices */</p>
+<p>lg: 1024px  /* Large devices */</p>
+<p>xl: 1280px  /* Extra large devices */</p>
+<p>2xl: 1536px /* 2X large devices */</p>
+<p><code></code>`</p>
+
+<h3>Exemples Responsive</h3>
+<p><code></code>`html</p>
+<!-- Texte responsive -->
+<h1 class="text-2xl md:text-3xl lg:text-4xl">
+
+<!-- Espacement responsive -->
+<div class="p-4 md:p-6 lg:p-8">
+
+<!-- Grille responsive -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+<p><code></code>`</p>
+
+<h2>♿ Accessibilité</h2>
+
+<h3>Contrastes</h3>
+<p><code></code>`css</p>
+<p>/* Contrastes minimums WCAG AA */</p>
+<p>Texte normal: 4.5:1</p>
+<p>Texte large: 3:1</p>
+<p>Éléments UI: 3:1</p>
+<p><code></code>`</p>
+
+<h3>Focus Management</h3>
+<p><code></code>`css</p>
+<p>/* Focus visible */</p>
+<p>.focus\:outline-none:focus { outline: none; }</p>
+<p>.focus\:ring-2:focus { </p>
+<p>  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);</p>
+<p>}</p>
+
+<p>/* Skip link */</p>
+<p>.skip-link {</p>
+<p>  position: absolute;</p>
+<p>  top: -40px;</p>
+<p>  left: 6px;</p>
+<p>  background: #000;</p>
+<p>  color: #fff;</p>
+<p>  padding: 8px;</p>
+<p>  text-decoration: none;</p>
+<p>  z-index: 1000;</p>
+<p>}</p>
+
+<p>.skip-link:focus {</p>
+<p>  top: 6px;</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>🎨 Exemples d'Application</h2>
+
+<h3>Page de Connexion</h3>
+<p><code></code>`html</p>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+<p>  <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8"></p>
+<p>    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center"></p>
+<p>      Connexion</p>
+<p>    </h2></p>
+<p>    </p>
+<p>    <form class="space-y-4"></p>
+<p>      <div></p>
+<p>        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></p>
+<p>          Email</p>
+<p>        </label></p>
+<p>        <input type="email" </p>
+<p>               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 transition-all"></p>
+<p>      </div></p>
+<p>      </p>
+<p>      <button type="submit" </p>
+<p>              class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"></p>
+<p>        Se connecter</p>
+<p>      </button></p>
+<p>    </form></p>
+<p>  </div></p>
+</div>
+<p><code></code>`</p>
+
+<h3>Dashboard Card</h3>
+<p><code></code>`html</p>
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+<p>  <div class="flex items-center justify-between mb-4"></p>
+<p>    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100"></p>
+<p>      Transcriptions Récentes</p>
+<p>    </h3></p>
+<p>    <button class="text-primary-600 hover:text-primary-700 font-medium transition-colors"></p>
+<p>      Voir tout</p>
+<p>    </button></p>
+<p>  </div></p>
+<p>  </p>
+<p>  <div class="space-y-3"></p>
+<p>    <div class="flex items-center justify-between py-2"></p>
+<p>      <span class="text-gray-900 dark:text-gray-100">Réunion équipe</span></p>
+<p>      <span class="px-2 py-1 bg-success-100 text-success-700 text-xs rounded-full"></p>
+<p>        Terminé</p>
+<p>      </span></p>
+<p>    </div></p>
+<p>  </div></p>
+</div>
+<p><code></code>`</p>
+
+<h2>📋 Checklist Design</h2>
+
+<h3>Avant de Publier</h3>
+<p>- [ ] Contrastes vérifiés (WCAG AA)</p>
+<p>- [ ] Navigation clavier fonctionnelle</p>
+<p>- [ ] Responsive sur tous les breakpoints</p>
+<p>- [ ] Mode sombre implémenté</p>
+<p>- [ ] États hover/focus définis</p>
+<p>- [ ] Animations fluides (<300ms)</p>
+<p>- [ ] Textes lisibles (min 16px)</p>
+<p>- [ ] Loading states inclus</p>
+<p>- [ ] Error states gérés</p>            </div>
+        </div>
+    </div>
+</body>
+</html>

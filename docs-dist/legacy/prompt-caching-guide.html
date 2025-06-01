@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guide d'Implémentation du Prompt Caching OpenAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Guide d'Implémentation du Prompt Caching OpenAI</h1>
+
+<h2>📋 Vue d'ensemble</h2>
+
+<p>Ce guide détaille l'implémentation du prompt caching natif d'OpenAI dans le projet Intelligent Transcription. Le prompt caching permet de réduire les coûts jusqu'à 50% et la latence jusqu'à 80% pour les prompts de plus de 1024 tokens.</p>
+
+<h2>🎯 Objectifs</h2>
+
+<p>- **Réduction des coûts** : Économiser ~50% sur les tokens de prompt récurrents</p>
+<p>- **Amélioration des performances** : Réduire la latence de 40-80%</p>
+<p>- **Optimisation automatique** : Aucune modification du code applicatif nécessaire</p>
+<p>- **Suivi des métriques** : Dashboard intégré pour monitorer les performances</p>
+
+<h2>🚀 Guide de Migration</h2>
+
+<h3>1. Configuration de l'Organization ID</h3>
+
+<p>L'Organization ID a été configuré dans le projet :</p>
+<p>```</p>
+<p>Organization ID: org-HzNhomFpeY5ewhrUNlmpTehv</p>
+<p>```</p>
+
+<p>**Vérification** :</p>
+<p>```bash</p>
+<h1>Vérifier la configuration</h1>
+<p>grep OPENAI_ORG_ID .env</p>
+<p>grep OPENAI_ORG_ID config.php</p>
+<p>```</p>
+
+<h3>2. Migration de la Base de Données</h3>
+
+<p>Exécutez le script de migration pour créer les tables nécessaires :</p>
+
+<p>```bash</p>
+<p>php migrate_openai_cache.php</p>
+<p>```</p>
+
+<p>Ce script crée :</p>
+<p>- Table `openai_cache_metrics` pour stocker les métriques</p>
+<p>- Table `openai_cache_daily_stats` pour les statistiques agrégées</p>
+<p>- Vues `openai_cache_hourly_stats` et `openai_cache_model_stats`</p>
+<p>- Triggers pour l'agrégation automatique</p>
+
+<h3>3. Validation de l'Installation</h3>
+
+<p>Exécutez le script de test pour valider l'implémentation :</p>
+
+<p>```bash</p>
+<p>php test_prompt_caching.php</p>
+<p>```</p>
+
+<p>Ce script vérifie :</p>
+<p>- ✅ PromptCacheManager génère des prompts >1024 tokens</p>
+<p>- ✅ PromptUtils utilise les prompts optimisés</p>
+<p>- ✅ Les métriques de cache sont capturées</p>
+<p>- ✅ CacheService enregistre les statistiques</p>
+
+<h3>4. Monitoring dans le Dashboard</h3>
+
+<p>Accédez au dashboard analytics pour voir les métriques :</p>
+<p>```</p>
+<p>http://votre-site.com/analytics.php</p>
+<p>```</p>
+
+<h2>📊 Métriques Disponibles</h2>
+
+<h3>Métriques en Temps Réel</h3>
+<p>- **Cache Hit Rate** : Pourcentage de tokens servis depuis le cache</p>
+<p>- **Tokens Économisés** : Nombre total de tokens cachés</p>
+<p>- **Économies Réalisées** : Estimation en USD des économies</p>
+<p>- **Requêtes Éligibles** : Nombre de requêtes avec prompts ≥1024 tokens</p>
+
+<h3>Statistiques Agrégées</h3>
+<p>- Statistiques horaires via `openai_cache_hourly_stats`</p>
+<p>- Statistiques quotidiennes via `openai_cache_daily_stats`</p>
+<p>- Statistiques par modèle via `openai_cache_model_stats`</p>
+
+<h2>🛠️ Architecture Technique</h2>
+
+<h3>Composants Principaux</h3>
+
+<p>1. **PromptCacheManager.php**</p>
+<p>   - Gère les prompts statiques optimisés (>1024 tokens)</p>
+<p>   - Assure le padding automatique si nécessaire</p>
+<p>   - Fournit des méthodes pour extraire les métriques</p>
+
+<p>2. **openai_cache_utils.py**</p>
+<p>   - Extrait les métriques de cache des réponses API</p>
+<p>   - Calcule les économies estimées</p>
+<p>   - Formate les rapports de performance</p>
+
+<p>3. **CacheService.php**</p>
+<p>   - `trackOpenAICacheMetrics()` : Enregistre les métriques</p>
+<p>   - `getOpenAICacheStats()` : Récupère les statistiques</p>
+<p>   - Auto-création des tables si nécessaire</p>
+
+<p>4. **Dashboard Analytics**</p>
+<p>   - Section dédiée aux métriques OpenAI</p>
+<p>   - Graphiques de performance</p>
+<p>   - Indicateurs clés en temps réel</p>
+
+<h3>Flux de Données</h3>
+
+<p>```</p>
+<p>1. Requête Chat → ChatService</p>
+<p>2. PromptUtils → PromptCacheManager (prompt >1024 tokens)</p>
+<p>3. chat_api.py → OpenAI API (avec org ID)</p>
+<p>4. Réponse → openai_cache_utils (extraction métriques)</p>
+<p>5. Métriques → CacheService.trackOpenAICacheMetrics()</p>
+<p>6. Dashboard → Affichage des statistiques</p>
+<p>```</p>
+
+<h2>💡 Best Practices</h2>
+
+<h3>1. Structure des Prompts</h3>
+
+<p>**✅ Bon** : Placer le contenu statique en premier</p>
+<p>```php</p>
+<p>$prompt = PromptCacheManager::getCachablePrompt('chat_system');</p>
+<p>$prompt .= "\n\n## Contexte Dynamique\n" . $userContext;</p>
+<p>```</p>
+
+<p>**❌ Mauvais** : Mélanger statique et dynamique</p>
+<p>```php</p>
+<p>$prompt = "User: " . $userInput . "\n" . $systemPrompt;</p>
+<p>```</p>
+
+<h3>2. Optimisation des Tokens</h3>
+
+<p>- Les prompts doivent dépasser 1024 tokens pour être éligibles</p>
+<p>- PromptCacheManager ajoute automatiquement du padding si nécessaire</p>
+<p>- Vérifiez régulièrement vos taux de cache dans le dashboard</p>
+
+<h3>3. Monitoring et Ajustements</h3>
+
+<p>1. **Surveillez le cache hit rate**</p>
+<p>   - Objectif : >70% pour les conversations répétitives</p>
+<p>   - Si <50%, vérifiez la structure de vos prompts</p>
+
+<p>2. **Analysez les requêtes non éligibles**</p>
+<p>   - Identifiez les prompts <1024 tokens</p>
+<p>   - Considérez l'ajout de contexte supplémentaire</p>
+
+<p>3. **Optimisez par modèle**</p>
+<p>   - Utilisez la vue `openai_cache_model_stats`</p>
+<p>   - Ajustez les modèles selon les performances</p>
+
+<h2>🔧 Dépannage</h2>
+
+<h3>Le cache hit rate est faible</h3>
+
+<p>1. Vérifiez que les prompts dépassent 1024 tokens :</p>
+<p>   ```php</p>
+<p>   $tokenCount = PromptUtils::estimateTokenCount($prompt);</p>
+<p>   echo "Tokens: $tokenCount";</p>
+<p>   ```</p>
+
+<p>2. Assurez-vous que l'Organization ID est configuré :</p>
+<p>   ```bash</p>
+<p>   grep -r "org-HzNhomFpeY5ewhrUNlmpTehv" .</p>
+<p>   ```</p>
+
+<p>3. Vérifiez les logs Python :</p>
+<p>   ```bash</p>
+<p>   tail -f python_api.log | grep "Cache"</p>
+<p>   ```</p>
+
+<h3>Les métriques ne s'affichent pas</h3>
+
+<p>1. Vérifiez que les tables existent :</p>
+<p>   ```sql</p>
+<p>   SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'openai%';</p>
+<p>   ```</p>
+
+<p>2. Exécutez la migration si nécessaire :</p>
+<p>   ```bash</p>
+<p>   php migrate_openai_cache.php</p>
+<p>   ```</p>
+
+<p>3. Vérifiez les logs d'erreur :</p>
+<p>   ```bash</p>
+<p>   tail -f php_errors.log | grep "openai"</p>
+<p>   ```</p>
+
+<h2>📈 Optimisations Futures</h2>
+
+<p>1. **Analyse Prédictive**</p>
+<p>   - Identifier les patterns de conversation</p>
+<p>   - Pré-charger les prompts fréquents</p>
+
+<p>2. **Optimisation Dynamique**</p>
+<p>   - Ajuster automatiquement la structure des prompts</p>
+<p>   - A/B testing des formats de prompt</p>
+
+<p>3. **Intégration Avancée**</p>
+<p>   - Webhooks pour alertes de performance</p>
+<p>   - Export des métriques vers des outils d'analyse</p>
+
+<h2>📚 Ressources</h2>
+
+<p>- [Documentation OpenAI Prompt Caching](https://cookbook.openai.com/examples/prompt_caching101)</p>
+<p>- [API Reference](https://platform.openai.com/docs/api-reference)</p>
+<p>- [Pricing Calculator](https://openai.com/pricing)</p>
+
+<h2>✅ Checklist de Déploiement</h2>
+
+<p>- [ ] Organization ID configuré dans `.env`</p>
+<p>- [ ] Migration de base de données exécutée</p>
+<p>- [ ] Tests de validation passés</p>
+<p>- [ ] Dashboard analytics accessible</p>
+<p>- [ ] Monitoring des métriques actif</p>
+<p>- [ ] Documentation lue par l'équipe</p>
+
+<p>---</p>
+
+<p>**Note** : Le prompt caching est automatique pour les prompts >1024 tokens avec les modèles supportés (gpt-4o, gpt-4o-mini). Aucune modification de l'API n'est nécessaire, seule l'optimisation de la structure des prompts est requise.</p>
+        </div>
+    </div>
+</body>
+</html>

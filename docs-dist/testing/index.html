@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testing Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Testing Guide</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Guide complet pour tester l'application Intelligent Transcription.</p>
+
+<h2>🛠️ Configuration de l'Environnement de Test</h2>
+
+<h3>Frontend (Vue.js + Vitest)</h3>
+
+<p>```bash</p>
+<p>cd frontend</p>
+<p>npm install</p>
+<p>npm run test</p>
+<p>```</p>
+
+<h3>Backend (PHPUnit)</h3>
+
+<p>```bash</p>
+<p>composer install</p>
+<p>vendor/bin/phpunit</p>
+<p>```</p>
+
+<h2>🧪 Types de Tests</h2>
+
+<h3>1. Tests Unitaires</h3>
+
+<h4>Frontend (Vitest + Vue Test Utils)</h4>
+
+<p>**Exemple - Test de composant :**</p>
+<p>```typescript</p>
+<p>// Input.test.ts</p>
+<p>import { describe, it, expect } from 'vitest'</p>
+<p>import { mount } from '@vue/test-utils'</p>
+<p>import Input from '@/components/ui/Input.vue'</p>
+
+<p>describe('Input', () => {</p>
+<p>  it('renders with placeholder', () => {</p>
+<p>    const wrapper = mount(Input, {</p>
+<p>      props: {</p>
+<p>        placeholder: 'Enter text'</p>
+<p>      }</p>
+<p>    })</p>
+<p>    </p>
+<p>    expect(wrapper.find('input').attributes('placeholder')).toBe('Enter text')</p>
+<p>  })</p>
+<p>  </p>
+<p>  it('emits update:modelValue on input', async () => {</p>
+<p>    const wrapper = mount(Input)</p>
+<p>    const input = wrapper.find('input')</p>
+<p>    </p>
+<p>    await input.setValue('test value')</p>
+<p>    </p>
+<p>    expect(wrapper.emitted('update:modelValue')).toEqual([['test value']])</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<p>**Exemple - Test de composable :**</p>
+<p>```typescript</p>
+<p>// useAuth.test.ts</p>
+<p>import { describe, it, expect, vi } from 'vitest'</p>
+<p>import { useAuthStore } from '@/stores/auth'</p>
+<p>import { createPinia, setActivePinia } from 'pinia'</p>
+
+<p>describe('useAuthStore', () => {</p>
+<p>  beforeEach(() => {</p>
+<p>    setActivePinia(createPinia())</p>
+<p>  })</p>
+<p>  </p>
+<p>  it('should login user with valid credentials', async () => {</p>
+<p>    const authStore = useAuthStore()</p>
+<p>    </p>
+<p>    // Mock API response</p>
+<p>    vi.mock('@/api/auth', () => ({</p>
+<p>      authApi: {</p>
+<p>        login: vi.fn().mockResolvedValue({</p>
+<p>          success: true,</p>
+<p>          data: { user: { id: 1, name: 'Test User' }, token: 'jwt-token' }</p>
+<p>        })</p>
+<p>      }</p>
+<p>    }))</p>
+<p>    </p>
+<p>    await authStore.login('test@example.com', 'password')</p>
+<p>    </p>
+<p>    expect(authStore.isAuthenticated).toBe(true)</p>
+<p>    expect(authStore.user?.name).toBe('Test User')</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<h4>Backend (PHPUnit)</h4>
+
+<p>**Exemple - Test d'entité :**</p>
+<p>```php</p>
+<p>// TranscriptionTest.php</p>
+<p>class TranscriptionTest extends TestCase</p>
+<p>{</p>
+<p>    public function testCreateTranscription(): void</p>
+<p>    {</p>
+<p>        $audioFile = new AudioFile('/path/to/audio.mp3', 'audio/mp3', 1024);</p>
+<p>        $language = Language::fromCode('fr');</p>
+<p>        </p>
+<p>        $transcription = Transcription::create(</p>
+<p>            TranscriptionId::generate(),</p>
+<p>            $audioFile,</p>
+<p>            $language</p>
+<p>        );</p>
+<p>        </p>
+<p>        $this->assertEquals(TranscriptionStatus::PENDING, $transcription->status());</p>
+<p>        $this->assertEquals('fr', $transcription->language()->code());</p>
+<p>    }</p>
+<p>    </p>
+<p>    public function testStartProcessing(): void</p>
+<p>    {</p>
+<p>        $transcription = $this->createTranscription();</p>
+<p>        </p>
+<p>        $transcription->startProcessing();</p>
+<p>        </p>
+<p>        $this->assertEquals(TranscriptionStatus::PROCESSING, $transcription->status());</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>2. Tests d'Intégration</h3>
+
+<h4>API Tests</h4>
+<p>```typescript</p>
+<p>// auth.integration.test.ts</p>
+<p>describe('Authentication API', () => {</p>
+<p>  it('should login with valid credentials', async () => {</p>
+<p>    const response = await fetch('/api/auth/login', {</p>
+<p>      method: 'POST',</p>
+<p>      headers: { 'Content-Type': 'application/json' },</p>
+<p>      body: JSON.stringify({</p>
+<p>        email: 'test@example.com',</p>
+<p>        password: 'password123'</p>
+<p>      })</p>
+<p>    })</p>
+<p>    </p>
+<p>    const data = await response.json()</p>
+<p>    </p>
+<p>    expect(response.status).toBe(200)</p>
+<p>    expect(data.success).toBe(true)</p>
+<p>    expect(data.data.token).toBeDefined()</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<h3>3. Tests End-to-End (Cypress)</h3>
+
+<p>**Configuration :**</p>
+<p>```typescript</p>
+<p>// cypress.config.ts</p>
+<p>export default defineConfig({</p>
+<p>  e2e: {</p>
+<p>    baseUrl: 'http://localhost:5173',</p>
+<p>    supportFile: 'cypress/support/e2e.ts'</p>
+<p>  }</p>
+<p>})</p>
+<p>```</p>
+
+<p>**Exemple de test E2E :**</p>
+<p>```typescript</p>
+<p>// auth.cy.ts</p>
+<p>describe('Authentication Flow', () => {</p>
+<p>  it('should login and redirect to dashboard', () => {</p>
+<p>    cy.visit('/login')</p>
+<p>    </p>
+<p>    cy.get('[data-testid="email-input"]').type('test@example.com')</p>
+<p>    cy.get('[data-testid="password-input"]').type('password123')</p>
+<p>    cy.get('[data-testid="login-button"]').click()</p>
+<p>    </p>
+<p>    cy.url().should('include', '/dashboard')</p>
+<p>    cy.get('[data-testid="user-menu"]').should('be.visible')</p>
+<p>  })</p>
+<p>  </p>
+<p>  it('should create transcription', () => {</p>
+<p>    cy.login() // Custom command</p>
+<p>    </p>
+<p>    cy.visit('/transcriptions/create')</p>
+<p>    cy.get('[data-testid="file-input"]').attachFile('test-audio.mp3')</p>
+<p>    cy.get('[data-testid="submit-button"]').click()</p>
+<p>    </p>
+<p>    cy.get('[data-testid="success-message"]').should('be.visible')</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<h2>📋 Conventions de Test</h2>
+
+<h3>Naming</h3>
+<p>- **Fichiers** : `ComponentName.test.ts` ou `ComponentName.spec.ts`</p>
+<p>- **Tests** : Description claire de ce qui est testé</p>
+<p>- **Data attributes** : `data-testid="element-name"`</p>
+
+<h3>Structure</h3>
+<p>```typescript</p>
+<p>describe('ComponentName', () => {</p>
+<p>  beforeEach(() => {</p>
+<p>    // Setup</p>
+<p>  })</p>
+<p>  </p>
+<p>  describe('when condition', () => {</p>
+<p>    it('should do something', () => {</p>
+<p>      // Arrange</p>
+<p>      // Act  </p>
+<p>      // Assert</p>
+<p>    })</p>
+<p>  })</p>
+<p>})</p>
+<p>```</p>
+
+<h2>📈 Couverture de Code</h2>
+
+<h3>Objectifs</h3>
+<p>- **Couverture globale** : >80%</p>
+<p>- **Composants critiques** : >90%</p>
+<p>- **Logique métier** : 100%</p>
+
+<h3>Génération des rapports</h3>
+<p>```bash</p>
+<h1>Frontend</h1>
+<p>npm run test:coverage</p>
+
+<h1>Backend  </h1>
+<p>vendor/bin/phpunit --coverage-html coverage/</p>
+<p>```</p>
+
+<h2>🚀 CI/CD et Tests</h2>
+
+<h3>GitHub Actions</h3>
+<p>```yaml</p>
+<p>- name: Run Frontend Tests</p>
+<p>  run: |</p>
+<p>    cd frontend</p>
+<p>    npm ci</p>
+<p>    npm run test:coverage</p>
+<p>    </p>
+<p>- name: Run Backend Tests</p>
+<p>  run: |</p>
+<p>    composer install</p>
+<p>    vendor/bin/phpunit --coverage-text</p>
+<p>```</p>
+
+<h2>🔧 Outils et Utilitaires</h2>
+
+<h3>Mocks et Stubs</h3>
+<p>```typescript</p>
+<p>// API Mock</p>
+<p>vi.mock('@/api/transcriptions', () => ({</p>
+<p>  transcriptionApi: {</p>
+<p>    create: vi.fn().mockResolvedValue({ id: 'tr_123' }),</p>
+<p>    list: vi.fn().mockResolvedValue({ transcriptions: [] })</p>
+<p>  }</p>
+<p>}))</p>
+
+<p>// Router Mock</p>
+<p>const mockRouter = {</p>
+<p>  push: vi.fn(),</p>
+<p>  replace: vi.fn()</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Test Helpers</h3>
+<p>```typescript</p>
+<p>// test-utils.ts</p>
+<p>export function createWrapper(component: Component, props = {}) {</p>
+<p>  return mount(component, {</p>
+<p>    props,</p>
+<p>    global: {</p>
+<p>      plugins: [createTestingPinia()]</p>
+<p>    }</p>
+<p>  })</p>
+<p>}</p>
+
+<p>export function waitForNextTick() {</p>
+<p>  return new Promise(resolve => setTimeout(resolve, 0))</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🚫 Tests à Éviter</h2>
+
+<p>- **Tests de détails d'implémentation** : Tester le comportement, pas l'implémentation</p>
+<p>- **Tests trop spécifiques** : Qui cassent pour des changements mineurs</p>
+<p>- **Tests sans assertions** : Toujours vérifier un résultat</p>
+
+<h2>📅 Commandes Utiles</h2>
+
+<p>```bash</p>
+<h1>Lancer tous les tests</h1>
+<p>npm run test</p>
+
+<h1>Mode watch</h1>
+<p>npm run test:watch</p>
+
+<h1>Tests d'un fichier spécifique</h1>
+<p>npm run test Input.test.ts</p>
+
+<h1>Tests E2E</h1>
+<p>npm run cypress:run</p>
+<p>npm run cypress:open</p>
+
+<h1>Backend tests</h1>
+<p>vendor/bin/phpunit</p>
+<p>vendor/bin/phpunit --filter TranscriptionTest</p>
+<p>```</p>
+        </div>
+    </div>
+</body>
+</html>

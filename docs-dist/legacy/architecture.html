@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Backend Architecture</h1>
+
+<h2>🏗️ Architecture Overview</h2>
+
+<p>The Intelligent Transcription application follows a modified MVC (Model-View-Controller) pattern architecture. The application combines PHP and Python for different aspects of functionality, with PHP handling web requests, file management, and request routing, while Python manages AI interactions and complex processing tasks.</p>
+
+<h3>Core Components</h3>
+
+<p>1. **Controllers**: Handle user requests and coordinate responses</p>
+<p>2. **Services**: Implement business logic and interact with external APIs</p>
+<p>3. **Utils**: Provide helper functions for common tasks</p>
+<p>4. **Templates**: Manage the presentation layer using Twig</p>
+<p>5. **Python Scripts**: Handle AI model interactions and audio processing</p>
+
+<h2>📊 Component Details</h2>
+
+<h3>Controllers</h3>
+
+<p>Controllers are responsible for handling HTTP requests, processing form data, and delegating tasks to appropriate services. They then return responses or redirect users.</p>
+
+<p>**Key Controllers:**</p>
+<p>- `TranscriptionController`: Manages audio file uploads and YouTube URL processing</p>
+<p>- `ChatController`: Handles chat interactions and context management</p>
+<p>- `ParaphraseController`: Manages text paraphrasing requests</p>
+
+<p>Example controller flow:</p>
+<p>```php</p>
+<p>public function handleFileUpload() {</p>
+<p>    // 1. Validate user input</p>
+<p>    // 2. Process file upload using TranscriptionService</p>
+<p>    // 3. Redirect to results page or error page</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Services</h3>
+
+<p>Services contain the core business logic of the application. They handle interactions with external APIs, file processing, and data manipulation.</p>
+
+<p>**Key Services:**</p>
+<p>- `TranscriptionService`: Manages audio preprocessing and transcription</p>
+<p>- `YouTubeService`: Handles YouTube video downloading and processing</p>
+<p>- `ChatService`: Manages chat interactions with the OpenAI API</p>
+<p>- `ParaphraseService`: Handles text paraphrasing with OpenAI</p>
+<p>- `CacheService`: Implements caching for prompt and conversation optimization</p>
+<p>- `SummarizerService`: Manages conversation summarization for context length optimization</p>
+<p>- `AnalyticsController`: Provides visualization of cache and performance metrics</p>
+
+<p>Example service flow:</p>
+<p>```php</p>
+<p>public function transcribeAudio($filePath, $outputPath, $language = null) {</p>
+<p>    // 1. Validate file</p>
+<p>    // 2. Call Python script to access OpenAI Whisper API</p>
+<p>    // 3. Process and return results</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Utils</h3>
+
+<p>Utility classes provide helper functions used across the application.</p>
+
+<p>**Key Utils:**</p>
+<p>- `FileUtils`: File management operations</p>
+<p>- `ResponseUtils`: HTTP response handling</p>
+<p>- `YouTubeUtils`: YouTube-specific functionality</p>
+<p>- `PromptUtils`: Optimizes prompts for better caching and token efficiency</p>
+
+<h3>Python Integration</h3>
+
+<p>Python scripts handle interactions with OpenAI APIs and complex processing tasks.</p>
+
+<p>**Key Python Scripts:**</p>
+<p>- `transcribe.py`: Interfaces with OpenAI Whisper API</p>
+<p>- `paraphrase.py`: Uses OpenAI for text enhancement</p>
+<p>- `preprocess_audio.py`: Optimizes audio files for API processing</p>
+
+<h2>📈 Data Flow Diagrams</h2>
+
+<h3>Transcription Process Flow</h3>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    participant User</p>
+<p>    participant PHP as PHP Controller</p>
+<p>    participant Service as PHP Service</p>
+<p>    participant Python as Python Script</p>
+<p>    participant OpenAI as OpenAI API</p>
+<p>    participant FileSystem as File System</p>
+
+<p>    User->>PHP: Upload audio file</p>
+<p>    PHP->>Service: Process file</p>
+<p>    Service->>FileSystem: Save uploaded file</p>
+<p>    Service->>Python: Call preprocess_audio.py</p>
+<p>    Python->>FileSystem: Save preprocessed file</p>
+<p>    Service->>Python: Call transcribe.py</p>
+<p>    Python->>OpenAI: Send to Whisper API</p>
+<p>    OpenAI->>Python: Return transcription</p>
+<p>    Python->>FileSystem: Save result as JSON</p>
+<p>    Python->>Service: Return result</p>
+<p>    Service->>PHP: Return success/failure</p>
+<p>    PHP->>User: Redirect to result page</p>
+<p>```</p>
+
+<h3>YouTube Download Process Flow</h3>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    participant User</p>
+<p>    participant PHP as PHP Controller</p>
+<p>    participant Service as PHP Service</p>
+<p>    participant YTService as YouTube Service</p>
+<p>    participant VideoAPI as Video Download API</p>
+<p>    participant Python as Python Script</p>
+<p>    participant OpenAI as OpenAI API</p>
+<p>    participant FileSystem as File System</p>
+
+<p>    User->>PHP: Submit YouTube URL</p>
+<p>    PHP->>YTService: Process YouTube URL</p>
+<p>    YTService->>VideoAPI: Request video download</p>
+<p>    VideoAPI->>YTService: Return download link</p>
+<p>    YTService->>FileSystem: Save downloaded audio</p>
+<p>    YTService->>Service: Request transcription</p>
+<p>    Service->>Python: Call transcribe.py</p>
+<p>    Python->>OpenAI: Send to Whisper API</p>
+<p>    OpenAI->>Python: Return transcription</p>
+<p>    Python->>FileSystem: Save result as JSON</p>
+<p>    Python->>Service: Return result</p>
+<p>    Service->>YTService: Return result</p>
+<p>    YTService->>PHP: Return success/failure</p>
+<p>    PHP->>User: Redirect to result page</p>
+<p>```</p>
+
+<h3>Chat Process Flow with Caching</h3>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    participant User</p>
+<p>    participant PHP as PHP Controller</p>
+<p>    participant Service as Chat Service</p>
+<p>    participant Cache as Cache Service</p>
+<p>    participant Summarizer as Summarizer Service</p>
+<p>    participant Python as Python Script</p>
+<p>    participant OpenAI as OpenAI API</p>
+<p>    participant DB as Database</p>
+
+<p>    User->>PHP: Send chat message</p>
+<p>    PHP->>Service: Process message with context</p>
+<p>    Service->>DB: Get conversation history</p>
+<p>    </p>
+<p>    opt Long conversation detected</p>
+<p>        Service->>Summarizer: Request summarization</p>
+<p>        Summarizer->>DB: Get messages to summarize</p>
+<p>        Summarizer->>Python: Generate summary</p>
+<p>        Python->>OpenAI: Request summary</p>
+<p>        OpenAI->>Python: Return summary</p>
+<p>        Python->>Summarizer: Return summary</p>
+<p>        Summarizer->>DB: Store summarized message</p>
+<p>        Summarizer->>Service: Return optimized context</p>
+<p>    end</p>
+<p>    </p>
+<p>    Service->>Cache: Check for cached response</p>
+<p>    </p>
+<p>    alt Cache hit</p>
+<p>        Cache->>DB: Update cache analytics</p>
+<p>        Cache->>Service: Return cached response</p>
+<p>        Service->>PHP: Return cached response</p>
+<p>        PHP->>User: Display response (fast)</p>
+<p>    else Cache miss</p>
+<p>        Service->>Python: Call chat_api.py</p>
+<p>        Python->>OpenAI: Send to GPT API with context</p>
+<p>        OpenAI->>Python: Return response</p>
+<p>        Python->>Service: Return response</p>
+<p>        Service->>DB: Save message</p>
+<p>        Service->>Cache: Store in cache</p>
+<p>        Cache->>DB: Update cache analytics</p>
+<p>        Service->>PHP: Return response</p>
+<p>        PHP->>User: Display response</p>
+<p>    end</p>
+<p>    </p>
+<p>    opt User requests analytics</p>
+<p>        User->>PHP: Request cache analytics</p>
+<p>        PHP->>Service: Get analytics data</p>
+<p>        Service->>Cache: Get cache statistics</p>
+<p>        Cache->>DB: Query cache metrics</p>
+<p>        DB->>Cache: Return metrics</p>
+<p>        Cache->>Service: Return analytics</p>
+<p>        Service->>PHP: Return visualized data</p>
+<p>        PHP->>User: Display analytics dashboard</p>
+<p>    end</p>
+<p>```</p>
+
+<h2>💾 File Storage</h2>
+
+<p>The application uses the file system for storage, with several key directories:</p>
+
+<p>- `/uploads/`: Temporary storage for original uploaded files</p>
+<p>- `/temp_audio/`: Preprocessed audio files optimized for the API</p>
+<p>- `/results/`: JSON files containing transcription results</p>
+<p>- `/exports/`: Text files containing exported chat histories</p>
+
+<p>Each file uses a unique identifier generated at creation time, typically combining a timestamp with a unique ID.</p>
+
+<p>Example result structure:</p>
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "text": "Transcribed content here...",</p>
+<p>  "language": "fr",</p>
+<p>  "original_text": "Original text if translation was applied"</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🔄 Error Handling</h2>
+
+<p>The application implements comprehensive error handling:</p>
+
+<p>1. **PHP Error Handlers**: Custom error and exception handlers in bootstrap.php</p>
+<p>2. **Service Error Returns**: Consistent error response format</p>
+<p>3. **Python Exception Handling**: Try/except blocks with JSON error responses</p>
+<p>4. **Debug Logs**: Multiple log files for different aspects of the application</p>
+
+<p>Example error response:</p>
+<p>```json</p>
+<p>{</p>
+<p>  "success": false,</p>
+<p>  "error": "Detailed error message here"</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🔌 External Integrations</h2>
+
+<p>The application integrates with several external services:</p>
+
+<p>1. **OpenAI API**:</p>
+<p>   - Whisper API for transcription</p>
+<p>   - ChatGPT API for contextual chat</p>
+<p>   - Assistant API for paraphrasing</p>
+
+<p>2. **Video Download API (loader.to)**:</p>
+<p>   - Used for downloading audio from YouTube videos</p>
+<p>   - Handles both regular videos and YouTube Shorts</p>
+
+<p>Integration is primarily managed through Python scripts, which handle API authentication, request formatting, and response processing.</p>
+        </div>
+    </div>
+</body>
+</html>

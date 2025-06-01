@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Deployment Guide</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Guide complet pour déployer Intelligent Transcription en production.</p>
+
+<h2>🏠 Environnements</h2>
+
+<h3>Développement</h3>
+<p>```bash</p>
+<h1>Démarrage rapide</h1>
+<p>git clone https://github.com/workmusicalflow/intelligent-transcription.git</p>
+<p>cd intelligent-transcription</p>
+
+<h1>Backend</h1>
+<p>composer install</p>
+<p>cp config.example.php config.php</p>
+<h1>Configurer les clés API</h1>
+
+<h1>Frontend</h1>
+<p>cd frontend</p>
+<p>npm install</p>
+
+<h1>Démarrer les serveurs</h1>
+<p>./start-servers.sh</p>
+<p>```</p>
+
+<h3>Production</h3>
+
+<h2>🚀 Déploiement cPanel (Recommandé)</h2>
+
+<h3>1. Préparation</h3>
+
+<h4>Structure cPanel</h4>
+<p>```</p>
+<p>public_html/</p>
+<p>├── index.html          # Vue.js SPA</p>
+<p>├── assets/             # JS/CSS compilés</p>
+<p>├── api/                # Points d'entrée API</p>
+<p>└── app/                # Backend PHP (hors web root)</p>
+<p>    ├── src/            # Code source</p>
+<p>    ├── vendor/         # Dépendances Composer</p>
+<p>    ├── database.sqlite # Base de données</p>
+<p>    └── uploads/        # Fichiers utilisateur</p>
+<p>```</p>
+
+<h4>Configuration PHP</h4>
+<p>```ini</p>
+<p>; php.ini (dans public_html)</p>
+<p>memory_limit = 512M</p>
+<p>max_execution_time = 300</p>
+<p>upload_max_filesize = 100M</p>
+<p>post_max_size = 100M</p>
+<p>max_file_uploads = 20</p>
+
+<p>; Extensions requises</p>
+<p>extension=pdo_sqlite</p>
+<p>extension=fileinfo</p>
+<p>extension=curl</p>
+<p>extension=openssl</p>
+<p>```</p>
+
+<h3>2. Build et Upload</h3>
+
+<h4>Script de build automatique</h4>
+<p>```bash</p>
+#!/bin/bash
+<h1>deploy.sh</h1>
+
+<p>echo "🛠️ Building for production..."</p>
+
+<h1>Build frontend</h1>
+<p>cd frontend</p>
+<p>npm ci</p>
+<p>npm run build</p>
+<p>cd ..</p>
+
+<h1>Préparation des fichiers</h1>
+<p>mkdir -p deploy/public_html</p>
+<p>mkdir -p deploy/app</p>
+
+<h1>Copier frontend build</h1>
+<p>cp -r frontend/dist/* deploy/public_html/</p>
+
+<h1>Copier backend</h1>
+<p>cp -r src/ deploy/app/</p>
+<p>cp -r vendor/ deploy/app/</p>
+<p>cp config.php deploy/app/</p>
+<p>cp router.php deploy/public_html/</p>
+
+<h1>Créer les API endpoints</h1>
+<p>mkdir -p deploy/public_html/api</p>
+<p>cp -r api/* deploy/public_html/api/</p>
+
+<p>echo "✅ Build terminé dans deploy/"</p>
+<p>```</p>
+
+<h4>Upload via cPanel File Manager</h4>
+<p>1. **Zipper le contenu** de `deploy/`</p>
+<p>2. **Uploader** le zip dans cPanel</p>
+<p>3. **Extraire** dans le bon répertoire</p>
+<p>4. **Configurer** les permissions</p>
+
+<h3>3. Configuration Base de Données</h3>
+
+<p>```bash</p>
+<h1>Dans cPanel Terminal ou SSH</h1>
+<p>cd app/</p>
+<p>php migrate.php</p>
+<p>php install_auth.php</p>
+<p>```</p>
+
+<h3>4. Configuration Serveur Web</h3>
+
+<h4>.htaccess (public_html)</h4>
+<p>```apache</p>
+<h1>Frontend SPA</h1>
+<p>RewriteEngine On</p>
+<p>RewriteBase /</p>
+
+<h1>API routes</h1>
+<p>RewriteRule ^api/(.*)$ router.php [QSA,L]</p>
+
+<h1>Frontend routes (SPA)</h1>
+<p>RewriteCond %{REQUEST_FILENAME} !-f</p>
+<p>RewriteCond %{REQUEST_FILENAME} !-d</p>
+<p>RewriteRule . /index.html [L]</p>
+
+<h1>Security headers</h1>
+<p>Header always set X-Content-Type-Options nosniff</p>
+<p>Header always set X-Frame-Options DENY</p>
+<p>Header always set X-XSS-Protection "1; mode=block"</p>
+
+<h1>CORS for API</h1>
+<p>Header always set Access-Control-Allow-Origin "https://yourdomain.com"</p>
+<p>Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"</p>
+<p>Header always set Access-Control-Allow-Headers "Content-Type, Authorization"</p>
+<p>```</p>
+
+<h2>🐳 Déploiement Docker (Alternatif)</h2>
+
+<h3>Dockerfile</h3>
+<p>```dockerfile</p>
+<h1>Multi-stage build</h1>
+<p>FROM node:18-alpine AS frontend-builder</p>
+<p>WORKDIR /app</p>
+<p>COPY frontend/package*.json ./</p>
+<p>RUN npm ci</p>
+<p>COPY frontend/ ./</p>
+<p>RUN npm run build</p>
+
+<p>FROM php:8.2-apache AS production</p>
+
+<h1>Install PHP extensions</h1>
+<p>RUN apt-get update && apt-get install -y \</p>
+<p>    sqlite3 libsqlite3-dev \</p>
+<p>    && docker-php-ext-install pdo_sqlite</p>
+
+<h1>Enable Apache modules</h1>
+<p>RUN a2enmod rewrite headers</p>
+
+<h1>Copy backend</h1>
+<p>COPY src/ /var/www/html/app/src/</p>
+<p>COPY composer.json composer.lock /var/www/html/app/</p>
+<p>WORKDIR /var/www/html/app</p>
+<p>RUN composer install --no-dev --optimize-autoloader</p>
+
+<h1>Copy frontend build</h1>
+<p>COPY --from=frontend-builder /app/dist/ /var/www/html/</p>
+
+<h1>Configuration</h1>
+<p>COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf</p>
+<p>COPY docker/php.ini /usr/local/etc/php/</p>
+
+<p>EXPOSE 80</p>
+<p>```</p>
+
+<h3>docker-compose.yml</h3>
+<p>```yaml</p>
+<p>version: '3.8'</p>
+<p>services:</p>
+<p>  app:</p>
+<p>    build: .</p>
+<p>    ports:</p>
+<p>      - "80:80"</p>
+<p>    environment:</p>
+<p>      - OPENAI_API_KEY=${OPENAI_API_KEY}</p>
+<p>      - VIDEO_DOWNLOAD_API_KEY=${VIDEO_DOWNLOAD_API_KEY}</p>
+<p>    volumes:</p>
+<p>      - ./uploads:/var/www/html/app/uploads</p>
+<p>      - ./database:/var/www/html/app/database</p>
+<p>```</p>
+
+<h2>🔐 Sécurité Production</h2>
+
+<h3>Variables d'environnement</h3>
+<p>```php</p>
+<p>// config.php</p>
+<?php
+<p>return [</p>
+<p>    'openai' => [</p>
+<p>        'api_key' => $_ENV['OPENAI_API_KEY'] ?? '',</p>
+<p>    ],</p>
+<p>    'database' => [</p>
+<p>        'path' => __DIR__ . '/database/production.sqlite'</p>
+<p>    ],</p>
+<p>    'security' => [</p>
+<p>        'jwt_secret' => $_ENV['JWT_SECRET'] ?? '',</p>
+<p>        'cors_origin' => $_ENV['CORS_ORIGIN'] ?? 'https://yourdomain.com'</p>
+<p>    ]</p>
+<p>];</p>
+<p>```</p>
+
+<h3>Permissions fichiers</h3>
+<p>```bash</p>
+<h1>cPanel Terminal</h1>
+<p>chmod 755 public_html/</p>
+<p>chmod -R 644 public_html/*</p>
+<p>chmod 755 public_html/api/</p>
+<p>chmod 600 app/config.php</p>
+<p>chmod 755 app/uploads/</p>
+<p>chmod 666 app/database.sqlite</p>
+<p>```</p>
+
+<h3>Sauvegarde automatique</h3>
+<p>```bash</p>
+#!/bin/bash
+<h1>backup.sh - à exécuter via cron</h1>
+
+<p>DATE=$(date +%Y%m%d_%H%M%S)</p>
+<p>BACKUP_DIR="/home/username/backups"</p>
+
+<h1>Sauvegarder la base de données</h1>
+<p>cp app/database.sqlite $BACKUP_DIR/database_$DATE.sqlite</p>
+
+<h1>Sauvegarder les uploads</h1>
+<p>tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz app/uploads/</p>
+
+<h1>Nettoyer les anciennes sauvegardes (>30 jours)</h1>
+<p>find $BACKUP_DIR -name "*.sqlite" -mtime +30 -delete</p>
+<p>find $BACKUP_DIR -name "*.tar.gz" -mtime +30 -delete</p>
+<p>```</p>
+
+<h2>📅 Maintenance</h2>
+
+<h3>Monitoring</h3>
+<p>```bash</p>
+<h1>Vérifier l'espace disque</h1>
+<p>du -sh app/database.sqlite</p>
+<p>du -sh app/uploads/</p>
+
+<h1>Logs d'erreur</h1>
+<p>tail -f app/logs/error.log</p>
+
+<h1>Nettoyage fichiers temporaires</h1>
+<p>find app/temp_audio/ -mtime +1 -delete</p>
+<p>```</p>
+
+<h3>Mise à jour</h3>
+<p>```bash</p>
+<h1>1. Sauvegarder</h1>
+<p>./backup.sh</p>
+
+<h1>2. Télécharger nouvelle version</h1>
+<p>git pull origin main</p>
+
+<h1>3. Mettre à jour dépendances</h1>
+<p>composer install --no-dev</p>
+<p>cd frontend && npm ci && npm run build</p>
+
+<h1>4. Migrations</h1>
+<p>php migrate.php</p>
+
+<h1>5. Vérifier</h1>
+<p>curl -f https://yourdomain.com/api/health || echo "Erreur détectée"</p>
+<p>```</p>
+
+<h2>📊 Performance</h2>
+
+<h3>Optimisations</h3>
+<p>```apache</p>
+<h1>.htaccess - Cache statique</h1>
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+<p>    ExpiresActive On</p>
+<p>    ExpiresDefault "access plus 1 month"</p>
+</FilesMatch>
+
+<h1>Compression</h1>
+<IfModule mod_deflate.c>
+<p>    AddOutputFilterByType DEFLATE text/plain</p>
+<p>    AddOutputFilterByType DEFLATE text/html</p>
+<p>    AddOutputFilterByType DEFLATE text/xml</p>
+<p>    AddOutputFilterByType DEFLATE text/css</p>
+<p>    AddOutputFilterByType DEFLATE application/xml</p>
+<p>    AddOutputFilterByType DEFLATE application/xhtml+xml</p>
+<p>    AddOutputFilterByType DEFLATE application/rss+xml</p>
+<p>    AddOutputFilterByType DEFLATE application/javascript</p>
+<p>    AddOutputFilterByType DEFLATE application/x-javascript</p>
+</IfModule>
+<p>```</p>
+
+<h2>🌍 Domaines et SSL</h2>
+
+<h3>Configuration DNS</h3>
+<p>```</p>
+<h1>Enregistrements DNS</h1>
+<p>A     yourdomain.com      IP_SERVER</p>
+<p>CNAME www.yourdomain.com  yourdomain.com</p>
+<p>CNAME api.yourdomain.com  yourdomain.com</p>
+<p>```</p>
+
+<h3>SSL (Let's Encrypt via cPanel)</h3>
+<p>1. **SSL/TLS** dans cPanel</p>
+<p>2. **Let's Encrypt** activation</p>
+<p>3. **Force HTTPS** redirection</p>
+
+<h2>🚫 Troubleshooting</h2>
+
+<h3>Problèmes courants</h3>
+
+<p>**Erreur 500** :</p>
+<p>```bash</p>
+<h1>Vérifier logs PHP</h1>
+<p>tail app/logs/error.log</p>
+
+<h1>Vérifier permissions</h1>
+<p>ls -la app/database.sqlite</p>
+<p>```</p>
+
+<p>**Upload échoué** :</p>
+<p>```bash</p>
+<h1>Vérifier php.ini</h1>
+<p>php -i | grep upload_max_filesize</p>
+
+<h1>Vérifier espace disque</h1>
+<p>df -h</p>
+<p>```</p>
+
+<p>**API inaccessible** :</p>
+<p>```bash</p>
+<h1>Tester endpoint</h1>
+<p>curl -v https://yourdomain.com/api/health</p>
+
+<h1>Vérifier .htaccess</h1>
+<p>cat .htaccess | grep RewriteRule</p>
+<p>```</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 4xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        ul { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Deployment Architecture</h1>
+
+<h2>Overview</h2>
+<p>The application supports multiple deployment scenarios from development to production.</p>
+
+<h2>Development Environment</h2>
+
+<p>```</p>
+<p>┌─────────────────┐    ┌─────────────────┐</p>
+<p>│   Frontend      │    │    Backend      │</p>
+<p>│   localhost:5173│◄──►│  localhost:8000 │</p>
+<p>│   (Vite Dev)    │    │   (PHP Server)  │</p>
+<p>└─────────────────┘    └─────────────────┘</p>
+<p>          │                       │</p>
+<p>          │                       │</p>
+<p>          └───────────┬───────────┘</p>
+<p>                      │</p>
+<p>          ┌─────────────────┐</p>
+<p>          │   SQLite DB     │</p>
+<p>          │   (Local File)  │</p>
+<p>          └─────────────────┘</p>
+<p>```</p>
+
+<h3>Development Setup</h3>
+<p>1. **Frontend:** `npm run dev` (Vite development server)</p>
+<p>2. **Backend:** `php -S localhost:8000 router.php`</p>
+<p>3. **Database:** SQLite file in project root</p>
+
+<h2>Production Environment</h2>
+
+<h3>cPanel Shared Hosting</h3>
+<p>```</p>
+<p>┌─────────────────┐    ┌─────────────────┐</p>
+<p>│   Static Files  │    │   PHP Scripts   │</p>
+<p>│  (public_html)  │◄──►│  (app folder)   │</p>
+<p>│                 │    │                 │</p>
+<p>│ • Built Vue App │    │ • Backend API   │</p>
+<p>│ • Assets        │    │ • File Uploads  │</p>
+<p>│ • index.html    │    │ • SQLite DB     │</p>
+<p>└─────────────────┘    └─────────────────┘</p>
+<p>```</p>
+
+<h3>Deployment Process</h3>
+<p>1. **Build Frontend:** `npm run build`</p>
+<p>2. **Upload Files:** Deploy via cPanel File Manager</p>
+<p>3. **Configure PHP:** Set PHP version and ini settings</p>
+<p>4. **Database Setup:** Initialize SQLite database</p>
+<p>5. **Environment Config:** Set production environment variables</p>
+
+<h3>File Structure (Production)</h3>
+<p>```</p>
+<p>public_html/</p>
+<p>├── index.html          # Vue.js SPA entry point</p>
+<p>├── assets/             # Compiled JS/CSS assets</p>
+<p>├── api/                # PHP API endpoints</p>
+<p>├── app/                # Backend application</p>
+<p>│   ├── src/            # Clean architecture layers</p>
+<p>│   ├── vendor/         # Composer dependencies</p>
+<p>│   └── database.sqlite # SQLite database</p>
+<p>└── uploads/            # User uploaded files</p>
+<p>```</p>
+
+<h2>Security Considerations</h2>
+
+<h3>Frontend Security</h3>
+<p>- Environment-based API URL configuration</p>
+<p>- JWT token storage in secure cookies</p>
+<p>- CSP headers for XSS protection</p>
+<p>- Input validation and sanitization</p>
+
+<h3>Backend Security</h3>
+<p>- JWT authentication with secure tokens</p>
+<p>- File upload validation and restrictions</p>
+<p>- SQL injection prevention (prepared statements)</p>
+<p>- Rate limiting for API endpoints</p>
+<p>- CORS configuration for cross-origin requests</p>
+
+<h3>Infrastructure Security</h3>
+<p>- HTTPS enforcement</p>
+<p>- Secure file permissions</p>
+<p>- Database access restrictions</p>
+<p>- Environment variable protection</p>
+        </div>
+    </div>
+</body>
+</html>

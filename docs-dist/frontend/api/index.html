@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .prose { max-width: none; }
+        .prose h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .prose h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose p { margin-bottom: 1rem; line-height: 1.7; }
+        .prose pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        .prose code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 2rem; }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.6; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        .prose th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <div class="prose max-w-none">
+<h1>Frontend API Documentation</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Documentation des types TypeScript et clients API du frontend Intelligent Transcription.</p>
+
+<h2>💻 Types TypeScript</h2>
+
+<h3>Types de Base</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/types/index.ts</p>
+
+<p>// Identifiants</p>
+<p>type UserId = string;</p>
+<p>type TranscriptionId = string;</p>
+<p>type ConversationId = string;</p>
+
+<p>// États</p>
+<p>type TranscriptionStatus = 'pending' | 'processing' | 'completed' | 'failed';</p>
+<p>type UserRole = 'admin' | 'user' | 'guest';</p>
+<p>type Theme = 'light' | 'dark' | 'system';</p>
+
+<p>// Dates</p>
+<p>type Timestamp = string; // ISO 8601</p>
+<p><code></code>`</p>
+
+<h3>Utilisateur</h3>
+
+<p><code></code>`typescript</p>
+<p>interface User {</p>
+<p>  id: UserId;</p>
+<p>  name: string;</p>
+<p>  email: string;</p>
+<p>  role: UserRole;</p>
+<p>  avatar?: string;</p>
+<p>  preferences: UserPreferences;</p>
+<p>  stats: UserStats;</p>
+<p>  created_at: Timestamp;</p>
+<p>  updated_at: Timestamp;</p>
+<p>}</p>
+
+<p>interface UserPreferences {</p>
+<p>  language: string;</p>
+<p>  theme: Theme;</p>
+<p>  notifications: {</p>
+<p>    email: boolean;</p>
+<p>    push: boolean;</p>
+<p>    transcription_complete: boolean;</p>
+<p>    weekly_summary: boolean;</p>
+<p>  };</p>
+<p>  transcription: {</p>
+<p>    auto_detect_language: boolean;</p>
+<p>    default_language: string;</p>
+<p>    enhance_audio: boolean;</p>
+<p>    detect_speakers: boolean;</p>
+<p>  };</p>
+<p>}</p>
+
+<p>interface UserStats {</p>
+<p>  transcriptions_count: number;</p>
+<p>  total_duration: number; // secondes</p>
+<p>  total_words: number;</p>
+<p>  last_activity: Timestamp;</p>
+<p>  plan: {</p>
+<p>    name: string;</p>
+<p>    quota_used: number;</p>
+<p>    quota_limit: number;</p>
+<p>    reset_date: Timestamp;</p>
+<p>  };</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Transcription</h3>
+
+<p><code></code>`typescript</p>
+<p>interface Transcription {</p>
+<p>  id: TranscriptionId;</p>
+<p>  title: string;</p>
+<p>  status: TranscriptionStatus;</p>
+<p>  language: string;</p>
+<p>  content?: TranscriptionContent;</p>
+<p>  metadata: TranscriptionMetadata;</p>
+<p>  processing?: ProcessingInfo;</p>
+<p>  analytics?: TranscriptionAnalytics;</p>
+<p>  created_at: Timestamp;</p>
+<p>  updated_at: Timestamp;</p>
+<p>  completed_at?: Timestamp;</p>
+<p>}</p>
+
+<p>interface TranscriptionContent {</p>
+<p>  text: string;</p>
+<p>  segments: TranscriptionSegment[];</p>
+<p>  summary?: string;</p>
+<p>  keywords?: string[];</p>
+<p>  chapters?: Chapter[];</p>
+<p>}</p>
+
+<p>interface TranscriptionSegment {</p>
+<p>  id: number;</p>
+<p>  start: number; // secondes</p>
+<p>  end: number;   // secondes</p>
+<p>  text: string;</p>
+<p>  confidence: number; // 0-1</p>
+<p>  speaker?: string;</p>
+<p>  words?: Word[];</p>
+<p>}</p>
+
+<p>interface Word {</p>
+<p>  word: string;</p>
+<p>  start: number;</p>
+<p>  end: number;</p>
+<p>  confidence: number;</p>
+<p>}</p>
+
+<p>interface Chapter {</p>
+<p>  id: number;</p>
+<p>  title: string;</p>
+<p>  start: number;</p>
+<p>  end: number;</p>
+<p>  summary: string;</p>
+<p>}</p>
+
+<p>interface TranscriptionMetadata {</p>
+<p>  duration: number; // secondes</p>
+<p>  file_size: number; // bytes</p>
+<p>  file_type: string;</p>
+<p>  file_name: string;</p>
+<p>  sample_rate?: number;</p>
+<p>  channels?: number;</p>
+<p>  bitrate?: number;</p>
+<p>}</p>
+
+<p>interface ProcessingInfo {</p>
+<p>  started_at: Timestamp;</p>
+<p>  completed_at?: Timestamp;</p>
+<p>  duration_seconds?: number;</p>
+<p>  model_used: string;</p>
+<p>  language_detection?: {</p>
+<p>    detected: string;</p>
+<p>    confidence: number;</p>
+<p>    alternatives: Array<{</p>
+<p>      language: string;</p>
+<p>      confidence: number;</p>
+<p>    }>;</p>
+<p>  };</p>
+<p>  progress?: number; // 0-100</p>
+<p>  current_step?: string;</p>
+<p>  estimated_completion?: Timestamp;</p>
+<p>}</p>
+
+<p>interface TranscriptionAnalytics {</p>
+<p>  word_count: number;</p>
+<p>  sentence_count: number;</p>
+<p>  speaking_rate: number; // mots par minute</p>
+<p>  pause_count: number;</p>
+<p>  average_confidence: number;</p>
+<p>  language_distribution?: Record<string, number>;</p>
+<p>  sentiment?: {</p>
+<p>    positive: number;</p>
+<p>    negative: number;</p>
+<p>    neutral: number;</p>
+<p>  };</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Chat et Conversations</h3>
+
+<p><code></code>`typescript</p>
+<p>interface Conversation {</p>
+<p>  id: ConversationId;</p>
+<p>  title: string;</p>
+<p>  transcription_id?: TranscriptionId;</p>
+<p>  messages: Message[];</p>
+<p>  context?: ConversationContext;</p>
+<p>  created_at: Timestamp;</p>
+<p>  updated_at: Timestamp;</p>
+<p>}</p>
+
+<p>interface Message {</p>
+<p>  id: string;</p>
+<p>  role: 'user' | 'assistant' | 'system';</p>
+<p>  content: string;</p>
+<p>  metadata?: MessageMetadata;</p>
+<p>  timestamp: Timestamp;</p>
+<p>}</p>
+
+<p>interface MessageMetadata {</p>
+<p>  model_used?: string;</p>
+<p>  tokens_used?: number;</p>
+<p>  response_time?: number;</p>
+<p>  confidence?: number;</p>
+<p>  sources?: string[];</p>
+<p>}</p>
+
+<p>interface ConversationContext {</p>
+<p>  transcription_content?: string;</p>
+<p>  user_preferences?: Record<string, any>;</p>
+<p>  conversation_summary?: string;</p>
+<p>  relevant_segments?: TranscriptionSegment[];</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Forms et Validation</h3>
+
+<p><code></code>`typescript</p>
+<p>// Formulaires</p>
+<p>interface LoginForm {</p>
+<p>  email: string;</p>
+<p>  password: string;</p>
+<p>  remember_me?: boolean;</p>
+<p>}</p>
+
+<p>interface RegisterForm {</p>
+<p>  name: string;</p>
+<p>  email: string;</p>
+<p>  password: string;</p>
+<p>  confirm_password: string;</p>
+<p>  accept_terms: boolean;</p>
+<p>  newsletter?: boolean;</p>
+<p>}</p>
+
+<p>interface ProfileForm {</p>
+<p>  name: string;</p>
+<p>  email: string;</p>
+<p>  current_password?: string;</p>
+<p>  new_password?: string;</p>
+<p>  confirm_password?: string;</p>
+<p>  preferences: Partial<UserPreferences>;</p>
+<p>}</p>
+
+<p>interface TranscriptionCreateForm {</p>
+<p>  file: File;</p>
+<p>  title?: string;</p>
+<p>  language?: string;</p>
+<p>  options?: TranscriptionOptions;</p>
+<p>}</p>
+
+<p>interface TranscriptionOptions {</p>
+<p>  enhance_audio?: boolean;</p>
+<p>  detect_speakers?: boolean;</p>
+<p>  generate_summary?: boolean;</p>
+<p>  extract_keywords?: boolean;</p>
+<p>  format_output?: 'text' | 'segments' | 'chapters';</p>
+<p>  webhook_url?: string;</p>
+<p>}</p>
+
+<p>// Validation</p>
+<p>interface ValidationError {</p>
+<p>  field: string;</p>
+<p>  message: string;</p>
+<p>  code?: string;</p>
+<p>}</p>
+
+<p>interface FormErrors {</p>
+<p>  [key: string]: string | undefined;</p>
+<p>}</p>
+
+<p>type FormState<T> = {</p>
+<p>  data: T;</p>
+<p>  errors: FormErrors;</p>
+<p>  loading: boolean;</p>
+<p>  submitted: boolean;</p>
+<p>};</p>
+<p><code></code>`</p>
+
+<h3>API Responses</h3>
+
+<p><code></code>`typescript</p>
+<p>// Réponses API génériques</p>
+<p>interface ApiResponse<T = any> {</p>
+<p>  success: boolean;</p>
+<p>  data?: T;</p>
+<p>  error?: ApiError;</p>
+<p>  meta?: ResponseMeta;</p>
+<p>}</p>
+
+<p>interface ApiError {</p>
+<p>  code: string;</p>
+<p>  message: string;</p>
+<p>  details?: Record<string, any>;</p>
+<p>  validation_errors?: ValidationError[];</p>
+<p>}</p>
+
+<p>interface ResponseMeta {</p>
+<p>  pagination?: {</p>
+<p>    page: number;</p>
+<p>    limit: number;</p>
+<p>    total_pages: number;</p>
+<p>    total_items: number;</p>
+<p>    has_next: boolean;</p>
+<p>    has_prev: boolean;</p>
+<p>  };</p>
+<p>  filters?: {</p>
+<p>    applied: Record<string, any>;</p>
+<p>    available: Record<string, any[]>;</p>
+<p>  };</p>
+<p>  timing?: {</p>
+<p>    request_time: number;</p>
+<p>    processing_time: number;</p>
+<p>  };</p>
+<p>}</p>
+
+<p>// Réponses spécifiques</p>
+<p>type LoginResponse = ApiResponse<{</p>
+<p>  user: User;</p>
+<p>  token: string;</p>
+<p>  expires_at: Timestamp;</p>
+<p>}>;</p>
+
+<p>type TranscriptionListResponse = ApiResponse<{</p>
+<p>  transcriptions: Transcription[];</p>
+<p>}>;</p>
+
+<p>type TranscriptionDetailResponse = ApiResponse<{</p>
+<p>  transcription: Transcription;</p>
+<p>}>;</p>
+<p><code></code>`</p>
+
+<h2>🌐 Clients API</h2>
+
+<h3>Configuration de Base</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/client.ts</p>
+<p>import axios, { AxiosInstance, AxiosResponse } from 'axios';</p>
+<p>import { useAuthStore } from '@/stores/auth';</p>
+
+<p>class ApiClient {</p>
+<p>  private client: AxiosInstance;</p>
+
+<p>  constructor() {</p>
+<p>    this.client = axios.create({</p>
+<p>      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',</p>
+<p>      timeout: 30000,</p>
+<p>      headers: {</p>
+<p>        'Content-Type': 'application/json',</p>
+<p>        'Accept': 'application/json'</p>
+<p>      }</p>
+<p>    });</p>
+
+<p>    this.setupInterceptors();</p>
+<p>  }</p>
+
+<p>  private setupInterceptors(): void {</p>
+<p>    // Request interceptor - Ajouter le token</p>
+<p>    this.client.interceptors.request.use(</p>
+<p>      (config) => {</p>
+<p>        const authStore = useAuthStore();</p>
+<p>        if (authStore.token) {</p>
+<p>          config.headers.Authorization = <code>Bearer ${authStore.token}</code>;</p>
+<p>        }</p>
+<p>        return config;</p>
+<p>      },</p>
+<p>      (error) => Promise.reject(error)</p>
+<p>    );</p>
+
+<p>    // Response interceptor - Gérer les erreurs</p>
+<p>    this.client.interceptors.response.use(</p>
+<p>      (response: AxiosResponse) => response,</p>
+<p>      async (error) => {</p>
+<p>        if (error.response?.status === 401) {</p>
+<p>          const authStore = useAuthStore();</p>
+<p>          await authStore.logout();</p>
+<p>          window.location.href = '/login';</p>
+<p>        }</p>
+<p>        return Promise.reject(error);</p>
+<p>      }</p>
+<p>    );</p>
+<p>  }</p>
+
+<p>  async get<T>(url: string, params?: Record<string, any>): Promise<ApiResponse<T>> {</p>
+<p>    const response = await this.client.get(url, { params });</p>
+<p>    return response.data;</p>
+<p>  }</p>
+
+<p>  async post<T>(url: string, data?: any): Promise<ApiResponse<T>> {</p>
+<p>    const response = await this.client.post(url, data);</p>
+<p>    return response.data;</p>
+<p>  }</p>
+
+<p>  async put<T>(url: string, data?: any): Promise<ApiResponse<T>> {</p>
+<p>    const response = await this.client.put(url, data);</p>
+<p>    return response.data;</p>
+<p>  }</p>
+
+<p>  async delete<T>(url: string): Promise<ApiResponse<T>> {</p>
+<p>    const response = await this.client.delete(url);</p>
+<p>    return response.data;</p>
+<p>  }</p>
+
+<p>  async upload<T>(url: string, formData: FormData, onProgress?: (progress: number) => void): Promise<ApiResponse<T>> {</p>
+<p>    const response = await this.client.post(url, formData, {</p>
+<p>      headers: {</p>
+<p>        'Content-Type': 'multipart/form-data'</p>
+<p>      },</p>
+<p>      onUploadProgress: (progressEvent) => {</p>
+<p>        if (onProgress && progressEvent.total) {</p>
+<p>          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);</p>
+<p>          onProgress(progress);</p>
+<p>        }</p>
+<p>      }</p>
+<p>    });</p>
+<p>    return response.data;</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const apiClient = new ApiClient();</p>
+<p><code></code>`</p>
+
+<h3>Client d'Authentification</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/auth.ts</p>
+<p>import { apiClient } from './client';</p>
+<p>import type { LoginForm, RegisterForm, LoginResponse, User } from '@/types';</p>
+
+<p>export class AuthAPI {</p>
+<p>  async login(credentials: LoginForm): Promise<LoginResponse> {</p>
+<p>    return apiClient.post<LoginResponse>('/api/auth/login', credentials);</p>
+<p>  }</p>
+
+<p>  async register(userData: RegisterForm): Promise<LoginResponse> {</p>
+<p>    return apiClient.post<LoginResponse>('/api/auth/register', userData);</p>
+<p>  }</p>
+
+<p>  async logout(): Promise<ApiResponse> {</p>
+<p>    return apiClient.post('/api/auth/logout');</p>
+<p>  }</p>
+
+<p>  async me(): Promise<ApiResponse<{ user: User }>> {</p>
+<p>    return apiClient.get<{ user: User }>('/api/auth/me');</p>
+<p>  }</p>
+
+<p>  async refreshToken(): Promise<LoginResponse> {</p>
+<p>    return apiClient.post<LoginResponse>('/api/auth/refresh');</p>
+<p>  }</p>
+
+<p>  async forgotPassword(email: string): Promise<ApiResponse> {</p>
+<p>    return apiClient.post('/api/auth/forgot-password', { email });</p>
+<p>  }</p>
+
+<p>  async resetPassword(token: string, password: string): Promise<ApiResponse> {</p>
+<p>    return apiClient.post('/api/auth/reset-password', { token, password });</p>
+<p>  }</p>
+
+<p>  async updateProfile(userData: Partial<User>): Promise<ApiResponse<{ user: User }>> {</p>
+<p>    return apiClient.put<{ user: User }>('/api/auth/profile', userData);</p>
+<p>  }</p>
+
+<p>  async changePassword(currentPassword: string, newPassword: string): Promise<ApiResponse> {</p>
+<p>    return apiClient.put('/api/auth/change-password', {</p>
+<p>      current_password: currentPassword,</p>
+<p>      new_password: newPassword</p>
+<p>    });</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const authApi = new AuthAPI();</p>
+<p><code></code>`</p>
+
+<h3>Client de Transcriptions</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/transcriptions.ts</p>
+<p>import { apiClient } from './client';</p>
+<p>import type { </p>
+<p>  Transcription, </p>
+<p>  TranscriptionCreateForm, </p>
+<p>  TranscriptionListResponse,</p>
+<p>  TranscriptionDetailResponse </p>
+<p>} from '@/types';</p>
+
+<p>export interface TranscriptionFilters {</p>
+<p>  page?: number;</p>
+<p>  limit?: number;</p>
+<p>  status?: TranscriptionStatus;</p>
+<p>  search?: string;</p>
+<p>  language?: string;</p>
+<p>  date_from?: string;</p>
+<p>  date_to?: string;</p>
+<p>  sort?: 'created_at' | 'title' | 'duration';</p>
+<p>  order?: 'asc' | 'desc';</p>
+<p>}</p>
+
+<p>export class TranscriptionAPI {</p>
+<p>  async list(filters: TranscriptionFilters = {}): Promise<TranscriptionListResponse> {</p>
+<p>    return apiClient.get<TranscriptionListResponse>('/api/transcriptions/list', filters);</p>
+<p>  }</p>
+
+<p>  async get(id: TranscriptionId): Promise<TranscriptionDetailResponse> {</p>
+<p>    return apiClient.get<TranscriptionDetailResponse>('/api/transcriptions/detail', { id });</p>
+<p>  }</p>
+
+<p>  async create(</p>
+<p>    data: TranscriptionCreateForm, </p>
+<p>    onProgress?: (progress: number) => void</p>
+<p>  ): Promise<ApiResponse<{ transcription: Transcription }>> {</p>
+<p>    const formData = new FormData();</p>
+<p>    formData.append('file', data.file);</p>
+<p>    </p>
+<p>    if (data.title) formData.append('title', data.title);</p>
+<p>    if (data.language) formData.append('language', data.language);</p>
+<p>    if (data.options) formData.append('options', JSON.stringify(data.options));</p>
+
+<p>    return apiClient.upload<{ transcription: Transcription }>(</p>
+<p>      '/api/transcriptions/create',</p>
+<p>      formData,</p>
+<p>      onProgress</p>
+<p>    );</p>
+<p>  }</p>
+
+<p>  async update(id: TranscriptionId, data: Partial<Transcription>): Promise<ApiResponse<{ transcription: Transcription }>> {</p>
+<p>    return apiClient.put<{ transcription: Transcription }>(<code>/api/transcriptions/${id}</code>, data);</p>
+<p>  }</p>
+
+<p>  async delete(id: TranscriptionId): Promise<ApiResponse> {</p>
+<p>    return apiClient.delete(<code>/api/transcriptions/${id}</code>);</p>
+<p>  }</p>
+
+<p>  async download(id: TranscriptionId, format: 'txt' | 'json' | 'srt' | 'vtt' = 'txt'): Promise<Blob> {</p>
+<p>    const response = await apiClient.client.get(<code>/api/transcriptions/${id}/download</code>, {</p>
+<p>      params: { format },</p>
+<p>      responseType: 'blob'</p>
+<p>    });</p>
+<p>    return response.data;</p>
+<p>  }</p>
+
+<p>  async regenerate(id: TranscriptionId, options?: TranscriptionOptions): Promise<ApiResponse<{ transcription: Transcription }>> {</p>
+<p>    return apiClient.post<{ transcription: Transcription }>(<code>/api/transcriptions/${id}/regenerate</code>, { options });</p>
+<p>  }</p>
+
+<p>  async share(id: TranscriptionId, options: { public: boolean; expires_at?: Timestamp }): Promise<ApiResponse<{ share_url: string }>> {</p>
+<p>    return apiClient.post<{ share_url: string }>(<code>/api/transcriptions/${id}/share</code>, options);</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const transcriptionApi = new TranscriptionAPI();</p>
+<p><code></code>`</p>
+
+<h3>Client de Chat</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/chat.ts</p>
+<p>import { apiClient } from './client';</p>
+<p>import type { Conversation, Message, ConversationId } from '@/types';</p>
+
+<p>export class ChatAPI {</p>
+<p>  async getConversations(): Promise<ApiResponse<{ conversations: Conversation[] }>> {</p>
+<p>    return apiClient.get<{ conversations: Conversation[] }>('/api/chat/conversations');</p>
+<p>  }</p>
+
+<p>  async getConversation(id: ConversationId): Promise<ApiResponse<{ conversation: Conversation }>> {</p>
+<p>    return apiClient.get<{ conversation: Conversation }>(<code>/api/chat/conversations/${id}</code>);</p>
+<p>  }</p>
+
+<p>  async createConversation(data: {</p>
+<p>    title?: string;</p>
+<p>    transcription_id?: TranscriptionId;</p>
+<p>  }): Promise<ApiResponse<{ conversation: Conversation }>> {</p>
+<p>    return apiClient.post<{ conversation: Conversation }>('/api/chat/conversations', data);</p>
+<p>  }</p>
+
+<p>  async sendMessage(</p>
+<p>    conversationId: ConversationId,</p>
+<p>    content: string</p>
+<p>  ): Promise<ApiResponse<{ message: Message; response: Message }>> {</p>
+<p>    return apiClient.post<{ message: Message; response: Message }>(</p>
+<p>      <code>/api/chat/conversations/${conversationId}/messages</code>,</p>
+<p>      { content }</p>
+<p>    );</p>
+<p>  }</p>
+
+<p>  async deleteConversation(id: ConversationId): Promise<ApiResponse> {</p>
+<p>    return apiClient.delete(<code>/api/chat/conversations/${id}</code>);</p>
+<p>  }</p>
+
+<p>  async exportConversation(id: ConversationId, format: 'txt' | 'json' | 'pdf' = 'txt'): Promise<Blob> {</p>
+<p>    const response = await apiClient.client.get(<code>/api/chat/conversations/${id}/export</code>, {</p>
+<p>      params: { format },</p>
+<p>      responseType: 'blob'</p>
+<p>    });</p>
+<p>    return response.data;</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const chatApi = new ChatAPI();</p>
+<p><code></code>`</p>
+
+<h2>🔌 WebSocket et Temps Réel</h2>
+
+<h3>WebSocket Client</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/websocket.ts</p>
+<p>import { useAuthStore } from '@/stores/auth';</p>
+
+<p>export type WebSocketEventType = </p>
+<p>  | 'transcription:progress'</p>
+<p>  | 'transcription:completed'</p>
+<p>  | 'transcription:failed'</p>
+<p>  | 'chat:message'</p>
+<p>  | 'user:notification';</p>
+
+<p>export interface WebSocketEvent<T = any> {</p>
+<p>  type: WebSocketEventType;</p>
+<p>  data: T;</p>
+<p>  timestamp: string;</p>
+<p>}</p>
+
+<p>export class WebSocketClient {</p>
+<p>  private ws: WebSocket | null = null;</p>
+<p>  private reconnectAttempts = 0;</p>
+<p>  private maxReconnectAttempts = 5;</p>
+<p>  private reconnectInterval = 1000;</p>
+<p>  private listeners: Map<WebSocketEventType, Set<(data: any) => void>> = new Map();</p>
+
+<p>  connect(): void {</p>
+<p>    const authStore = useAuthStore();</p>
+<p>    if (!authStore.token) return;</p>
+
+<p>    const wsUrl = <code>${import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws'}?token=${authStore.token}</code>;</p>
+<p>    </p>
+<p>    this.ws = new WebSocket(wsUrl);</p>
+
+<p>    this.ws.onopen = () => {</p>
+<p>      console.log('WebSocket connected');</p>
+<p>      this.reconnectAttempts = 0;</p>
+<p>    };</p>
+
+<p>    this.ws.onmessage = (event) => {</p>
+<p>      try {</p>
+<p>        const wsEvent: WebSocketEvent = JSON.parse(event.data);</p>
+<p>        this.handleEvent(wsEvent);</p>
+<p>      } catch (error) {</p>
+<p>        console.error('Failed to parse WebSocket message:', error);</p>
+<p>      }</p>
+<p>    };</p>
+
+<p>    this.ws.onclose = () => {</p>
+<p>      console.log('WebSocket disconnected');</p>
+<p>      this.attemptReconnect();</p>
+<p>    };</p>
+
+<p>    this.ws.onerror = (error) => {</p>
+<p>      console.error('WebSocket error:', error);</p>
+<p>    };</p>
+<p>  }</p>
+
+<p>  disconnect(): void {</p>
+<p>    if (this.ws) {</p>
+<p>      this.ws.close();</p>
+<p>      this.ws = null;</p>
+<p>    }</p>
+<p>  }</p>
+
+<p>  subscribe<T>(eventType: WebSocketEventType, callback: (data: T) => void): () => void {</p>
+<p>    if (!this.listeners.has(eventType)) {</p>
+<p>      this.listeners.set(eventType, new Set());</p>
+<p>    }</p>
+<p>    </p>
+<p>    this.listeners.get(eventType)!.add(callback);</p>
+
+<p>    // Retourner une fonction de désabonnement</p>
+<p>    return () => {</p>
+<p>      this.listeners.get(eventType)?.delete(callback);</p>
+<p>    };</p>
+<p>  }</p>
+
+<p>  private handleEvent(event: WebSocketEvent): void {</p>
+<p>    const callbacks = this.listeners.get(event.type);</p>
+<p>    if (callbacks) {</p>
+<p>      callbacks.forEach(callback => callback(event.data));</p>
+<p>    }</p>
+<p>  }</p>
+
+<p>  private attemptReconnect(): void {</p>
+<p>    if (this.reconnectAttempts < this.maxReconnectAttempts) {</p>
+<p>      this.reconnectAttempts++;</p>
+<p>      setTimeout(() => {</p>
+<p>        console.log(<code>Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})</code>);</p>
+<p>        this.connect();</p>
+<p>      }, this.reconnectInterval * this.reconnectAttempts);</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const wsClient = new WebSocketClient();</p>
+<p><code></code>`</p>
+
+<h2>🛠️ Utilitaires API</h2>
+
+<h3>Gestion d'Erreurs</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/errors.ts</p>
+<p>import type { ApiError } from '@/types';</p>
+
+<p>export class APIError extends Error {</p>
+<p>  public code: string;</p>
+<p>  public details?: Record<string, any>;</p>
+<p>  public status?: number;</p>
+
+<p>  constructor(error: ApiError, status?: number) {</p>
+<p>    super(error.message);</p>
+<p>    this.name = 'APIError';</p>
+<p>    this.code = error.code;</p>
+<p>    this.details = error.details;</p>
+<p>    this.status = status;</p>
+<p>  }</p>
+
+<p>  static fromResponse(response: any): APIError {</p>
+<p>    return new APIError(</p>
+<p>      response.data?.error || { code: 'UNKNOWN_ERROR', message: 'Une erreur inconnue s\'est produite' },</p>
+<p>      response.status</p>
+<p>    );</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export function handleApiError(error: any): APIError {</p>
+<p>  if (error.response) {</p>
+<p>    return APIError.fromResponse(error.response);</p>
+<p>  } else if (error.request) {</p>
+<p>    return new APIError({</p>
+<p>      code: 'NETWORK_ERROR',</p>
+<p>      message: 'Erreur de connexion au serveur'</p>
+<p>    });</p>
+<p>  } else {</p>
+<p>    return new APIError({</p>
+<p>      code: 'CLIENT_ERROR',</p>
+<p>      message: error.message || 'Erreur client'</p>
+<p>    });</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Cache et Performance</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/cache.ts</p>
+<p>export class APICache {</p>
+<p>  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();</p>
+
+<p>  set(key: string, data: any, ttl: number = 5 * 60 * 1000): void { // 5 min par défaut</p>
+<p>    this.cache.set(key, {</p>
+<p>      data,</p>
+<p>      timestamp: Date.now(),</p>
+<p>      ttl</p>
+<p>    });</p>
+<p>  }</p>
+
+<p>  get(key: string): any | null {</p>
+<p>    const item = this.cache.get(key);</p>
+<p>    if (!item) return null;</p>
+
+<p>    if (Date.now() - item.timestamp > item.ttl) {</p>
+<p>      this.cache.delete(key);</p>
+<p>      return null;</p>
+<p>    }</p>
+
+<p>    return item.data;</p>
+<p>  }</p>
+
+<p>  clear(): void {</p>
+<p>    this.cache.clear();</p>
+<p>  }</p>
+
+<p>  generateKey(url: string, params?: Record<string, any>): string {</p>
+<p>    const searchParams = new URLSearchParams(params).toString();</p>
+<p>    return <code>${url}${searchParams ? '?' + searchParams : ''}</code>;</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const apiCache = new APICache();</p>
+<p><code></code>`</p>
+
+<h2>📈 Monitoring Frontend</h2>
+
+<h3>Métriques API</h3>
+
+<p><code></code>`typescript</p>
+<p>// src/api/metrics.ts</p>
+<p>export class APIMetrics {</p>
+<p>  private metrics = {</p>
+<p>    requests: 0,</p>
+<p>    errors: 0,</p>
+<p>    averageResponseTime: 0,</p>
+<p>    responseTimeSum: 0</p>
+<p>  };</p>
+
+<p>  recordRequest(responseTime: number, isError: boolean = false): void {</p>
+<p>    this.metrics.requests++;</p>
+<p>    this.metrics.responseTimeSum += responseTime;</p>
+<p>    this.metrics.averageResponseTime = this.metrics.responseTimeSum / this.metrics.requests;</p>
+<p>    </p>
+<p>    if (isError) {</p>
+<p>      this.metrics.errors++;</p>
+<p>    }</p>
+<p>  }</p>
+
+<p>  getMetrics() {</p>
+<p>    return {</p>
+<p>      ...this.metrics,</p>
+<p>      errorRate: this.metrics.requests > 0 ? this.metrics.errors / this.metrics.requests : 0</p>
+<p>    };</p>
+<p>  }</p>
+
+<p>  reset(): void {</p>
+<p>    this.metrics = {</p>
+<p>      requests: 0,</p>
+<p>      errors: 0,</p>
+<p>      averageResponseTime: 0,</p>
+<p>      responseTimeSum: 0</p>
+<p>    };</p>
+<p>  }</p>
+<p>}</p>
+
+<p>export const apiMetrics = new APIMetrics();</p>
+<p><code></code>`</p>            </div>
+        </div>
+    </div>
+</body>
+</html>

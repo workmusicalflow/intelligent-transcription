@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 4xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        ul { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Backend Architecture</h1>
+
+<h2>Overview</h2>
+<p>The backend follows Clean Architecture principles with clear separation between layers.</p>
+
+<h2>Clean Architecture Layers</h2>
+
+<p>```</p>
+<p>┌─────────────────────────────────────┐</p>
+<p>│            Frameworks               │  ← Infrastructure Layer</p>
+<p>│  (Twig, SQLite, OpenAI, GraphQL)    │</p>
+<p>└─────────────────┬───────────────────┘</p>
+<p>                  │</p>
+<p>┌─────────────────┼───────────────────┐</p>
+<p>│       Interface Adapters            │  ← Application Layer  </p>
+<p>│   (Controllers, Repositories)       │</p>
+<p>└─────────────────┬───────────────────┘</p>
+<p>                  │</p>
+<p>┌─────────────────┼───────────────────┐</p>
+<p>│         Use Cases                   │  ← Application Layer</p>
+<p>│    (Command/Query Handlers)         │</p>
+<p>└─────────────────┬───────────────────┘</p>
+<p>                  │</p>
+<p>┌─────────────────┼───────────────────┐</p>
+<p>│          Entities                   │  ← Domain Layer</p>
+<p>│   (Business Rules & Logic)          │</p>
+<p>└─────────────────────────────────────┘</p>
+<p>```</p>
+
+<h2>Domain Layer</h2>
+
+<h3>Entities</h3>
+<p>- **Transcription:** Core business entity for transcription processes</p>
+<p>- **User:** User management and authentication</p>
+<p>- **Conversation:** Chat conversation management</p>
+
+<h3>Value Objects</h3>
+<p>- **TranscriptionId:** Unique transcription identifier</p>
+<p>- **AudioFile:** Audio file representation with validation</p>
+<p>- **Language:** Supported language codes</p>
+<p>- **TranscriptionStatus:** Processing status enumeration</p>
+
+<h3>Domain Services</h3>
+<p>- **TranscriptionWorkflowService:** Orchestrates transcription process</p>
+<p>- **TranscriptionPricingService:** Calculates costs</p>
+
+<h2>Application Layer</h2>
+
+<h3>Command/Query Separation (CQRS)</h3>
+<p>- **Commands:** Write operations (CreateTranscription, AuthenticateUser)</p>
+<p>- **Queries:** Read operations (GetTranscription, ListTranscriptions)</p>
+<p>- **Handlers:** Process commands and queries</p>
+
+<h3>Application Services</h3>
+<p>- **TranscriptionApplicationService:** Transcription use cases</p>
+<p>- **UserApplicationService:** User management use cases</p>
+<p>- **ChatApplicationService:** Chat functionality</p>
+
+<h2>Infrastructure Layer</h2>
+
+<h3>External Services</h3>
+<p>- **OpenAI Adapters:** Integration with OpenAI APIs</p>
+<p>- **YouTube Adapter:** Video download functionality</p>
+<p>- **Email Service:** Notification delivery</p>
+
+<h3>Persistence</h3>
+<p>- **SQLite Repositories:** Data access implementation</p>
+<p>- **Database Manager:** Connection and migration management</p>
+<p>- **Event Store:** Domain event persistence</p>
+
+<h3>Web Layer</h3>
+<p>- **Controllers:** HTTP request handling</p>
+<p>- **GraphQL Resolvers:** GraphQL query/mutation handling</p>
+<p>- **Middleware:** Cross-cutting concerns (auth, CORS, etc.)</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>API Reference</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Intelligent Transcription propose deux types d'APIs :</p>
+
+<p>- **REST API** : Endpoints traditionnels pour les opérations CRUD</p>
+<p>- **GraphQL API** : Interface moderne avec subscriptions temps réel</p>
+
+<h2>🔄 REST API</h2>
+
+<h3>Authentification</h3>
+
+<h4>POST /api/auth/login</h4>
+<p>Connexion utilisateur avec email/mot de passe.</p>
+
+<p>**Request:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "email": "user@example.com",</p>
+<p>  "password": "password123"</p>
+<p>}</p>
+<p>```</p>
+
+<p>**Response:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "user": {</p>
+<p>      "id": 1,</p>
+<p>      "name": "John Doe",</p>
+<p>      "email": "user@example.com"</p>
+<p>    },</p>
+<p>    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>POST /api/auth/logout</h4>
+<p>Déconnexion utilisateur (nécessite authentification).</p>
+
+<h4>GET /api/auth/me</h4>
+<p>Informations de l'utilisateur connecté.</p>
+
+<h3>Transcriptions</h3>
+
+<h4>GET /api/transcriptions/list</h4>
+<p>Liste des transcriptions de l'utilisateur.</p>
+
+<p>**Query Parameters:**</p>
+<p>- `page` (int): Numéro de page (défaut: 1)</p>
+<p>- `limit` (int): Nombre d'éléments par page (défaut: 10)</p>
+<p>- `status` (string): Filtrer par statut (pending, processing, completed, failed)</p>
+
+<p>**Response:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "transcriptions": [</p>
+<p>      {</p>
+<p>        "id": "tr_123",</p>
+<p>        "title": "Réunion équipe",</p>
+<p>        "status": "completed",</p>
+<p>        "duration": 1800,</p>
+<p>        "created_at": "2024-01-15T10:30:00Z"</p>
+<p>      }</p>
+<p>    ],</p>
+<p>    "pagination": {</p>
+<p>      "page": 1,</p>
+<p>      "total_pages": 5,</p>
+<p>      "total_items": 47</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>GET /api/transcriptions/detail</h4>
+<p>Détails d'une transcription spécifique.</p>
+
+<p>**Query Parameters:**</p>
+<p>- `id` (string, required): ID de la transcription</p>
+
+<h4>POST /api/transcriptions/create</h4>
+<p>Créer une nouvelle transcription.</p>
+
+<p>**Request (multipart/form-data):**</p>
+<p>- `file`: Fichier audio/vidéo</p>
+<p>- `language`: Code langue (optionnel)</p>
+<p>- `title`: Titre personnalisé (optionnel)</p>
+
+<h2>🚀 GraphQL API</h2>
+
+<h3>Endpoint</h3>
+<p>```</p>
+<p>POST /graphql</p>
+<p>```</p>
+
+<h3>Queries</h3>
+
+<h4>Obtenir une transcription</h4>
+<p>```graphql</p>
+<p>query GetTranscription($id: ID!) {</p>
+<p>  transcription(id: $id) {</p>
+<p>    id</p>
+<p>    title</p>
+<p>    status</p>
+<p>    content</p>
+<p>    language</p>
+<p>    duration</p>
+<p>    createdAt</p>
+<p>    updatedAt</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>Lister les transcriptions</h4>
+<p>```graphql</p>
+<p>query ListTranscriptions($first: Int, $after: String) {</p>
+<p>  transcriptions(first: $first, after: $after) {</p>
+<p>    edges {</p>
+<p>      node {</p>
+<p>        id</p>
+<p>        title</p>
+<p>        status</p>
+<p>        createdAt</p>
+<p>      }</p>
+<p>    }</p>
+<p>    pageInfo {</p>
+<p>      hasNextPage</p>
+<p>      endCursor</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Mutations</h3>
+
+<h4>Créer une transcription</h4>
+<p>```graphql</p>
+<p>mutation CreateTranscription($input: CreateTranscriptionInput!) {</p>
+<p>  createTranscription(input: $input) {</p>
+<p>    transcription {</p>
+<p>      id</p>
+<p>      status</p>
+<p>    }</p>
+<p>    errors {</p>
+<p>      field</p>
+<p>      message</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Subscriptions</h3>
+
+<h4>Suivi du progrès de transcription</h4>
+<p>```graphql</p>
+<p>subscription TranscriptionProgress($id: ID!) {</p>
+<p>  transcriptionProgress(id: $id) {</p>
+<p>    id</p>
+<p>    status</p>
+<p>    progress</p>
+<p>    message</p>
+<p>  }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🔐 Authentification</h2>
+
+<h3>JWT Token</h3>
+<p>Toutes les requêtes authentifiées nécessitent un header :</p>
+<p>```</p>
+<p>Authorization: Bearer YOUR_JWT_TOKEN</p>
+<p>```</p>
+
+<h3>Codes d'erreur</h3>
+
+<p>| Code | Message | Description |</p>
+<p>|------|---------|-------------|</p>
+<p>| 401 | Unauthorized | Token manquant ou invalide |</p>
+<p>| 403 | Forbidden | Permissions insuffisantes |</p>
+<p>| 422 | Validation Error | Données de requête invalides |</p>
+<p>| 429 | Rate Limited | Trop de requêtes |</p>
+
+<h2>📊 Rate Limiting</h2>
+
+<p>- **Authentification** : 5 tentatives/minute</p>
+<p>- **API générale** : 100 requêtes/minute</p>
+<p>- **Upload de fichiers** : 10 uploads/heure</p>
+
+<h2>🌐 CORS</h2>
+
+<p>Origines autorisées en développement :</p>
+<p>- `http://localhost:5173` (Vite dev server)</p>
+<p>- `http://localhost:8000` (PHP dev server)</p>
+
+<p>En production : domaines configurés dans `config.php`</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        .prose { max-width: none; }
+        .prose h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .prose h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose p { margin-bottom: 1rem; line-height: 1.7; }
+        .prose pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        .prose code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 2rem; }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.6; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        .prose th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <div class="prose max-w-none">
+<h1>Backend API Documentation</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Documentation technique complète de l'API backend d'Intelligent Transcription.</p>
+
+<h2>🏗️ Architecture API</h2>
+
+<h3>Structure</h3>
+<p><code></code>`</p>
+<p>api/</p>
+<p>├── auth/              # Authentification</p>
+<p>│   ├── login.php      # Connexion utilisateur</p>
+<p>│   ├── logout.php     # Déconnexion</p>
+<p>│   └── me.php         # Profil utilisateur</p>
+<p>├── transcriptions/   # Gestion transcriptions</p>
+<p>│   ├── list.php       # Liste des transcriptions</p>
+<p>│   └── detail.php     # Détails transcription</p>
+<p>└── v2/               # API v2 (moderne)</p>
+<p>    ├── index.php      # Point d'entrée</p>
+<p>    └── openapi.yaml   # Spécification OpenAPI</p>
+<p><code></code>`</p>
+
+<h3>Base URL</h3>
+<p><code></code>`</p>
+<p>Production: https://yourdomain.com/api</p>
+<p>Développement: http://localhost:8000/api</p>
+<p><code></code>`</p>
+
+<h2>🔐 Authentification</h2>
+
+<h3>JWT Authentication</h3>
+
+<h4>POST /api/auth/login</h4>
+<p>**Description:** Connexion utilisateur avec email/mot de passe.</p>
+
+<p>**Request:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "email": "user@example.com",</p>
+<p>  "password": "password123"</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<p>**Response (Success):**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "user": {</p>
+<p>      "id": 1,</p>
+<p>      "name": "John Doe",</p>
+<p>      "email": "user@example.com",</p>
+<p>      "role": "user",</p>
+<p>      "created_at": "2024-01-15T10:30:00Z",</p>
+<p>      "updated_at": "2024-01-20T14:25:00Z"</p>
+<p>    },</p>
+<p>    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",</p>
+<p>    "expires_at": "2024-01-22T10:30:00Z"</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<p>**Response (Error):**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": false,</p>
+<p>  "error": {</p>
+<p>    "code": "INVALID_CREDENTIALS",</p>
+<p>    "message": "Email ou mot de passe incorrect",</p>
+<p>    "details": {</p>
+<p>      "attempts_remaining": 2</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h4>GET /api/auth/me</h4>
+<p>**Description:** Informations de l'utilisateur connecté.</p>
+
+<p>**Headers:**</p>
+<p><code></code>`</p>
+<p>Authorization: Bearer {jwt_token}</p>
+<p><code></code>`</p>
+
+<p>**Response:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "user": {</p>
+<p>      "id": 1,</p>
+<p>      "name": "John Doe",</p>
+<p>      "email": "user@example.com",</p>
+<p>      "role": "user",</p>
+<p>      "preferences": {</p>
+<p>        "language": "fr",</p>
+<p>        "theme": "dark",</p>
+<p>        "notifications": true</p>
+<p>      },</p>
+<p>      "stats": {</p>
+<p>        "transcriptions_count": 15,</p>
+<p>        "total_duration": 7200,</p>
+<p>        "last_activity": "2024-01-20T14:25:00Z"</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h4>POST /api/auth/logout</h4>
+<p>**Description:** Déconnexion utilisateur (invalide le token).</p>
+
+<p>**Headers:**</p>
+<p><code></code>`</p>
+<p>Authorization: Bearer {jwt_token}</p>
+<p><code></code>`</p>
+
+<p>**Response:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "message": "Déconnexion réussie"</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>📝 Transcriptions</h2>
+
+<h3>GET /api/transcriptions/list</h3>
+<p>**Description:** Liste des transcriptions de l'utilisateur.</p>
+
+<p>**Query Parameters:**</p>
+<p>- <code>page</code> (int, default: 1): Numéro de page</p>
+<p>- <code>limit</code> (int, default: 10, max: 50): Nombre d'éléments par page</p>
+<p>- <code>status</code> (string): Filtrer par statut (<code>pending</code>, <code>processing</code>, <code>completed</code>, <code>failed</code>)</p>
+<p>- <code>search</code> (string): Recherche dans le titre ou contenu</p>
+<p>- <code>language</code> (string): Filtrer par langue</p>
+<p>- <code>date_from</code> (string, ISO 8601): Date de début</p>
+<p>- <code>date_to</code> (string, ISO 8601): Date de fin</p>
+<p>- <code>sort</code> (string): Tri (<code>created_at</code>, <code>title</code>, <code>duration</code>)</p>
+<p>- <code>order</code> (string): Ordre (<code>asc</code>, <code>desc</code>)</p>
+
+<p>**Headers:**</p>
+<p><code></code>`</p>
+<p>Authorization: Bearer {jwt_token}</p>
+<p><code></code>`</p>
+
+<p>**Response:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "transcriptions": [</p>
+<p>      {</p>
+<p>        "id": "tr_123456",</p>
+<p>        "title": "Réunion équipe marketing",</p>
+<p>        "status": "completed",</p>
+<p>        "language": "fr",</p>
+<p>        "duration": 1800,</p>
+<p>        "file_size": 15728640,</p>
+<p>        "file_type": "audio/mp3",</p>
+<p>        "created_at": "2024-01-15T10:30:00Z",</p>
+<p>        "updated_at": "2024-01-15T10:45:00Z",</p>
+<p>        "completed_at": "2024-01-15T10:45:00Z",</p>
+<p>        "word_count": 2450,</p>
+<p>        "confidence_score": 0.95,</p>
+<p>        "preview": "Bonjour à tous, nous allons commencer..."</p>
+<p>      }</p>
+<p>    ],</p>
+<p>    "pagination": {</p>
+<p>      "page": 1,</p>
+<p>      "limit": 10,</p>
+<p>      "total_pages": 5,</p>
+<p>      "total_items": 47,</p>
+<p>      "has_next": true,</p>
+<p>      "has_prev": false</p>
+<p>    },</p>
+<p>    "filters": {</p>
+<p>      "applied": {</p>
+<p>        "status": "completed",</p>
+<p>        "language": "fr"</p>
+<p>      },</p>
+<p>      "available": {</p>
+<p>        "statuses": ["pending", "processing", "completed", "failed"],</p>
+<p>        "languages": ["fr", "en", "es", "de"]</p>
+<p>      }</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>GET /api/transcriptions/detail</h3>
+<p>**Description:** Détails complets d'une transcription.</p>
+
+<p>**Query Parameters:**</p>
+<p>- <code>id</code> (string, required): ID de la transcription</p>
+
+<p>**Headers:**</p>
+<p><code></code>`</p>
+<p>Authorization: Bearer {jwt_token}</p>
+<p><code></code>`</p>
+
+<p>**Response:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "transcription": {</p>
+<p>      "id": "tr_123456",</p>
+<p>      "title": "Réunion équipe marketing",</p>
+<p>      "status": "completed",</p>
+<p>      "language": "fr",</p>
+<p>      "content": {</p>
+<p>        "text": "Bonjour à tous, nous allons commencer cette réunion...",</p>
+<p>        "segments": [</p>
+<p>          {</p>
+<p>            "id": 1,</p>
+<p>            "start": 0.0,</p>
+<p>            "end": 3.5,</p>
+<p>            "text": "Bonjour à tous",</p>
+<p>            "confidence": 0.98,</p>
+<p>            "speaker": "Speaker 1"</p>
+<p>          },</p>
+<p>          {</p>
+<p>            "id": 2,</p>
+<p>            "start": 3.5,</p>
+<p>            "end": 8.2,</p>
+<p>            "text": "nous allons commencer cette réunion",</p>
+<p>            "confidence": 0.95,</p>
+<p>            "speaker": "Speaker 1"</p>
+<p>          }</p>
+<p>        ],</p>
+<p>        "summary": "Réunion de planification marketing avec discussion des objectifs Q1...",</p>
+<p>        "keywords": ["marketing", "objectifs", "planification", "budget"]</p>
+<p>      },</p>
+<p>      "metadata": {</p>
+<p>        "duration": 1800,</p>
+<p>        "file_size": 15728640,</p>
+<p>        "file_type": "audio/mp3",</p>
+<p>        "sample_rate": 44100,</p>
+<p>        "channels": 2,</p>
+<p>        "bitrate": 192000</p>
+<p>      },</p>
+<p>      "processing": {</p>
+<p>        "started_at": "2024-01-15T10:32:00Z",</p>
+<p>        "completed_at": "2024-01-15T10:45:00Z",</p>
+<p>        "duration_seconds": 780,</p>
+<p>        "model_used": "whisper-large-v3",</p>
+<p>        "language_detection": {</p>
+<p>          "detected": "fr",</p>
+<p>          "confidence": 0.99,</p>
+<p>          "alternatives": [</p>
+<p>            {"language": "en", "confidence": 0.01}</p>
+<p>          ]</p>
+<p>        }</p>
+<p>      },</p>
+<p>      "analytics": {</p>
+<p>        "word_count": 2450,</p>
+<p>        "sentence_count": 156,</p>
+<p>        "speaking_rate": 145,</p>
+<p>        "pause_count": 23,</p>
+<p>        "average_confidence": 0.95</p>
+<p>      },</p>
+<p>      "created_at": "2024-01-15T10:30:00Z",</p>
+<p>      "updated_at": "2024-01-15T10:45:00Z"</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>POST /api/transcriptions/create</h3>
+<p>**Description:** Créer une nouvelle transcription.</p>
+
+<p>**Content-Type:** <code>multipart/form-data</code></p>
+
+<p>**Form Data:**</p>
+<p>- <code>file</code> (file, required): Fichier audio/vidéo</p>
+<p>- <code>title</code> (string): Titre personnalisé</p>
+<p>- <code>language</code> (string): Code langue (auto-détection si non spécifié)</p>
+<p>- <code>options</code> (json): Options de traitement</p>
+
+<p>**Options JSON:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "enhance_audio": true,</p>
+<p>  "detect_speakers": true,</p>
+<p>  "generate_summary": true,</p>
+<p>  "extract_keywords": true,</p>
+<p>  "format_output": "segments",</p>
+<p>  "webhook_url": "https://yourapp.com/webhook"</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<p>**Headers:**</p>
+<p><code></code>`</p>
+<p>Authorization: Bearer {jwt_token}</p>
+<p>Content-Type: multipart/form-data</p>
+<p><code></code>`</p>
+
+<p>**Response:**</p>
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "data": {</p>
+<p>    "transcription": {</p>
+<p>      "id": "tr_789012",</p>
+<p>      "title": "Nouveau fichier audio",</p>
+<p>      "status": "pending",</p>
+<p>      "estimated_duration": 120,</p>
+<p>      "queue_position": 3,</p>
+<p>      "estimated_completion": "2024-01-20T15:05:00Z"</p>
+<p>    },</p>
+<p>    "upload": {</p>
+<p>      "file_size": 8396800,</p>
+<p>      "file_type": "audio/wav",</p>
+<p>      "duration": 1205,</p>
+<p>      "upload_id": "up_456789"</p>
+<p>    }</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>🔍 Status Codes</h2>
+
+<h3>Codes de Réponse HTTP</h3>
+
+<p>| Code | Statut | Description |</p>
+<p>|------|--------|-------------|</p>
+<p>| 200 | OK | Requête réussie |</p>
+<p>| 201 | Created | Ressource créée avec succès |</p>
+<p>| 400 | Bad Request | Paramètres invalides |</p>
+<p>| 401 | Unauthorized | Token manquant ou invalide |</p>
+<p>| 403 | Forbidden | Permissions insuffisantes |</p>
+<p>| 404 | Not Found | Ressource introuvable |</p>
+<p>| 422 | Unprocessable Entity | Erreurs de validation |</p>
+<p>| 429 | Too Many Requests | Rate limit dépassé |</p>
+<p>| 500 | Internal Server Error | Erreur serveur |</p>
+<p>| 503 | Service Unavailable | Service temporairement indisponible |</p>
+
+<h3>Codes d'Erreur Personnalisés</h3>
+
+<p>| Code | Description |</p>
+<p>|------|-------------|</p>
+<p>| <code>INVALID_CREDENTIALS</code> | Email/mot de passe incorrect |</p>
+<p>| <code>TOKEN_EXPIRED</code> | Token JWT expiré |</p>
+<p>| <code>TOKEN_INVALID</code> | Token JWT invalide |</p>
+<p>| <code>USER_NOT_FOUND</code> | Utilisateur introuvable |</p>
+<p>| <code>TRANSCRIPTION_NOT_FOUND</code> | Transcription introuvable |</p>
+<p>| <code>FILE_TOO_LARGE</code> | Fichier trop volumineux |</p>
+<p>| <code>UNSUPPORTED_FORMAT</code> | Format de fichier non supporté |</p>
+<p>| <code>PROCESSING_FAILED</code> | Échec du traitement |</p>
+<p>| <code>QUOTA_EXCEEDED</code> | Quota dépassé |</p>
+<p>| <code>RATE_LIMIT_EXCEEDED</code> | Limite de taux dépassée |</p>
+
+<h2>📏 Rate Limiting</h2>
+
+<h3>Limites par Endpoint</h3>
+
+<p>| Endpoint | Limite | Fenêtre |</p>
+<p>|----------|--------|----------|</p>
+<p>| <code>/auth/login</code> | 5 tentatives | 15 minutes |</p>
+<p>| <code>/auth/logout</code> | 10 requêtes | 1 minute |</p>
+<p>| <code>/auth/me</code> | 60 requêtes | 1 minute |</p>
+<p>| <code>/transcriptions/*</code> | 100 requêtes | 1 minute |</p>
+<p>| Upload de fichiers | 10 uploads | 1 heure |</p>
+
+<h3>Headers de Rate Limiting</h3>
+
+<p><code></code>`http</p>
+<p>X-RateLimit-Limit: 100</p>
+<p>X-RateLimit-Remaining: 95</p>
+<p>X-RateLimit-Reset: 1642694400</p>
+<p>X-RateLimit-Retry-After: 60</p>
+<p><code></code>`</p>
+
+<h2>🔒 Sécurité</h2>
+
+<h3>CORS</h3>
+
+<p>**Origines Autorisées:**</p>
+<p>- Production: <code>https://yourdomain.com</code></p>
+<p>- Développement: <code>http://localhost:5173</code></p>
+
+<p>**Headers CORS:**</p>
+<p><code></code>`http</p>
+<p>Access-Control-Allow-Origin: https://yourdomain.com</p>
+<p>Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS</p>
+<p>Access-Control-Allow-Headers: Content-Type, Authorization</p>
+<p>Access-Control-Max-Age: 86400</p>
+<p><code></code>`</p>
+
+<h3>Validation des Entrées</h3>
+
+<p>**Fichiers Upload:**</p>
+<p>- Taille max: 100 MB</p>
+<p>- Formats supportés: MP3, WAV, MP4, MOV, AVI, M4A, OGG</p>
+<p>- Durée max: 4 heures</p>
+<p>- Scan antivirus automatique</p>
+
+<p>**Validation des Données:**</p>
+<p><code></code>`php</p>
+<p>// Exemple de validation</p>
+<p>$rules = [</p>
+<p>    'email' => 'required|email|max:255',</p>
+<p>    'password' => 'required|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/',</p>
+<p>    'title' => 'string|max:200',</p>
+<p>    'language' => 'string|in:fr,en,es,de,it,pt'</p>
+<p>];</p>
+<p><code></code>`</p>
+
+<h2>📈 Monitoring et Logs</h2>
+
+<h3>Métriques Disponibles</h3>
+
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "api_metrics": {</p>
+<p>    "requests_per_minute": 150,</p>
+<p>    "average_response_time": 245,</p>
+<p>    "error_rate": 0.02,</p>
+<p>    "uptime_percentage": 99.95</p>
+<p>  },</p>
+<p>  "transcription_metrics": {</p>
+<p>    "queue_length": 5,</p>
+<p>    "average_processing_time": 780,</p>
+<p>    "success_rate": 0.98,</p>
+<p>    "total_processed_today": 234</p>
+<p>  }</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>Logs Structure</h3>
+
+<p><code></code>`json</p>
+<p>{</p>
+<p>  "timestamp": "2024-01-20T14:30:00Z",</p>
+<p>  "level": "INFO",</p>
+<p>  "message": "Transcription completed",</p>
+<p>  "context": {</p>
+<p>    "user_id": 123,</p>
+<p>    "transcription_id": "tr_456789",</p>
+<p>    "duration": 780,</p>
+<p>    "file_size": 15728640,</p>
+<p>    "language": "fr"</p>
+<p>  },</p>
+<p>  "request_id": "req_789012",</p>
+<p>  "user_agent": "IntelligentTranscription/1.0",</p>
+<p>  "ip_address": "192.168.1.100"</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h2>🚀 Performance</h2>
+
+<h3>Optimisations</h3>
+
+<p>**Cache:**</p>
+<p>- Redis pour les sessions</p>
+<p>- Cache de réponses API (5 min)</p>
+<p>- Cache des métadonnées utilisateur (1h)</p>
+
+<p>**Base de Données:**</p>
+<p>- Index sur <code>user_id</code>, <code>status</code>, <code>created_at</code></p>
+<p>- Pagination efficace avec curseurs</p>
+<p>- Requêtes optimisées avec EXPLAIN</p>
+
+<p>**Files d'Attente:**</p>
+<p>- Traitement asynchrone des transcriptions</p>
+<p>- Priorité basée sur le type d'utilisateur</p>
+<p>- Retry automatique en cas d'échec</p>
+
+<h2>🔧 Outils de Développement</h2>
+
+<h3>Postman Collection</h3>
+
+<p><code></code>`bash</p>
+<h1>Importer la collection</h1>
+<p>curl -O https://api.yourdomain.com/postman/collection.json</p>
+<p><code></code>`</p>
+
+<h3>OpenAPI Specification</h3>
+
+<p><code></code>`bash</p>
+<h1>Télécharger le schéma OpenAPI</h1>
+<p>curl https://api.yourdomain.com/v2/openapi.yaml</p>
+<p><code></code>`</p>
+
+<h3>SDK Officiel</h3>
+
+<p><code></code>`bash</p>
+<h1>Installation SDK JavaScript</h1>
+<p>npm install @intelligent-transcription/api-sdk</p>
+
+<h1>Installation SDK PHP</h1>
+<p>composer require intelligent-transcription/api-sdk</p>
+<p><code></code>`</p>
+
+<h2>📝 Exemples d'Intégration</h2>
+
+<h3>JavaScript/TypeScript</h3>
+
+<p><code></code>`typescript</p>
+<p>import { IntelligentTranscriptionAPI } from '@intelligent-transcription/api-sdk';</p>
+
+<p>const api = new IntelligentTranscriptionAPI({</p>
+<p>  baseURL: 'https://api.yourdomain.com',</p>
+<p>  apiKey: 'your-api-key'</p>
+<p>});</p>
+
+<p>// Connexion</p>
+<p>const { user, token } = await api.auth.login({</p>
+<p>  email: 'user@example.com',</p>
+<p>  password: 'password123'</p>
+<p>});</p>
+
+<p>// Upload et transcription</p>
+<p>const file = new File([audioBlob], 'audio.mp3', { type: 'audio/mp3' });</p>
+<p>const transcription = await api.transcriptions.create({</p>
+<p>  file,</p>
+<p>  title: 'Ma transcription',</p>
+<p>  language: 'fr'</p>
+<p>});</p>
+
+<p>// Suivre le progrès</p>
+<p>api.transcriptions.subscribe(transcription.id, (update) => {</p>
+<p>  console.log('Progress:', update.status, update.progress);</p>
+<p>});</p>
+<p><code></code>`</p>
+
+<h3>PHP</h3>
+
+<p><code></code>`php</p>
+<p>use IntelligentTranscription\ApiSDK\Client;</p>
+<p>use IntelligentTranscription\ApiSDK\Auth\JWTAuth;</p>
+
+<p>$client = new Client([</p>
+<p>    'base_uri' => 'https://api.yourdomain.com',</p>
+<p>    'auth' => new JWTAuth('your-jwt-token')</p>
+<p>]);</p>
+
+<p>// Lister les transcriptions</p>
+<p>$transcriptions = $client->transcriptions()->list([</p>
+<p>    'status' => 'completed',</p>
+<p>    'limit' => 20</p>
+<p>]);</p>
+
+<p>foreach ($transcriptions['data']['transcriptions'] as $transcription) {</p>
+<p>    echo $transcription['title'] . "\n";</p>
+<p>}</p>
+<p><code></code>`</p>
+
+<h3>cURL</h3>
+
+<p><code></code>`bash</p>
+<h1>Connexion</h1>
+<p>curl -X POST https://api.yourdomain.com/auth/login \</p>
+<p>  -H "Content-Type: application/json" \</p>
+<p>  -d '{</p>
+<p>    "email": "user@example.com",</p>
+<p>    "password": "password123"</p>
+<p>  }'</p>
+
+<h1>Upload transcription</h1>
+<p>curl -X POST https://api.yourdomain.com/transcriptions/create \</p>
+<p>  -H "Authorization: Bearer YOUR_JWT_TOKEN" \</p>
+<p>  -F "file=@audio.mp3" \</p>
+<p>  -F "title=Ma transcription" \</p>
+<p>  -F "language=fr"</p>
+<p><code></code>`</p>            </div>
+        </div>
+    </div>
+</body>
+</html>

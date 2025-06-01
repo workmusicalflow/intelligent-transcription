@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contributing Guidelines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Contributing Guidelines</h1>
+
+<p>Thank you for your interest in contributing to the Intelligent Transcription project! This document provides guidelines and instructions for contributing to the project.</p>
+
+<h2>🔍 Getting Started</h2>
+
+<h3>Environment Setup</h3>
+
+<p>1. **Fork and Clone**:</p>
+<p>   - Fork the repository on GitHub</p>
+<p>   - Clone your fork locally:</p>
+<p>   ```bash</p>
+<p>   git clone https://github.com/your-username/intelligent-transcription.git</p>
+<p>   cd intelligent-transcription</p>
+<p>   ```</p>
+
+<p>2. **Set Up Development Environment**:</p>
+<p>   - Configure environment variables in `.env`</p>
+<p>   - Run the setup script:</p>
+<p>   ```bash</p>
+<p>   ./setup_env.sh</p>
+<p>   ```</p>
+
+<p>3. **Start the Development Server**:</p>
+<p>   ```bash</p>
+<p>   php -S localhost:8000 -c php.ini</p>
+<p>   ```</p>
+
+<h2>🌱 Development Workflow</h2>
+
+<h3>Branch Strategy</h3>
+
+<p>- **`master` branch**: Production-ready code</p>
+<p>- **Feature branches**: Create for new features (`feature/feature-name`)</p>
+<p>- **Bug fix branches**: Create for bug fixes (`fix/issue-description`)</p>
+
+<h3>Commit Guidelines</h3>
+
+<p>- Use clear, descriptive commit messages</p>
+<p>- Begin with a verb (Add, Fix, Update, Refactor, etc.)</p>
+<p>- Keep commits focused on single tasks/changes</p>
+<p>- Reference issue numbers when applicable</p>
+
+<p>Example commit messages:</p>
+<p>```</p>
+<p>Add YouTube Shorts support</p>
+<p>Fix language detection in transcription results</p>
+<p>Update OpenAI API integration to latest version</p>
+<p>```</p>
+
+<h3>Pull Request Process</h3>
+
+<p>1. Ensure your code follows the project's coding standards</p>
+<p>2. Update documentation to reflect any changes</p>
+<p>3. Include tests when adding new features</p>
+<p>4. Ensure all tests pass</p>
+<p>5. Submit PR to the `master` branch</p>
+
+<h2>📝 Coding Standards</h2>
+
+<h3>PHP Standards</h3>
+
+<p>- Follow PSR-12 coding standards</p>
+<p>- Use proper namespacing (`namespace Controllers;`)</p>
+<p>- Document all classes and methods with PHPDoc comments</p>
+<p>- Use type hints where applicable</p>
+
+<p>Example:</p>
+<p>```php</p>
+<p>/**</p>
+<p> * Transcribes an audio file</p>
+<p> * </p>
+<p> * @param string $filePath Path to the audio file</p>
+<p> * @param string|null $language Language code</p>
+<p> * @return array Transcription result</p>
+<p> */</p>
+<p>public function transcribeAudio(string $filePath, ?string $language = null): array</p>
+<p>{</p>
+<p>    // Implementation</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Python Standards</h3>
+
+<p>- Follow PEP 8 style guide</p>
+<p>- Document functions with docstrings</p>
+<p>- Use type hints in Python 3.6+</p>
+<p>- Handle exceptions properly</p>
+
+<p>Example:</p>
+<p>```python</p>
+<p>def transcribe_audio(file_path: str, language: str = None) -> dict:</p>
+<p>    """</p>
+<p>    Transcribes an audio file using OpenAI Whisper.</p>
+<p>    </p>
+<p>    Args:</p>
+<p>        file_path: Path to the audio file</p>
+<p>        language: Optional language code</p>
+<p>        </p>
+<p>    Returns:</p>
+<p>        Dict containing transcription result</p>
+<p>    """</p>
+<p>    # Implementation</p>
+<p>```</p>
+
+<h3>JavaScript Standards</h3>
+
+<p>- Use ES6+ syntax</p>
+<p>- Format with 2-space indentation</p>
+<p>- Use descriptive variable and function names</p>
+<p>- Add comments for complex logic</p>
+
+<h3>HTML/CSS Standards</h3>
+
+<p>- Follow HTML5 standards</p>
+<p>- Use semantic HTML elements</p>
+<p>- Follow BEM methodology for CSS class naming</p>
+<p>- Ensure responsive design</p>
+
+<h2>🧪 Testing</h2>
+
+<h3>Testing Guidelines</h3>
+
+<p>- Test new features before submitting</p>
+<p>- Maintain existing tests when changing code</p>
+<p>- Write both unit and integration tests when applicable</p>
+
+<h3>Manual Testing Checklist</h3>
+
+<p>- Test on multiple browsers (Chrome, Firefox, Safari)</p>
+<p>- Test on both desktop and mobile views</p>
+<p>- Test with various file types and sizes</p>
+<p>- Verify language detection and translation</p>
+<p>- Test error scenarios (e.g., invalid files, API failures)</p>
+
+<h2>📚 Documentation</h2>
+
+<h3>Documentation Requirements</h3>
+
+<p>- Update README.md when adding features</p>
+<p>- Document new API endpoints</p>
+<p>- Update workflow diagrams if processes change</p>
+<p>- Add JSDoc comments for JavaScript functions</p>
+<p>- Add PHPDoc comments for PHP methods</p>
+
+<h2>🔄 Updating Dependencies</h2>
+
+<p>When updating dependencies:</p>
+
+<p>1. Document the change and reason</p>
+<p>2. Test thoroughly after upgrade</p>
+<p>3. Update requirements.txt or composer.json</p>
+<p>4. Update setup instructions if needed</p>
+
+<h2>⚠️ Common Issues</h2>
+
+<h3>Troubleshooting</h3>
+
+<p>- **API Key Issues**: Verify `.env` file has correct API keys</p>
+<p>- **File Permission Errors**: Ensure upload directories are writable</p>
+<p>- **Python Environment Issues**: Check venv activation and dependencies</p>
+
+<h2>📊 Project Roadmap</h2>
+
+<p>Key areas for contribution:</p>
+
+<p>1. **Performance Optimization**:</p>
+<p>   - Implement proper caching</p>
+<p>   - Optimize file processing algorithms</p>
+
+<p>2. **Feature Extensions**:</p>
+<p>   - Add batch processing capabilities</p>
+<p>   - Implement database storage for results</p>
+<p>   - Add user authentication system</p>
+
+<p>3. **UI Improvements**:</p>
+<p>   - Enhance mobile experience</p>
+<p>   - Add real-time progress indicators</p>
+<p>   - Implement dark mode</p>
+
+<p>4. **Testing**:</p>
+<p>   - Increase test coverage</p>
+<p>   - Add automated testing</p>
+
+<h2>🙏 Code of Conduct</h2>
+
+<p>- Be respectful and inclusive</p>
+<p>- Give constructive feedback</p>
+<p>- Maintain professionalism</p>
+<p>- Respect the project's goals and decisions</p>
+<p>- Help others learn and grow</p>
+
+<h2>📫 Contact</h2>
+
+<p>For questions or assistance:</p>
+<p>- Open an issue on GitHub</p>
+<p>- Reach out to the project maintainers at [contact email]</p>
+
+<p>Thank you for contributing to make Intelligent Transcription better!</p>
+        </div>
+    </div>
+</body>
+</html>

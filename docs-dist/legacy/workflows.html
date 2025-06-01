@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Workflows</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>User Workflows</h1>
+
+<p>This document outlines the main user workflows of the Intelligent Transcription application with sequence diagrams to illustrate the interactions between the user, the application, and external services.</p>
+
+<h2>🔄 File Upload and Transcription Workflow</h2>
+
+<p>This workflow describes the process of uploading an audio or video file and getting it transcribed.</p>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    actor User</p>
+<p>    participant UI as Web Interface</p>
+<p>    participant TC as TranscriptionController</p>
+<p>    participant TS as TranscriptionService</p>
+<p>    participant PP as Python Process</p>
+<p>    participant OpenAI as OpenAI API</p>
+<p>    participant FS as File System</p>
+
+<p>    User->>UI: Upload audio/video file</p>
+<p>    User->>UI: Select language options</p>
+<p>    User->>UI: Click "Transcribe"</p>
+<p>    UI->>TC: Submit form (POST /transcribe.php)</p>
+<p>    TC->>TS: processUploadedFile()</p>
+<p>    TS->>FS: Save uploaded file</p>
+<p>    TS->>PP: Execute preprocess_audio.py</p>
+<p>    PP->>FS: Save preprocessed file</p>
+<p>    TS->>PP: Execute transcribe.py</p>
+<p>    PP->>OpenAI: Request transcription (Whisper API)</p>
+<p>    OpenAI->>PP: Return transcription text</p>
+<p>    PP->>FS: Save result JSON</p>
+<p>    PP->>TS: Return result</p>
+<p>    TS->>TC: Return result</p>
+<p>    TC->>UI: Redirect to result page</p>
+<p>    UI->>User: Display transcription result</p>
+<p>    User->>UI: Download transcription (optional)</p>
+<p>```</p>
+
+<h2>🔄 YouTube Video Transcription Workflow</h2>
+
+<p>This workflow describes the process of transcribing content from a YouTube URL.</p>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    actor User</p>
+<p>    participant UI as Web Interface</p>
+<p>    participant TC as TranscriptionController</p>
+<p>    participant YS as YouTubeService</p>
+<p>    participant TS as TranscriptionService</p>
+<p>    participant YT as YouTube API</p>
+<p>    participant PP as Python Process</p>
+<p>    participant OpenAI as OpenAI API</p>
+<p>    participant FS as File System</p>
+
+<p>    User->>UI: Enter YouTube URL</p>
+<p>    User->>UI: Select language options</p>
+<p>    User->>UI: Click "Transcribe YouTube"</p>
+<p>    UI->>TC: Submit form (POST /youtube_download.php)</p>
+<p>    TC->>YS: downloadAndTranscribe()</p>
+<p>    YS->>YT: Download YouTube video audio</p>
+<p>    YT->>FS: Save audio file</p>
+<p>    YS->>TS: preprocessAudio()</p>
+<p>    TS->>PP: Execute preprocess_audio.py</p>
+<p>    PP->>FS: Save preprocessed file</p>
+<p>    YS->>PP: Execute transcribe.py</p>
+<p>    PP->>OpenAI: Request transcription (Whisper API)</p>
+<p>    OpenAI->>PP: Return transcription text</p>
+<p>    PP->>FS: Save result JSON</p>
+<p>    PP->>YS: Return result</p>
+<p>    YS->>TC: Return result</p>
+<p>    TC->>UI: Redirect to result page</p>
+<p>    UI->>User: Display transcription result</p>
+<p>    User->>UI: Download transcription (optional)</p>
+<p>```</p>
+
+<h2>🔄 Paraphrasing Workflow</h2>
+
+<p>This workflow describes the process of paraphrasing a transcription to improve clarity and readability.</p>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    actor User</p>
+<p>    participant UI as Web Interface</p>
+<p>    participant PC as ParaphraseController</p>
+<p>    participant PS as ParaphraseService</p>
+<p>    participant PP as Python Process</p>
+<p>    participant OpenAI as OpenAI Assistant API</p>
+<p>    participant FS as File System</p>
+
+<p>    User->>UI: View transcription result</p>
+<p>    User->>UI: Click "Paraphrase"</p>
+<p>    UI->>PC: Submit request (POST /paraphrase.php)</p>
+<p>    PC->>PS: paraphraseText()</p>
+<p>    PS->>PP: Execute paraphrase.py</p>
+<p>    PP->>OpenAI: Send text to Assistant API</p>
+<p>    OpenAI->>PP: Return paraphrased text</p>
+<p>    PP->>PS: Return result</p>
+<p>    PS->>PC: Return result</p>
+<p>    PC->>UI: Return JSON response</p>
+<p>    UI->>User: Display original and paraphrased text</p>
+<p>    User->>UI: Select preferred version</p>
+<p>    User->>UI: Download paraphrased result (optional)</p>
+<p>```</p>
+
+<h2>🔄 Contextual Chat Workflow</h2>
+
+<p>This workflow describes the process of engaging in a contextual chat about the transcribed content.</p>
+
+<p>```mermaid</p>
+<p>sequenceDiagram</p>
+<p>    actor User</p>
+<p>    participant UI as Web Interface</p>
+<p>    participant CC as ChatController</p>
+<p>    participant CS as ChatService</p>
+<p>    participant TS as TranscriptionService</p>
+<p>    participant PP as Python Process</p>
+<p>    participant OpenAI as OpenAI Chat API</p>
+<p>    participant FS as File System</p>
+
+<p>    User->>UI: View transcription result</p>
+<p>    User->>UI: Click "Chat with Assistant"</p>
+<p>    UI->>CC: Navigate to chat page</p>
+<p>    CC->>UI: Load chat interface</p>
+<p>    </p>
+<p>    User->>UI: Type question about content</p>
+<p>    User->>UI: Submit chat message</p>
+<p>    UI->>CC: Send message (POST /chat.php)</p>
+<p>    CC->>CS: sendMessage()</p>
+<p>    CS->>TS: getTranscriptionResult()</p>
+<p>    TS->>CS: Return transcription text</p>
+<p>    CS->>PP: Execute chat_api.py</p>
+<p>    PP->>OpenAI: Send message + context to GPT API</p>
+<p>    OpenAI->>PP: Return assistant response</p>
+<p>    PP->>CS: Return response</p>
+<p>    CS->>CC: Return result</p>
+<p>    CC->>UI: Return JSON response</p>
+<p>    UI->>User: Display assistant response</p>
+<p>    </p>
+<p>    Note over User,UI: Conversation continues...</p>
+<p>    </p>
+<p>    User->>UI: Click "Export Chat"</p>
+<p>    UI->>CC: Request export (POST /chat.php?action=export)</p>
+<p>    CC->>CS: exportConversation()</p>
+<p>    CS->>FS: Save formatted chat history</p>
+<p>    CS->>CC: Return export result</p>
+<p>    CC->>UI: Provide download link</p>
+<p>    UI->>User: Download chat history</p>
+<p>```</p>
+
+<h2>🔄 Complete User Journey Workflow</h2>
+
+<p>This diagram shows a complete user journey, combining multiple workflows.</p>
+
+<p>```mermaid</p>
+<p>graph LR</p>
+<p>    subgraph "Input Phase"</p>
+<p>        A[User visits homepage] --> B1[Upload audio/video file]</p>
+<p>        A --> B2[Enter YouTube URL]</p>
+<p>    end</p>
+<p>    </p>
+<p>    subgraph "Processing Phase"</p>
+<p>        B1 --> C1[File preprocessing]</p>
+<p>        B2 --> C2[YouTube download]</p>
+<p>        C1 --> D[Transcription with Whisper API]</p>
+<p>        C2 --> D</p>
+<p>    end</p>
+<p>    </p>
+<p>    subgraph "Result Phase"</p>
+<p>        D --> E[View transcription result]</p>
+<p>        E --> F1[Download result as text]</p>
+<p>        E --> F2[Paraphrase result]</p>
+<p>        E --> F3[Chat about content]</p>
+<p>    end</p>
+<p>    </p>
+<p>    subgraph "Interaction Phase"</p>
+<p>        F2 --> G1[View improved text]</p>
+<p>        F3 --> G2[Ask questions about content]</p>
+<p>        G2 --> G3[Continue conversation]</p>
+<p>        G3 --> G4[Export chat history]</p>
+<p>    end</p>
+<p>    </p>
+<p>    style A fill:#d4f1f9,stroke:#05728f</p>
+<p>    style D fill:#ffe6cc,stroke:#d79b00</p>
+<p>    style E fill:#d5e8d4,stroke:#82b366</p>
+<p>    style F3 fill:#e1d5e7,stroke:#9673a6</p>
+<p>```</p>
+
+<h2>📋 User Story: First-time User Experience</h2>
+
+<p>1. **Homepage Entry**</p>
+<p>   - User visits the application homepage</p>
+<p>   - User sees the file upload section and YouTube URL input</p>
+
+<p>2. **Input Selection**</p>
+<p>   - User chooses to upload a local audio file</p>
+<p>   - User selects language options (e.g., automatic detection)</p>
+<p>   - User clicks "Transcribe" button</p>
+
+<p>3. **Processing**</p>
+<p>   - System shows loading indicator</p>
+<p>   - File is uploaded, preprocessed, and transcribed</p>
+<p>   - System redirects to results page</p>
+
+<p>4. **Result Exploration**</p>
+<p>   - User views transcription text</p>
+<p>   - User explores available options (download, paraphrase, chat)</p>
+
+<p>5. **Feature Discovery**</p>
+<p>   - User clicks "Chat with Assistant"</p>
+<p>   - User is taken to chat interface with transcription context loaded</p>
+<p>   - User asks questions about the transcribed content</p>
+<p>   - User receives contextually relevant answers</p>
+
+<p>6. **Export and Sharing**</p>
+<p>   - User exports chat history</p>
+<p>   - User downloads transcription</p>
+
+<h2>📋 User Story: Regular User Experience</h2>
+
+<p>1. **Efficient Input**</p>
+<p>   - User enters YouTube URL directly</p>
+<p>   - User selects preferred language and "Force language" option</p>
+<p>   - User initiates transcription</p>
+
+<p>2. **Result Review**</p>
+<p>   - User quickly reviews transcription for accuracy</p>
+<p>   - User immediately clicks "Paraphrase" for improved readability</p>
+
+<p>3. **Content Interaction**</p>
+<p>   - User begins chat session with specific questions</p>
+<p>   - User conducts focused conversation about key topics</p>
+<p>   - User exports conversation for documentation purposes</p>
+
+<p>4. **Multiple Session Management**</p>
+<p>   - User starts a new transcription in another tab</p>
+<p>   - User efficiently switches between multiple transcriptions</p>
+<p>   - User leverages previously learned workflow patterns</p>
+        </div>
+    </div>
+</body>
+</html>

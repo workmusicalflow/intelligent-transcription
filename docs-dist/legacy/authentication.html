@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication System Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Authentication System Documentation</h1>
+
+<h2>Overview</h2>
+
+<p>The Intelligent Transcription system includes a complete user authentication system that provides:</p>
+
+<p>- User accounts with secure password storage</p>
+<p>- Role-based access control</p>
+<p>- Session management with "Remember Me" functionality</p>
+<p>- Integration with transcription data</p>
+<p>- Admin user management interface</p>
+<p>- CSRF protection</p>
+<p>- Secure HTTP-only cookies</p>
+
+<h2>Setup</h2>
+
+<h3>Installation</h3>
+
+<p>To install the authentication system:</p>
+
+<p>1. Run the installation script:</p>
+<p>   ```bash</p>
+<p>   php install_auth.php</p>
+<p>   ```</p>
+
+<p>2. This creates:</p>
+<p>   - All authentication database tables</p>
+<p>   - A default admin user</p>
+<p>   - Required indexes and relations</p>
+
+<p>3. Default admin credentials:</p>
+<p>   - Username: `admin`</p>
+<p>   - Password: `admin123`</p>
+
+<p>> ⚠️ **Important:** Change the default admin password after first login!</p>
+
+<h3>Troubleshooting Installation</h3>
+
+<p>If you encounter errors during installation:</p>
+
+<p>1. Run the cleanup script to remove temporary tables:</p>
+<p>   ```bash</p>
+<p>   php cleanup_temp_tables.php</p>
+<p>   ```</p>
+
+<p>2. Then run the installation script again:</p>
+<p>   ```bash</p>
+<p>   php install_auth.php</p>
+<p>   ```</p>
+
+<h2>User Management</h2>
+
+<h3>User Roles and Permissions</h3>
+
+<p>The system includes the following permission types:</p>
+
+<p>| Permission | Description |</p>
+<p>|------------|-------------|</p>
+<p>| `admin.access` | General admin access |</p>
+<p>| `users.manage` | Ability to create and manage users |</p>
+<p>| `users.view` | View users list |</p>
+<p>| `transcriptions.own` | Access to own transcriptions only |</p>
+<p>| `transcriptions.all` | Access to all transcriptions |</p>
+
+<p>Admin users automatically have all permissions.</p>
+
+<h3>User Administration</h3>
+
+<p>Administrator users can:</p>
+
+<p>1. Create new users at `/admin.php?controller=user&action=create`</p>
+<p>2. Edit existing users at `/admin.php?controller=user&action=edit&id={user_id}`</p>
+<p>3. Delete users at `/admin.php?controller=user&action=delete&id={user_id}`</p>
+<p>4. Assign permissions to users</p>
+
+<p>Regular users have access to:</p>
+<p>1. Their own profile at `/profile.php`</p>
+<p>2. Their own transcriptions</p>
+
+<h2>File Structure</h2>
+
+<h3>Key Components</h3>
+
+<p>- **Entry Points:**</p>
+<p>  - `/login.php` - Login form and authentication</p>
+<p>  - `/profile.php` - User profile management</p>
+<p>  - `/admin.php` - Admin interface</p>
+
+<p>- **Controllers:**</p>
+<p>  - `src/Controllers/AuthController.php` - Authentication logic</p>
+<p>  - `src/Controllers/UserController.php` - User management</p>
+
+<p>- **Models:**</p>
+<p>  - `src/Models/User.php` - User data model</p>
+
+<p>- **Services:**</p>
+<p>  - `src/Services/AuthService.php` - Session and authentication</p>
+
+<p>- **Database:**</p>
+<p>  - `src/Database/auth_schema.sql` - Database schema</p>
+<p>  - `src/Database/DatabaseManager.php` - Database connection</p>
+
+<p>- **Templates:**</p>
+<p>  - `templates/auth/login.twig` - Login form</p>
+<p>  - `templates/auth/profile.twig` - Profile management</p>
+<p>  - `templates/admin/users/` - User administration templates</p>
+
+<h2>Integration with Transcription System</h2>
+
+<p>The authentication system integrates with the transcription system through the following mechanisms:</p>
+
+<p>1. **User Association:** All transcriptions are associated with the user who created them via the `user_id` field.</p>
+
+<p>2. **Permission-Based Access:** Users can only view their own transcriptions unless they have admin privileges or the `transcriptions.all` permission.</p>
+
+<p>3. **Controller Integration:** The `TranscriptionController` checks for authentication and passes the user ID to the transcription service.</p>
+
+<p>4. **Service Integration:** The `TranscriptionService` stores and filters transcriptions by user ID based on authentication status.</p>
+
+<p>5. **Global Twig Variables:** Templates automatically receive authentication-related variables:</p>
+<p>   - `is_authenticated`: Indicates if a user is logged in</p>
+<p>   - `is_admin`: Indicates if the current user is an admin</p>
+<p>   - `current_user`: Data for the current user</p>
+
+<h2>Technical Implementation</h2>
+
+<h3>Database Schema</h3>
+
+<p>**Users Table:**</p>
+<p>```sql</p>
+<p>CREATE TABLE users (</p>
+<p>    id INTEGER PRIMARY KEY AUTOINCREMENT,</p>
+<p>    username TEXT UNIQUE NOT NULL,</p>
+<p>    email TEXT UNIQUE NOT NULL,</p>
+<p>    password_hash TEXT NOT NULL,</p>
+<p>    first_name TEXT,</p>
+<p>    last_name TEXT,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    last_login TIMESTAMP,</p>
+<p>    is_active BOOLEAN DEFAULT 1,</p>
+<p>    is_admin BOOLEAN DEFAULT 0</p>
+<p>);</p>
+<p>```</p>
+
+<p>**User Sessions Table:**</p>
+<p>```sql</p>
+<p>CREATE TABLE user_sessions (</p>
+<p>    id TEXT PRIMARY KEY,</p>
+<p>    user_id INTEGER NOT NULL,</p>
+<p>    ip_address TEXT NOT NULL,</p>
+<p>    user_agent TEXT NOT NULL,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    expires_at TIMESTAMP NOT NULL,</p>
+<p>    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    is_active BOOLEAN DEFAULT 1,</p>
+<p>    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE</p>
+<p>);</p>
+<p>```</p>
+
+<p>**User Permissions Table:**</p>
+<p>```sql</p>
+<p>CREATE TABLE user_permissions (</p>
+<p>    id INTEGER PRIMARY KEY AUTOINCREMENT,</p>
+<p>    user_id INTEGER NOT NULL,</p>
+<p>    permission TEXT NOT NULL,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,</p>
+<p>    UNIQUE(user_id, permission)</p>
+<p>);</p>
+<p>```</p>
+
+<p>**Password Reset Tokens Table:**</p>
+<p>```sql</p>
+<p>CREATE TABLE password_reset_tokens (</p>
+<p>    id TEXT PRIMARY KEY,</p>
+<p>    user_id INTEGER NOT NULL,</p>
+<p>    token TEXT NOT NULL,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    expires_at TIMESTAMP NOT NULL,</p>
+<p>    is_used BOOLEAN DEFAULT 0,</p>
+<p>    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE</p>
+<p>);</p>
+<p>```</p>
+
+<h3>Security Features</h3>
+
+<p>1. **Password Hashing:** All passwords are hashed using PHP's `password_hash()` function with the `PASSWORD_BCRYPT` algorithm.</p>
+
+<p>2. **CSRF Protection:** All forms include a CSRF token that is verified on submission to prevent cross-site request forgery attacks.</p>
+
+<p>3. **Secure Sessions:** Sessions are managed with secure, HTTP-only cookies and session data is also stored in the database.</p>
+
+<p>4. **Remember Me Functionality:** Users can choose to stay logged in with a secure, expiring token.</p>
+
+<p>5. **Input Validation:** All user inputs are validated and sanitized to prevent SQL injection and other attacks.</p>
+
+<p>6. **Automatic Cleanup:** Expired sessions and tokens are automatically cleaned up.</p>
+
+<h2>Usage in Code</h2>
+
+<h3>Authentication Checks</h3>
+
+<p>To require authentication in a controller:</p>
+
+<p>```php</p>
+<p>// Initialize authentication</p>
+<p>AuthService::init();</p>
+
+<p>// Require authentication</p>
+<p>AuthService::requireAuth();</p>
+
+<p>// Get current user</p>
+<p>$user = AuthService::getCurrentUser();</p>
+<p>$userId = $user->getId();</p>
+<p>```</p>
+
+<h3>Permission Checks</h3>
+
+<p>To check for specific permissions:</p>
+
+<p>```php</p>
+<p>// Check if user has admin access</p>
+<p>if (AuthService::hasPermission('admin.access')) {</p>
+<p>    // Show admin features</p>
+<p>}</p>
+
+<p>// Require specific permission</p>
+<p>AuthService::requirePermission('users.manage');</p>
+<p>```</p>
+
+<h3>User Association</h3>
+
+<p>To associate data with the current user:</p>
+
+<p>```php</p>
+<p>// Get user ID if authenticated</p>
+<p>$userId = null;</p>
+<p>if (AuthService::isAuthenticated()) {</p>
+<p>    $userId = AuthService::getCurrentUser()->getId();</p>
+<p>}</p>
+
+<p>// Store data with user ID</p>
+<p>$result = $service->storeData($data, $userId);</p>
+<p>```</p>
+
+<h2>Customization</h2>
+
+<h3>Adding New Permissions</h3>
+
+<p>1. Define the new permission string (e.g., `transcriptions.export`)</p>
+
+<p>2. Add the permission to a user:</p>
+<p>   ```php</p>
+<p>   User::addPermission($userId, 'transcriptions.export');</p>
+<p>   ```</p>
+
+<p>3. Check for the permission in your code:</p>
+<p>   ```php</p>
+<p>   if (AuthService::hasPermission('transcriptions.export')) {</p>
+<p>       // Allow export functionality</p>
+<p>   }</p>
+<p>   ```</p>
+
+<h3>Password Policy Customization</h3>
+
+<p>Password requirements (minimum length, complexity, etc.) can be modified in the `ValidationUtils` class and the authentication controllers.</p>
+
+<h2>Future Enhancements</h2>
+
+<p>Potential future enhancements to the authentication system:</p>
+
+<p>- Two-factor authentication (2FA)</p>
+<p>- OAuth integration for third-party login</p>
+<p>- User groups with group-based permissions</p>
+<p>- Password expiration and history</p>
+<p>- Comprehensive activity logging</p>
+<p>- Login attempt throttling for security</p>
+        </div>
+    </div>
+</body>
+</html>

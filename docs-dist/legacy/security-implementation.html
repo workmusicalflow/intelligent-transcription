@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guide d'Implémentation des Fonctionnalités de Sécurité</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Guide d'Implémentation des Fonctionnalités de Sécurité</h1>
+
+<p>Ce document technique détaille l'implémentation des différentes fonctionnalités de sécurité de l'application Intelligent Transcription. Il est destiné aux développeurs qui souhaitent comprendre ou contribuer au code source de ces fonctionnalités.</p>
+
+<h2>Table des Matières</h2>
+
+<p>1. [Protection du Fichier .env](#1-protection-du-fichier-env)</p>
+<p>2. [Validation des Entrées](#2-validation-des-entrées)</p>
+<p>3. [Sécurité des Fichiers Uploadés](#3-sécurité-des-fichiers-uploadés)</p>
+<p>4. [Gestion Standardisée des Erreurs](#4-gestion-standardisée-des-erreurs)</p>
+<p>5. [Traitement Asynchrone](#5-traitement-asynchrone)</p>
+<p>6. [Échappement des Sorties](#6-échappement-des-sorties)</p>
+
+<p>---</p>
+
+<h2>1. Protection du Fichier .env</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Protéger les informations sensibles comme les clés API stockées dans le fichier .env.</p>
+
+<h3>Implémentation</h3>
+
+<h4>1.1 Protection par .htaccess</h4>
+
+<p>Fichier: `/.htaccess`</p>
+
+<p>```apache</p>
+<h1>Protéger les fichiers sensibles</h1>
+<FilesMatch "^\.env|config\.php\.bak">
+<p>    Order allow,deny</p>
+<p>    Deny from all</p>
+</FilesMatch>
+
+<h1>Désactiver la navigation dans les répertoires</h1>
+<p>Options -Indexes</p>
+
+<h1>Protéger contre les inclusions de fichiers distants</h1>
+<p>php_flag allow_url_fopen off</p>
+<p>php_flag allow_url_include off</p>
+<p>```</p>
+
+<p>Cette configuration empêche l'accès direct aux fichiers .env via le navigateur en bloquant toutes les requêtes HTTP à ces fichiers.</p>
+
+<h4>1.2 Gestion des Permissions de Fichiers</h4>
+
+<p>Script d'installation:</p>
+
+<p>```bash</p>
+<h1>Définir des permissions restrictives sur .env</h1>
+<p>chmod 600 .env</p>
+<p>```</p>
+
+<p>Ces permissions garantissent que seul le propriétaire du fichier (généralement l'utilisateur sous lequel s'exécute le serveur web) peut lire ou modifier le fichier.</p>
+
+<h4>1.3 Stockage Hors Répertoire Web</h4>
+
+<p>Fichier: `/src/config.php`</p>
+
+<p>```php</p>
+<p>// Chemins environnement</p>
+<p>define('ENV_DIR', dirname(BASE_DIR));</p>
+<p>define('ENV_FILE', ENV_DIR . '/inteligent-transcription-env/.env');</p>
+
+<p>// Fonction pour charger les variables d'environnement</p>
+<p>function loadEnvFile($envFilePath) {</p>
+<p>    if (file_exists($envFilePath)) {</p>
+<p>        $envFile = file_get_contents($envFilePath);</p>
+<p>        $lines = explode("\n", $envFile);</p>
+<p>        foreach ($lines as $line) {</p>
+<p>            if (empty($line) || strpos($line, '#') === 0) {</p>
+<p>                continue;</p>
+<p>            }</p>
+<p>            if (strpos($line, '=') !== false) {</p>
+<p>                list($key, $value) = explode('=', $line, 2);</p>
+<p>                $key = trim($key);</p>
+<p>                $value = trim($value);</p>
+<p>                if (!defined($key) && !empty($key)) {</p>
+<p>                    define($key, $value);</p>
+<p>                    // Définir également dans $_ENV pour compatibilité</p>
+<p>                    $_ENV[$key] = $value;</p>
+<p>                    // Définir dans getenv() pour compatibilité</p>
+<p>                    putenv("$key=$value");</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>        return true;</p>
+<p>    }</p>
+<p>    return false;</p>
+<p>}</p>
+
+<p>// Essayer de charger .env en dehors du répertoire web</p>
+<p>$envLoaded = loadEnvFile(ENV_FILE);</p>
+
+<p>// Si le fichier .env externe n'existe pas, essayer avec le fichier dans le répertoire du projet</p>
+<p>if (!$envLoaded) {</p>
+<p>    loadEnvFile(BASE_DIR . '/.env');</p>
+<p>}</p>
+<p>```</p>
+
+<p>Cette implémentation recherche d'abord le fichier .env dans un répertoire parent, hors de la racine web, avant de chercher dans le répertoire du projet.</p>
+
+<h4>1.4 Support en Python</h4>
+
+<p>Fichier: `/transcribe.py` et `/paraphrase.py`</p>
+
+<p>```python</p>
+<h1>Charger les variables d'environnement depuis différents emplacements possibles</h1>
+<p>env_paths = [</p>
+<p>    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))), </p>
+<p>                'inteligent-transcription-env', '.env'),</p>
+<p>    os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')</p>
+<p>]</p>
+
+<p>for env_path in env_paths:</p>
+<p>    if os.path.exists(env_path):</p>
+<p>        load_dotenv(env_path)</p>
+<p>        break</p>
+<p>```</p>
+
+<p>Cette implémentation Python assure que les scripts peuvent accéder aux variables d'environnement, qu'elles soient stockées dans le répertoire du projet ou en dehors.</p>
+
+<h4>1.5 Fichier .env.example</h4>
+
+<p>Fichier: `/.env.example`</p>
+
+<p>```</p>
+<h1>Configuration de l'application Intelligent Transcription</h1>
+<h1>NE JAMAIS COMMIT LE FICHIER .env AVEC LES VRAIES CLÉS API !</h1>
+
+<h1>Clé API OpenAI pour Whisper et paraphrasage</h1>
+<p>OPENAI_API_KEY=your_openai_api_key_here</p>
+
+<h1>ID de l'assistant OpenAI pour la paraphrase</h1>
+<p>PARAPHRASER_ASSISTANT_ID=</p>
+
+<h1>Autres variables...</h1>
+<p>```</p>
+
+<p>Ce fichier modèle permet aux développeurs de connaître la structure attendue sans exposer de clés réelles.</p>
+
+<p>---</p>
+
+<h2>2. Validation des Entrées</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Prévenir les injections et autres attaques en validant strictement toutes les entrées avant traitement.</p>
+
+<h3>Implémentation</h3>
+
+<h4>2.1 Classe ValidationUtils</h4>
+
+<p>Fichier: `/src/Utils/ValidationUtils.php`</p>
+
+<p>```php</p>
+<p>class ValidationUtils {</p>
+<p>    // Types de fichiers supportés </p>
+<p>    const SUPPORTED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', ...];</p>
+<p>    const SUPPORTED_VIDEO_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', ...];</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide un fichier uploadé</p>
+<p>     */</p>
+<p>    public static function validateUploadedFile($file, $options = []) {</p>
+<p>        // Options par défaut</p>
+<p>        $defaults = [</p>
+<p>            'max_size' => MAX_UPLOAD_SIZE_BYTES ?? 100 * 1024 * 1024,</p>
+<p>            'types' => null // Tous les types supportés par défaut</p>
+<p>        ];</p>
+<p>        </p>
+<p>        $options = array_merge($defaults, $options);</p>
+<p>        </p>
+<p>        // 1. Vérifier si le fichier existe et s'il n'y a pas d'erreur</p>
+<p>        if (!isset($file) || empty($file) || !is_array($file) || $file['error'] !== UPLOAD_ERR_OK) {</p>
+<p>            $errorCode = isset($file['error']) ? $file['error'] : 'unknown';</p>
+<p>            $errorMsg = self::getUploadErrorMessage($errorCode);</p>
+<p>            return ['success' => false, 'error' => $errorMsg];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // 2. Vérifier la taille du fichier</p>
+<p>        if ($file['size'] > $options['max_size']) {</p>
+<p>            $maxSizeMB = $options['max_size'] / (1024 * 1024);</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "Le fichier est trop volumineux. Taille maximale autorisée: {$maxSizeMB}MB",</p>
+<p>                'advice' => "Veuillez réduire la taille du fichier ou utiliser un outil de compression."</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // 3. Vérifier le type de fichier</p>
+<p>        $fileMimeType = mime_content_type($file['tmp_name']);</p>
+<p>        $validTypes = $options['types'] ?? array_merge(self::SUPPORTED_AUDIO_TYPES, self::SUPPORTED_VIDEO_TYPES);</p>
+<p>        </p>
+<p>        if (!in_array($fileMimeType, $validTypes)) {</p>
+<p>            $validTypesStr = implode(', ', $validTypes);</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "Type de fichier non supporté: {$fileMimeType}",</p>
+<p>                'advice' => "Types supportés: {$validTypesStr}"</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // 4. Vérification avancée du contenu (en-têtes de fichiers, etc.)</p>
+<p>        $contentValidation = self::validateFileContent($file['tmp_name'], $fileMimeType);</p>
+<p>        if (!$contentValidation['success']) {</p>
+<p>            return $contentValidation;</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Si tout est OK</p>
+<p>        return [</p>
+<p>            'success' => true,</p>
+<p>            'file_info' => [</p>
+<p>                'name' => $file['name'],</p>
+<p>                'type' => $fileMimeType,</p>
+<p>                'size' => $file['size'],</p>
+<p>                'tmp_name' => $file['tmp_name']</p>
+<p>            ]</p>
+<p>        ];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide une URL YouTube</p>
+<p>     */</p>
+<p>    public static function validateYoutubeUrl($url) {</p>
+<p>        // Nettoyer l'URL</p>
+<p>        $url = trim($url);</p>
+<p>        </p>
+<p>        // Vérifier si l'URL est valide</p>
+<p>        if (!filter_var($url, FILTER_VALIDATE_URL)) {</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "URL invalide",</p>
+<p>                'advice' => "Veuillez entrer une URL YouTube valide."</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Vérifier si c'est une URL YouTube</p>
+<p>        $patterns = [</p>
+<p>            '/^https?:\/\/(www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/',</p>
+<p>            '/^https?:\/\/(www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/',</p>
+<p>            '/^https?:\/\/(www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/'</p>
+<p>        ];</p>
+<p>        </p>
+<p>        $isYoutubeUrl = false;</p>
+<p>        foreach ($patterns as $pattern) {</p>
+<p>            if (preg_match($pattern, $url)) {</p>
+<p>                $isYoutubeUrl = true;</p>
+<p>                break;</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        if (!$isYoutubeUrl) {</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "URL YouTube non valide",</p>
+<p>                'advice' => "Veuillez entrer une URL de vidéo YouTube valide."</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // URL valide</p>
+<p>        return ['success' => true, 'url' => $url];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Validation d'un message texte</p>
+<p>     */</p>
+<p>    public static function validateTextMessage($message, $options = []) {</p>
+<p>        // Options par défaut</p>
+<p>        $defaults = [</p>
+<p>            'min_length' => 1,</p>
+<p>            'max_length' => 10000,</p>
+<p>            'allow_html' => false</p>
+<p>        ];</p>
+<p>        </p>
+<p>        $options = array_merge($defaults, $options);</p>
+<p>        </p>
+<p>        // Nettoyer le message</p>
+<p>        $message = trim($message);</p>
+<p>        </p>
+<p>        // Vérifier la longueur minimale</p>
+<p>        if (strlen($message) < $options['min_length']) {</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "Message trop court",</p>
+<p>                'advice' => "Le message doit contenir au moins {$options['min_length']} caractères."</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Vérifier la longueur maximale</p>
+<p>        if (strlen($message) > $options['max_length']) {</p>
+<p>            return [</p>
+<p>                'success' => false, </p>
+<p>                'error' => "Message trop long",</p>
+<p>                'advice' => "Le message ne doit pas dépasser {$options['max_length']} caractères."</p>
+<p>            ];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Si HTML n'est pas autorisé, nettoyer les balises</p>
+<p>        if (!$options['allow_html']) {</p>
+<p>            $cleanMessage = strip_tags($message);</p>
+<p>            if ($cleanMessage !== $message) {</p>
+<p>                return [</p>
+<p>                    'success' => false, </p>
+<p>                    'error' => "Le message contient du HTML non autorisé",</p>
+<p>                    'advice' => "Veuillez supprimer les balises HTML de votre message."</p>
+<p>                ];</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Message valide</p>
+<p>        return ['success' => true, 'message' => $message];</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Autres méthodes de validation et utilitaires...</p>
+<p>}</p>
+<p>```</p>
+
+<h4>2.2 Middleware de Validation</h4>
+
+<p>Fichier: `/src/Middleware/ValidationMiddleware.php`</p>
+
+<p>```php</p>
+<p>class ValidationMiddleware {</p>
+<p>    /**</p>
+<p>     * Valide les données d'une route spécifique</p>
+<p>     */</p>
+<p>    public static function validateRoute($controller, $action, $data) {</p>
+<p>        $rules = self::getValidationRules($controller, $action);</p>
+<p>        </p>
+<p>        if (!$rules) {</p>
+<p>            // Pas de règles définies pour cette route</p>
+<p>            return ['success' => true, 'sanitized' => $data];</p>
+<p>        }</p>
+<p>        </p>
+<p>        return self::validate($data, $rules);</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Récupère les règles de validation pour une route spécifique</p>
+<p>     */</p>
+<p>    private static function getValidationRules($controller, $action) {</p>
+<p>        $validationRules = [</p>
+<p>            'TranscriptionController' => [</p>
+<p>                'uploadFile' => [</p>
+<p>                    'audio_file' => [</p>
+<p>                        'type' => 'file',</p>
+<p>                        'required' => true,</p>
+<p>                        'options' => [</p>
+<p>                            'max_size' => MAX_UPLOAD_SIZE_BYTES,</p>
+<p>                            'types' => array_merge(</p>
+<p>                                ValidationUtils::SUPPORTED_AUDIO_TYPES,</p>
+<p>                                ValidationUtils::SUPPORTED_VIDEO_TYPES</p>
+<p>                            )</p>
+<p>                        ]</p>
+<p>                    ],</p>
+<p>                    'language' => [</p>
+<p>                        'type' => 'string',</p>
+<p>                        'required' => false,</p>
+<p>                        'options' => [</p>
+<p>                            'default' => 'auto'</p>
+<p>                        ]</p>
+<p>                    ],</p>
+<p>                    'force_language' => [</p>
+<p>                        'type' => 'boolean',</p>
+<p>                        'required' => false,</p>
+<p>                        'options' => [</p>
+<p>                            'default' => false</p>
+<p>                        ]</p>
+<p>                    ]</p>
+<p>                ],</p>
+<p>                'processYoutubeUrl' => [</p>
+<p>                    'youtube_url' => [</p>
+<p>                        'type' => 'youtube_url',</p>
+<p>                        'required' => true</p>
+<p>                    ],</p>
+<p>                    'language' => [</p>
+<p>                        'type' => 'string',</p>
+<p>                        'required' => false,</p>
+<p>                        'options' => [</p>
+<p>                            'default' => 'auto'</p>
+<p>                        ]</p>
+<p>                    ],</p>
+<p>                    'force_language' => [</p>
+<p>                        'type' => 'boolean',</p>
+<p>                        'required' => false,</p>
+<p>                        'options' => [</p>
+<p>                            'default' => false</p>
+<p>                        ]</p>
+<p>                    ]</p>
+<p>                ]</p>
+<p>                // Autres actions...</p>
+<p>            ],</p>
+<p>            // Autres contrôleurs...</p>
+<p>        ];</p>
+<p>        </p>
+<p>        return isset($validationRules[$controller][$action]) ? </p>
+<p>               $validationRules[$controller][$action] : null;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide les données selon les règles spécifiées</p>
+<p>     */</p>
+<p>    public static function validate($data, $rules) {</p>
+<p>        $sanitizedData = [];</p>
+<p>        $errors = [];</p>
+<p>        </p>
+<p>        // Valider chaque champ selon les règles</p>
+<p>        foreach ($rules as $field => $rule) {</p>
+<p>            $isRequired = $rule['required'] ?? false;</p>
+<p>            $fieldExists = array_key_exists($field, $data);</p>
+<p>            </p>
+<p>            // Vérifier si le champ est requis</p>
+<p>            if ($isRequired && !$fieldExists) {</p>
+<p>                $errors[$field] = "Le champ '{$field}' est requis.";</p>
+<p>                continue;</p>
+<p>            }</p>
+<p>            </p>
+<p>            // Si le champ n'existe pas mais n'est pas requis, utiliser la valeur par défaut si disponible</p>
+<p>            if (!$fieldExists) {</p>
+<p>                if (isset($rule['options']['default'])) {</p>
+<p>                    $sanitizedData[$field] = $rule['options']['default'];</p>
+<p>                }</p>
+<p>                continue;</p>
+<p>            }</p>
+<p>            </p>
+<p>            // Valider le champ selon son type</p>
+<p>            $validation = self::validateField($data[$field], $rule['type'], $rule['options'] ?? []);</p>
+<p>            </p>
+<p>            if (!$validation['success']) {</p>
+<p>                $errors[$field] = $validation['error'];</p>
+<p>                continue;</p>
+<p>            }</p>
+<p>            </p>
+<p>            // Stocker la valeur validée et sanitisée</p>
+<p>            $sanitizedData[$field] = $validation['value'];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Retourner les résultats de la validation</p>
+<p>        if (empty($errors)) {</p>
+<p>            return ['success' => true, 'sanitized' => $sanitizedData];</p>
+<p>        } else {</p>
+<p>            return ['success' => false, 'errors' => $errors];</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide un champ spécifique selon son type</p>
+<p>     */</p>
+<p>    private static function validateField($value, $type, $options = []) {</p>
+<p>        switch ($type) {</p>
+<p>            case 'file':</p>
+<p>                return ValidationUtils::validateUploadedFile($value, $options);</p>
+<p>                </p>
+<p>            case 'youtube_url':</p>
+<p>                return ValidationUtils::validateYoutubeUrl($value);</p>
+<p>                </p>
+<p>            case 'string':</p>
+<p>                return ValidationUtils::validateString($value, $options);</p>
+<p>                </p>
+<p>            case 'boolean':</p>
+<p>                return ValidationUtils::validateBoolean($value, $options);</p>
+<p>                </p>
+<p>            case 'number':</p>
+<p>                return ValidationUtils::validateNumber($value, $options);</p>
+<p>                </p>
+<p>            case 'email':</p>
+<p>                return ValidationUtils::validateEmail($value, $options);</p>
+<p>                </p>
+<p>            // Autres types de validation...</p>
+<p>                </p>
+<p>            default:</p>
+<p>                return ['success' => false, 'error' => "Type de validation inconnu: {$type}"];</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<p>---</p>
+
+<h2>3. Sécurité des Fichiers Uploadés</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Prévenir les attaques liées aux fichiers uploadés, comme les injections de code ou l'exécution de scripts.</p>
+
+<h3>Implémentation</h3>
+
+<h4>3.1 Génération de Noms de Fichiers Sécurisés</h4>
+
+<p>Fichier: `/src/Utils/FileUtils.php`</p>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Génère un nom de fichier sécurisé</p>
+<p> */</p>
+<p>public static function secureFileName($originalName, $includeTimestamp = true) {</p>
+<p>    // Extraire l'extension</p>
+<p>    $extension = pathinfo($originalName, PATHINFO_EXTENSION);</p>
+<p>    </p>
+<p>    // S'assurer que l'extension est valide et sécurisée</p>
+<p>    if (empty($extension) || !preg_match('/^[a-zA-Z0-9]{1,5}$/', $extension)) {</p>
+<p>        $extension = 'bin'; // Valeur par défaut si invalide</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Générer un identifiant aléatoire</p>
+<p>    $randomPart = bin2hex(random_bytes(8)); // 16 caractères hexadécimaux</p>
+<p>    </p>
+<p>    // Ajouter un timestamp si demandé</p>
+<p>    $timestamp = $includeTimestamp ? '_' . date('Ymd_His') : '';</p>
+<p>    </p>
+<p>    // Assembler le nom de fichier sécurisé</p>
+<p>    return $randomPart . $timestamp . '.' . $extension;</p>
+<p>}</p>
+<p>```</p>
+
+<h4>3.2 Structure de Stockage Imbriquée</h4>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Génère un chemin de stockage sécurisé</p>
+<p> */</p>
+<p>public static function getSecureStoragePath($baseDir, $fileName, $createDirs = true) {</p>
+<p>    // Générer un hash à partir du nom de fichier</p>
+<p>    $hash = md5($fileName);</p>
+<p>    </p>
+<p>    // Utiliser les 2 premiers caractères du hash comme sous-répertoire</p>
+<p>    $subDir1 = substr($hash, 0, 2);</p>
+<p>    $subDir2 = substr($hash, 2, 2);</p>
+<p>    </p>
+<p>    // Construire le chemin complet</p>
+<p>    $storagePath = $baseDir . '/' . $subDir1 . '/' . $subDir2;</p>
+<p>    </p>
+<p>    // Créer les répertoires si demandé</p>
+<p>    if ($createDirs && !is_dir($storagePath)) {</p>
+<p>        mkdir($storagePath, 0755, true);</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Retourner le chemin complet du fichier</p>
+<p>    return $storagePath . '/' . $fileName;</p>
+<p>}</p>
+<p>```</p>
+
+<h4>3.3 Stockage Sécurisé des Fichiers Uploadés</h4>
+
+<p>```php</p>
+<p>/**</p>
+<p> * Stocke un fichier uploadé de manière sécurisée</p>
+<p> */</p>
+<p>public static function storeUploadedFile($file, $destinationDir, $options = []) {</p>
+<p>    // Options par défaut</p>
+<p>    $defaults = [</p>
+<p>        'prefix' => 'audio_',</p>
+<p>        'add_timestamp' => true,</p>
+<p>        'nested_storage' => true,</p>
+<p>        'validate_file' => true</p>
+<p>    ];</p>
+<p>    </p>
+<p>    $options = array_merge($defaults, $options);</p>
+<p>    </p>
+<p>    // Valider le fichier si demandé</p>
+<p>    if ($options['validate_file']) {</p>
+<p>        $validation = ValidationUtils::validateUploadedFile($file);</p>
+<p>        if (!$validation['success']) {</p>
+<p>            return $validation;</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Générer un nom de fichier sécurisé</p>
+<p>    $originalName = $file['name'];</p>
+<p>    $secureName = $options['prefix'] . self::secureFileName($originalName, $options['add_timestamp']);</p>
+<p>    </p>
+<p>    // Déterminer le chemin de stockage</p>
+<p>    $filePath = $options['nested_storage'] </p>
+<p>        ? self::getSecureStoragePath($destinationDir, $secureName)</p>
+<p>        : $destinationDir . '/' . $secureName;</p>
+<p>    </p>
+<p>    // Déplacer le fichier uploadé</p>
+<p>    if (!move_uploaded_file($file['tmp_name'], $filePath)) {</p>
+<p>        return [</p>
+<p>            'success' => false,</p>
+<p>            'error' => "Échec du stockage du fichier",</p>
+<p>            'advice' => "Vérifiez les permissions du répertoire de destination."</p>
+<p>        ];</p>
+<p>    }</p>
+<p>    </p>
+<p>    // Définir les permissions du fichier</p>
+<p>    chmod($filePath, 0644); // Lecture pour tous, écriture uniquement pour le propriétaire</p>
+<p>    </p>
+<p>    // Retourner le chemin du fichier stocké</p>
+<p>    return [</p>
+<p>        'success' => true,</p>
+<p>        'file_path' => $filePath,</p>
+<p>        'file_name' => $secureName,</p>
+<p>        'original_name' => $originalName</p>
+<p>    ];</p>
+<p>}</p>
+<p>```</p>
+
+<p>---</p>
+
+<h2>4. Gestion Standardisée des Erreurs</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Assurer une gestion cohérente des erreurs pour éviter les fuites d'informations sensibles et améliorer la résilience.</p>
+
+<h3>Implémentation</h3>
+
+<h4>4.1 Catégories d'Erreurs Standardisées</h4>
+
+<p>Fichier: `/src/Utils/PythonErrorUtils.php`</p>
+
+<p>```php</p>
+<p>class PythonErrorUtils {</p>
+<p>    /**</p>
+<p>     * Catégories d'erreurs standardisées</p>
+<p>     */</p>
+<p>    const ERROR_CATEGORIES = [</p>
+<p>        'api_key' => [</p>
+<p>            'pattern' => ['api_key', 'authentication', 'auth', 'credential', 'openai key', 'openai api'],</p>
+<p>            'message' => "Erreur d'authentification API. Vérifiez votre clé API dans le fichier .env.",</p>
+<p>            'advice' => "Veuillez vérifier que votre clé API OpenAI est correctement configurée dans le fichier .env."</p>
+<p>        ],</p>
+<p>        'file_access' => [</p>
+<p>            'pattern' => ['file not found', 'no such file', 'cannot access', 'permission denied', 'not accessible'],</p>
+<p>            'message' => "Erreur d'accès au fichier.",</p>
+<p>            'advice' => "Vérifiez que le fichier existe et que les permissions sont correctes."</p>
+<p>        ],</p>
+<p>        'network' => [</p>
+<p>            'pattern' => ['network', 'connection', 'timeout', 'connect', 'unreachable', 'connexion'],</p>
+<p>            'message' => "Erreur de connexion réseau.",</p>
+<p>            'advice' => "Vérifiez votre connexion internet ou réessayez plus tard."</p>
+<p>        ],</p>
+<p>        'format' => [</p>
+<p>            'pattern' => ['format', 'encoding', 'codec', 'unsupported', 'non supporté', 'invalid'],</p>
+<p>            'message' => "Format de fichier non supporté ou corrompu.",</p>
+<p>            'advice' => "Veuillez utiliser un format audio/vidéo standard comme MP3, WAV, MP4."</p>
+<p>        ],</p>
+<p>        'quota' => [</p>
+<p>            'pattern' => ['quota', 'rate limit', 'exceeded', 'too many', 'limite', 'dépassée'],</p>
+<p>            'message' => "Limite d'utilisation de l'API atteinte.",</p>
+<p>            'advice' => "Veuillez réessayer plus tard ou augmenter votre quota OpenAI."</p>
+<p>        ],</p>
+<p>        'media' => [</p>
+<p>            'pattern' => ['media error', 'audio error', 'video error', 'corrupt', 'damaged', 'unable to read'],</p>
+<p>            'message' => "Erreur dans le fichier média.",</p>
+<p>            'advice' => "Le fichier peut être corrompu. Essayez avec un autre fichier."</p>
+<p>        ],</p>
+<p>        'python' => [</p>
+<p>            'pattern' => ['python', 'module', 'import', 'dependency', 'package', 'library'],</p>
+<p>            'message' => "Erreur dans l'environnement Python.",</p>
+<p>            'advice' => "Exécutez le script setup_env.sh pour reconfigurer l'environnement Python."</p>
+<p>        ]</p>
+<p>    ];</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Analyse une erreur pour déterminer sa catégorie</p>
+<p>     */</p>
+<p>    public static function categorizeError($errorMessage) {</p>
+<p>        $errorMessage = strtolower($errorMessage);</p>
+<p>        </p>
+<p>        foreach (self::ERROR_CATEGORIES as $category => $info) {</p>
+<p>            foreach ($info['pattern'] as $pattern) {</p>
+<p>                if (strpos($errorMessage, strtolower($pattern)) !== false) {</p>
+<p>                    return [</p>
+<p>                        'category' => $category,</p>
+<p>                        'message' => $info['message'],</p>
+<p>                        'advice' => $info['advice'],</p>
+<p>                        'original' => $errorMessage</p>
+<p>                    ];</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Catégorie par défaut si aucune correspondance</p>
+<p>        return [</p>
+<p>            'category' => 'unknown',</p>
+<p>            'message' => "Une erreur inattendue s'est produite.",</p>
+<p>            'advice' => "Veuillez contacter l'administrateur système si le problème persiste.",</p>
+<p>            'original' => $errorMessage</p>
+<p>        ];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Analyse la sortie d'erreur d'un script Python</p>
+<p>     */</p>
+<p>    public static function parsePythonError($output) {</p>
+<p>        // Si la sortie est déjà un JSON valide, l'analyser</p>
+<p>        $jsonOutput = json_decode($output, true);</p>
+<p>        if (json_last_error() === JSON_ERROR_NONE) {</p>
+<p>            if (isset($jsonOutput['error'])) {</p>
+<p>                return self::categorizeError($jsonOutput['error']);</p>
+<p>            } elseif (isset($jsonOutput['success']) && $jsonOutput['success'] === false) {</p>
+<p>                $errorMsg = $jsonOutput['error'] ?? "Erreur non spécifiée";</p>
+<p>                return self::categorizeError($errorMsg);</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Si ce n'est pas un JSON valide, chercher des patterns d'erreur courants</p>
+<p>        if (strpos($output, 'Traceback') !== false) {</p>
+<p>            // Erreur Python standard</p>
+<p>            return self::categorizeError($output);</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Par défaut, considérer comme une erreur inconnue</p>
+<p>        return [</p>
+<p>            'category' => 'unknown',</p>
+<p>            'message' => "Une erreur inattendue s'est produite lors de l'exécution du script Python.",</p>
+<p>            'advice' => "Veuillez vérifier les logs pour plus de détails.",</p>
+<p>            'original' => $output</p>
+<p>        ];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Journalise une erreur dans un fichier de log</p>
+<p>     */</p>
+<p>    public static function logError($errorType, $errorMessage, $context = []) {</p>
+<p>        $logDir = self::getLogDirectory($errorType);</p>
+<p>        $timestamp = date('Y-m-d H:i:s');</p>
+<p>        $logEntry = "[{$timestamp}] [{$errorType}] {$errorMessage}";</p>
+<p>        </p>
+<p>        // Ajouter le contexte si disponible</p>
+<p>        if (!empty($context)) {</p>
+<p>            $logEntry .= " | Context: " . json_encode($context);</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Écrire dans le fichier de log spécifique à ce type d'erreur</p>
+<p>        file_put_contents(</p>
+<p>            $logDir . "/error_{$errorType}.log", </p>
+<p>            $logEntry . PHP_EOL, </p>
+<p>            FILE_APPEND</p>
+<p>        );</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Obtient le répertoire de log approprié pour un type d'erreur</p>
+<p>     */</p>
+<p>    private static function getLogDirectory($errorType) {</p>
+<p>        $baseLogDir = BASE_DIR . '/logs';</p>
+<p>        </p>
+<p>        // Créer le répertoire de logs s'il n'existe pas</p>
+<p>        if (!is_dir($baseLogDir)) {</p>
+<p>            mkdir($baseLogDir, 0755, true);</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Répertoires spécifiques par type d'erreur</p>
+<p>        $typeLogDirs = [</p>
+<p>            'api' => $baseLogDir . '/api',</p>
+<p>            'python' => $baseLogDir . '/python',</p>
+<p>            'upload' => $baseLogDir . '/uploads',</p>
+<p>            'processing' => $baseLogDir . '/processing',</p>
+<p>            'network' => $baseLogDir . '/network',</p>
+<p>            'security' => $baseLogDir . '/security'</p>
+<p>        ];</p>
+<p>        </p>
+<p>        // Utiliser le répertoire spécifique si défini, sinon le répertoire de base</p>
+<p>        $logDir = isset($typeLogDirs[$errorType]) ? $typeLogDirs[$errorType] : $baseLogDir;</p>
+<p>        </p>
+<p>        // Créer le sous-répertoire s'il n'existe pas</p>
+<p>        if (!is_dir($logDir)) {</p>
+<p>            mkdir($logDir, 0755, true);</p>
+<p>        }</p>
+<p>        </p>
+<p>        return $logDir;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<p>---</p>
+
+<h2>5. Traitement Asynchrone</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Éviter les timeouts HTTP et améliorer l'expérience utilisateur pour les opérations longues durée.</p>
+
+<h3>Implémentation</h3>
+
+<h4>5.1 AsyncProcessingService</h4>
+
+<p>Fichier: `/src/Services/AsyncProcessingService.php`</p>
+
+<p>```php</p>
+<p>class AsyncProcessingService {</p>
+<p>    // Répertoire de stockage des tâches</p>
+<p>    private $jobsDir;</p>
+<p>    </p>
+<p>    // Statuts possibles des tâches</p>
+<p>    const STATUS_PENDING = 'pending';</p>
+<p>    const STATUS_PROCESSING = 'processing';</p>
+<p>    const STATUS_COMPLETED = 'completed';</p>
+<p>    const STATUS_FAILED = 'failed';</p>
+<p>    const STATUS_CANCELED = 'canceled';</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Constructeur</p>
+<p>     */</p>
+<p>    public function __construct() {</p>
+<p>        $this->jobsDir = BASE_DIR . '/cache/jobs';</p>
+<p>        </p>
+<p>        // Créer le répertoire de tâches s'il n'existe pas</p>
+<p>        if (!is_dir($this->jobsDir)) {</p>
+<p>            mkdir($this->jobsDir, 0755, true);</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Crée une tâche de traitement de fichier</p>
+<p>     */</p>
+<p>    public function createFileProcessingTask($filePath, $outputDir, $language = 'auto', $forceLanguage = false, $metadata = []) {</p>
+<p>        // Génération d'un ID de tâche unique</p>
+<p>        $jobId = uniqid('job_', true);</p>
+<p>        </p>
+<p>        // Création d'un objet de tâche</p>
+<p>        $job = [</p>
+<p>            'id' => $jobId,</p>
+<p>            'type' => 'file_transcription',</p>
+<p>            'status' => self::STATUS_PENDING,</p>
+<p>            'created_at' => date('Y-m-d H:i:s'),</p>
+<p>            'file_path' => $filePath,</p>
+<p>            'output_dir' => $outputDir,</p>
+<p>            'language' => $language,</p>
+<p>            'force_language' => $forceLanguage,</p>
+<p>            'metadata' => $metadata</p>
+<p>        ];</p>
+<p>        </p>
+<p>        // Enregistrement de la tâche dans le système</p>
+<p>        $this->saveJobData($jobId, $job);</p>
+<p>        </p>
+<p>        // Lancement du traitement en arrière-plan</p>
+<p>        $this->executeTaskInBackground($jobId);</p>
+<p>        </p>
+<p>        return ['success' => true, 'job_id' => $jobId];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Crée une tâche de traitement YouTube</p>
+<p>     */</p>
+<p>    public function createYoutubeProcessingTask($youtubeUrl, $outputDir, $language = 'auto', $forceLanguage = false, $metadata = []) {</p>
+<p>        // Génération d'un ID de tâche unique</p>
+<p>        $jobId = uniqid('job_', true);</p>
+<p>        </p>
+<p>        // Création d'un objet de tâche</p>
+<p>        $job = [</p>
+<p>            'id' => $jobId,</p>
+<p>            'type' => 'youtube_transcription',</p>
+<p>            'status' => self::STATUS_PENDING,</p>
+<p>            'created_at' => date('Y-m-d H:i:s'),</p>
+<p>            'youtube_url' => $youtubeUrl,</p>
+<p>            'output_dir' => $outputDir,</p>
+<p>            'language' => $language,</p>
+<p>            'force_language' => $forceLanguage,</p>
+<p>            'metadata' => $metadata</p>
+<p>        ];</p>
+<p>        </p>
+<p>        // Enregistrement de la tâche dans le système</p>
+<p>        $this->saveJobData($jobId, $job);</p>
+<p>        </p>
+<p>        // Lancement du traitement en arrière-plan</p>
+<p>        $this->executeTaskInBackground($jobId);</p>
+<p>        </p>
+<p>        return ['success' => true, 'job_id' => $jobId];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Exécute une tâche spécifique</p>
+<p>     */</p>
+<p>    public function processTask($jobId) {</p>
+<p>        // Récupérer les données de la tâche</p>
+<p>        $job = $this->getJobData($jobId);</p>
+<p>        </p>
+<p>        // Vérifier si la tâche existe</p>
+<p>        if (!$job) {</p>
+<p>            return ['success' => false, 'error' => "Tâche non trouvée: {$jobId}"];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Mettre à jour le statut</p>
+<p>        $job['status'] = self::STATUS_PROCESSING;</p>
+<p>        $job['started_at'] = date('Y-m-d H:i:s');</p>
+<p>        $this->saveJobData($jobId, $job);</p>
+<p>        </p>
+<p>        try {</p>
+<p>            // Exécuter la tâche selon son type</p>
+<p>            switch ($job['type']) {</p>
+<p>                case 'file_transcription':</p>
+<p>                    $result = $this->processFileTranscription($job);</p>
+<p>                    break;</p>
+<p>                    </p>
+<p>                case 'youtube_transcription':</p>
+<p>                    $result = $this->processYoutubeTranscription($job);</p>
+<p>                    break;</p>
+<p>                    </p>
+<p>                default:</p>
+<p>                    throw new Exception("Type de tâche non supporté: {$job['type']}");</p>
+<p>            }</p>
+<p>            </p>
+<p>            // Mettre à jour la tâche avec le résultat</p>
+<p>            if ($result['success']) {</p>
+<p>                $job['status'] = self::STATUS_COMPLETED;</p>
+<p>                $job['result'] = $result;</p>
+<p>            } else {</p>
+<p>                $job['status'] = self::STATUS_FAILED;</p>
+<p>                $job['error'] = $result['error'] ?? "Erreur inconnue";</p>
+<p>            }</p>
+<p>        } catch (Exception $e) {</p>
+<p>            // Gérer les exceptions</p>
+<p>            $job['status'] = self::STATUS_FAILED;</p>
+<p>            $job['error'] = $e->getMessage();</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Enregistrer la finalisation</p>
+<p>        $job['completed_at'] = date('Y-m-d H:i:s');</p>
+<p>        $this->saveJobData($jobId, $job);</p>
+<p>        </p>
+<p>        return $job;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Exécute une tâche en arrière-plan</p>
+<p>     */</p>
+<p>    private function executeTaskInBackground($jobId) {</p>
+<p>        // Construire la commande pour exécuter worker.php</p>
+<p>        $phpPath = PHP_BINARY;</p>
+<p>        $workerScript = BASE_DIR . '/worker.php';</p>
+<p>        </p>
+<p>        // Construction de la commande</p>
+<p>        $command = sprintf(</p>
+<p>            '%s %s process_task %s > /dev/null 2>&1 & echo $!',</p>
+<p>            escapeshellarg($phpPath),</p>
+<p>            escapeshellarg($workerScript),</p>
+<p>            escapeshellarg($jobId)</p>
+<p>        );</p>
+<p>        </p>
+<p>        // Exécuter la commande en arrière-plan</p>
+<p>        exec($command, $output);</p>
+<p>        </p>
+<p>        // Stocker le PID du processus</p>
+<p>        if (!empty($output[0])) {</p>
+<p>            $job = $this->getJobData($jobId);</p>
+<p>            if ($job) {</p>
+<p>                $job['pid'] = (int)$output[0];</p>
+<p>                $this->saveJobData($jobId, $job);</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Traite une tâche de transcription de fichier</p>
+<p>     */</p>
+<p>    private function processFileTranscription($job) {</p>
+<p>        // Instancier le service de transcription</p>
+<p>        $transcriptionService = new TranscriptionService();</p>
+<p>        </p>
+<p>        // Effectuer la transcription</p>
+<p>        return $transcriptionService->transcribeFile(</p>
+<p>            $job['file_path'],</p>
+<p>            $job['output_dir'],</p>
+<p>            $job['language'],</p>
+<p>            $job['force_language']</p>
+<p>        );</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Traite une tâche de transcription YouTube</p>
+<p>     */</p>
+<p>    private function processYoutubeTranscription($job) {</p>
+<p>        // Instancier les services nécessaires</p>
+<p>        $youtubeService = new YouTubeService();</p>
+<p>        $transcriptionService = new TranscriptionService();</p>
+<p>        </p>
+<p>        // Télécharger la vidéo YouTube</p>
+<p>        $downloadResult = $youtubeService->downloadYoutubeVideo(</p>
+<p>            $job['youtube_url'],</p>
+<p>            TEMP_AUDIO_DIR</p>
+<p>        );</p>
+<p>        </p>
+<p>        if (!$downloadResult['success']) {</p>
+<p>            return $downloadResult;</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Effectuer la transcription</p>
+<p>        return $transcriptionService->transcribeFile(</p>
+<p>            $downloadResult['file_path'],</p>
+<p>            $job['output_dir'],</p>
+<p>            $job['language'],</p>
+<p>            $job['force_language'],</p>
+<p>            ['youtube_url' => $job['youtube_url']]</p>
+<p>        );</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Sauvegarde les données d'une tâche</p>
+<p>     */</p>
+<p>    private function saveJobData($jobId, $data) {</p>
+<p>        $filePath = $this->jobsDir . '/' . $jobId . '.json';</p>
+<p>        file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));</p>
+<p>        return true;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Récupère les données d'une tâche</p>
+<p>     */</p>
+<p>    public function getJobData($jobId) {</p>
+<p>        $filePath = $this->jobsDir . '/' . $jobId . '.json';</p>
+<p>        </p>
+<p>        if (!file_exists($filePath)) {</p>
+<p>            return null;</p>
+<p>        }</p>
+<p>        </p>
+<p>        $content = file_get_contents($filePath);</p>
+<p>        return json_decode($content, true);</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Récupère l'état d'une tâche</p>
+<p>     */</p>
+<p>    public function getJobStatus($jobId) {</p>
+<p>        $job = $this->getJobData($jobId);</p>
+<p>        </p>
+<p>        if (!$job) {</p>
+<p>            return ['success' => false, 'error' => "Tâche non trouvée: {$jobId}"];</p>
+<p>        }</p>
+<p>        </p>
+<p>        return [</p>
+<p>            'success' => true,</p>
+<p>            'id' => $job['id'],</p>
+<p>            'type' => $job['type'],</p>
+<p>            'status' => $job['status'],</p>
+<p>            'created_at' => $job['created_at'],</p>
+<p>            'started_at' => $job['started_at'] ?? null,</p>
+<p>            'completed_at' => $job['completed_at'] ?? null,</p>
+<p>            'progress' => $job['progress'] ?? 0,</p>
+<p>            'error' => $job['error'] ?? null</p>
+<p>        ];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Annule une tâche en cours</p>
+<p>     */</p>
+<p>    public function cancelTask($jobId) {</p>
+<p>        $job = $this->getJobData($jobId);</p>
+<p>        </p>
+<p>        if (!$job) {</p>
+<p>            return ['success' => false, 'error' => "Tâche non trouvée: {$jobId}"];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Vérifier si la tâche peut être annulée</p>
+<p>        if ($job['status'] === self::STATUS_COMPLETED || $job['status'] === self::STATUS_FAILED) {</p>
+<p>            return ['success' => false, 'error' => "La tâche est déjà terminée ou a échoué."];</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Tuer le processus si le PID est disponible</p>
+<p>        if (isset($job['pid']) && $job['pid'] > 0) {</p>
+<p>            exec("kill " . (int)$job['pid'] . " 2>/dev/null");</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Mettre à jour le statut</p>
+<p>        $job['status'] = self::STATUS_CANCELED;</p>
+<p>        $job['completed_at'] = date('Y-m-d H:i:s');</p>
+<p>        $this->saveJobData($jobId, $job);</p>
+<p>        </p>
+<p>        return ['success' => true, 'message' => "Tâche annulée avec succès."];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Nettoie les tâches anciennes</p>
+<p>     */</p>
+<p>    public function cleanupOldJobs($daysToKeep = 7) {</p>
+<p>        $files = glob($this->jobsDir . '/*.json');</p>
+<p>        $now = time();</p>
+<p>        $deleteCount = 0;</p>
+<p>        </p>
+<p>        foreach ($files as $file) {</p>
+<p>            $job = json_decode(file_get_contents($file), true);</p>
+<p>            </p>
+<p>            // Vérifier si la tâche est complétée et ancienne</p>
+<p>            if (isset($job['completed_at'])) {</p>
+<p>                $completedTime = strtotime($job['completed_at']);</p>
+<p>                if (($now - $completedTime) > ($daysToKeep * 86400)) {</p>
+<p>                    unlink($file);</p>
+<p>                    $deleteCount++;</p>
+<p>                }</p>
+<p>            } else {</p>
+<p>                // Vérifier si c'est une tâche bloquée/abandonnée</p>
+<p>                $createdTime = strtotime($job['created_at']);</p>
+<p>                if (($now - $createdTime) > (2 * 86400)) { // 2 jours</p>
+<p>                    if ($job['status'] === self::STATUS_PENDING || $job['status'] === self::STATUS_PROCESSING) {</p>
+<p>                        $job['status'] = self::STATUS_FAILED;</p>
+<p>                        $job['error'] = "Tâche abandonnée (timeout)";</p>
+<p>                        $job['completed_at'] = date('Y-m-d H:i:s');</p>
+<p>                        file_put_contents($file, json_encode($job, JSON_PRETTY_PRINT));</p>
+<p>                    }</p>
+<p>                }</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        return ['success' => true, 'deleted' => $deleteCount];</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>5.2 Worker Script</h4>
+
+<p>Fichier: `/worker.php`</p>
+
+<p>```php</p>
+#!/usr/bin/env php
+<?php
+
+<p>/**</p>
+<p> * Worker script pour le traitement des tâches en arrière-plan</p>
+<p> * </p>
+<p> * Usage:</p>
+<p> * php worker.php process_task [job_id]</p>
+<p> * php worker.php process_queue</p>
+<p> * php worker.php cleanup</p>
+<p> */</p>
+
+<p>// Charger l'environnement de l'application</p>
+<p>require_once __DIR__ . '/src/bootstrap.php';</p>
+
+<p>// Fonction principale</p>
+<p>function main($argc, $argv) {</p>
+<p>    // Vérifier les arguments</p>
+<p>    if ($argc < 2) {</p>
+<p>        echo "Usage: php worker.php [action] [params]\n";</p>
+<p>        echo "Actions disponibles:\n";</p>
+<p>        echo "  process_task [job_id]  - Traite une tâche spécifique\n";</p>
+<p>        echo "  process_queue          - Traite la file d'attente des tâches\n";</p>
+<p>        echo "  cleanup                - Nettoie les anciennes tâches\n";</p>
+<p>        exit(1);</p>
+<p>    }</p>
+<p>    </p>
+<p>    $action = $argv[1];</p>
+<p>    </p>
+<p>    // Instancier le service de traitement asynchrone</p>
+<p>    $asyncService = new AsyncProcessingService();</p>
+<p>    </p>
+<p>    switch ($action) {</p>
+<p>        case 'process_task':</p>
+<p>            if ($argc < 3) {</p>
+<p>                echo "Erreur: ID de tâche manquant\n";</p>
+<p>                exit(1);</p>
+<p>            }</p>
+<p>            </p>
+<p>            $jobId = $argv[2];</p>
+<p>            echo "Traitement de la tâche {$jobId}...\n";</p>
+<p>            </p>
+<p>            try {</p>
+<p>                $result = $asyncService->processTask($jobId);</p>
+<p>                echo "Tâche terminée. Statut: {$result['status']}\n";</p>
+<p>                </p>
+<p>                if ($result['status'] === 'failed') {</p>
+<p>                    echo "Erreur: " . ($result['error'] ?? "Inconnue") . "\n";</p>
+<p>                    exit(1);</p>
+<p>                }</p>
+<p>            } catch (Exception $e) {</p>
+<p>                echo "Exception: " . $e->getMessage() . "\n";</p>
+<p>                exit(1);</p>
+<p>            }</p>
+<p>            break;</p>
+<p>            </p>
+<p>        case 'process_queue':</p>
+<p>            echo "Traitement de la file d'attente des tâches...\n";</p>
+<p>            </p>
+<p>            // Rechercher et traiter les tâches en attente</p>
+<p>            $jobsDir = BASE_DIR . '/cache/jobs';</p>
+<p>            $files = glob($jobsDir . '/*.json');</p>
+<p>            </p>
+<p>            $processed = 0;</p>
+<p>            foreach ($files as $file) {</p>
+<p>                $job = json_decode(file_get_contents($file), true);</p>
+<p>                </p>
+<p>                if ($job['status'] === 'pending') {</p>
+<p>                    echo "Traitement de la tâche {$job['id']}...\n";</p>
+<p>                    $result = $asyncService->processTask($job['id']);</p>
+<p>                    $processed++;</p>
+<p>                    </p>
+<p>                    echo "Tâche terminée. Statut: {$result['status']}\n";</p>
+<p>                }</p>
+<p>            }</p>
+<p>            </p>
+<p>            echo "Traitement terminé. {$processed} tâches traitées.\n";</p>
+<p>            break;</p>
+<p>            </p>
+<p>        case 'cleanup':</p>
+<p>            echo "Nettoyage des anciennes tâches...\n";</p>
+<p>            </p>
+<p>            $daysToKeep = isset($argv[2]) ? (int)$argv[2] : 7;</p>
+<p>            $result = $asyncService->cleanupOldJobs($daysToKeep);</p>
+<p>            </p>
+<p>            echo "Nettoyage terminé. {$result['deleted']} tâches supprimées.\n";</p>
+<p>            break;</p>
+<p>            </p>
+<p>        default:</p>
+<p>            echo "Action inconnue: {$action}\n";</p>
+<p>            exit(1);</p>
+<p>    }</p>
+<p>    </p>
+<p>    exit(0);</p>
+<p>}</p>
+
+<p>// Exécuter le script</p>
+<p>main($argc, $argv);</p>
+<p>```</p>
+
+<p>---</p>
+
+<h2>6. Échappement des Sorties</h2>
+
+<h3>Objectif de Sécurité</h3>
+
+<p>Prévenir les attaques XSS en échappant correctement toutes les sorties affichées aux utilisateurs.</p>
+
+<h3>Implémentation</h3>
+
+<h4>6.1 Configuration de Twig avec Auto-échappement</h4>
+
+<p>Fichier: `/src/Template/TwigManager.php`</p>
+
+<p>```php</p>
+<p>class TwigManager {</p>
+<p>    private static $instance = null;</p>
+<p>    private $twig;</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Constructeur privé (pattern Singleton)</p>
+<p>     */</p>
+<p>    private function __construct() {</p>
+<p>        $loader = new \Twig\Loader\FilesystemLoader(TEMPLATES_DIR);</p>
+<p>        </p>
+<p>        $options = [</p>
+<p>            'cache' => BASE_DIR . '/cache/twig',</p>
+<p>            'auto_reload' => true,</p>
+<p>            'debug' => DEBUG_MODE,</p>
+<p>            'autoescape' => 'html' // Active l'auto-échappement HTML par défaut</p>
+<p>        ];</p>
+<p>        </p>
+<p>        $this->twig = new \Twig\Environment($loader, $options);</p>
+<p>        </p>
+<p>        // Ajouter des extensions et filtres</p>
+<p>        if (DEBUG_MODE) {</p>
+<p>            $this->twig->addExtension(new \Twig\Extension\DebugExtension());</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Ajouter des fonctions globales</p>
+<p>        $this->twig->addGlobal('app_name', 'Intelligent Transcription');</p>
+<p>        $this->twig->addGlobal('app_version', '1.0');</p>
+<p>        $this->twig->addGlobal('current_year', date('Y'));</p>
+<p>        </p>
+<p>        // Ajouter des filtres personnalisés</p>
+<p>        $this->twig->addFilter(new \Twig\TwigFilter('format_size', [$this, 'formatFileSize']));</p>
+<p>        $this->twig->addFilter(new \Twig\TwigFilter('truncate', [$this, 'truncateText']));</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Obtient l'instance unique de TwigManager (pattern Singleton)</p>
+<p>     */</p>
+<p>    public static function getInstance() {</p>
+<p>        if (self::$instance === null) {</p>
+<p>            self::$instance = new self();</p>
+<p>        }</p>
+<p>        </p>
+<p>        return self::$instance;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Rend un template avec les variables fournies</p>
+<p>     */</p>
+<p>    public function render($template, $variables = []) {</p>
+<p>        try {</p>
+<p>            return $this->twig->render($template, $variables);</p>
+<p>        } catch (\Exception $e) {</p>
+<p>            // Log de l'erreur</p>
+<p>            error_log("Erreur Twig: " . $e->getMessage());</p>
+<p>            </p>
+<p>            if (DEBUG_MODE) {</p>
+<p>                return "<h1>Erreur de Template</h1><p>{$e->getMessage()}</p>";</p>
+<p>            } else {</p>
+<p>                return "<h1>Erreur</h1><p>Une erreur est survenue lors du rendu de la page.</p>";</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Filtre: Formate une taille de fichier en unités lisibles</p>
+<p>     */</p>
+<p>    public function formatFileSize($bytes, $precision = 2) {</p>
+<p>        $units = ['B', 'KB', 'MB', 'GB', 'TB'];</p>
+<p>        </p>
+<p>        $bytes = max($bytes, 0);</p>
+<p>        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));</p>
+<p>        $pow = min($pow, count($units) - 1);</p>
+<p>        </p>
+<p>        $bytes /= pow(1024, $pow);</p>
+<p>        </p>
+<p>        return round($bytes, $precision) . ' ' . $units[$pow];</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Filtre: Tronque un texte à une longueur donnée</p>
+<p>     */</p>
+<p>    public function truncateText($text, $length = 100, $suffix = '...') {</p>
+<p>        if (mb_strlen($text) <= $length) {</p>
+<p>            return $text;</p>
+<p>        }</p>
+<p>        </p>
+<p>        return mb_substr($text, 0, $length) . $suffix;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>6.2 Fonction de Sécurité pour les Sorties Directes</h4>
+
+<p>Fichier: `/src/Utils/ResponseUtils.php`</p>
+
+<p>```php</p>
+<p>class ResponseUtils {</p>
+<p>    /**</p>
+<p>     * Envoie une réponse JSON</p>
+<p>     */</p>
+<p>    public static function sendJsonResponse($data, $httpCode = 200) {</p>
+<p>        http_response_code($httpCode);</p>
+<p>        header('Content-Type: application/json');</p>
+<p>        echo json_encode($data);</p>
+<p>        exit;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Redirige vers une URL spécifiée</p>
+<p>     */</p>
+<p>    public static function redirect($url) {</p>
+<p>        header("Location: {$url}");</p>
+<p>        exit;</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Redirige avec un message d'erreur</p>
+<p>     */</p>
+<p>    public static function redirectWithError($route, $error, $advice = null) {</p>
+<p>        $errorEncoded = urlencode($error);</p>
+<p>        $url = "/{$route}?error={$errorEncoded}";</p>
+<p>        </p>
+<p>        if ($advice) {</p>
+<p>            $adviceEncoded = urlencode($advice);</p>
+<p>            $url .= "&advice={$adviceEncoded}";</p>
+<p>        }</p>
+<p>        </p>
+<p>        self::redirect($url);</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Redirige avec un message de succès</p>
+<p>     */</p>
+<p>    public static function redirectWithSuccess($route, $message) {</p>
+<p>        $messageEncoded = urlencode($message);</p>
+<p>        $url = "/{$route}?success={$messageEncoded}";</p>
+<p>        self::redirect($url);</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Affiche du texte de manière sécurisée</p>
+<p>     */</p>
+<p>    public static function escapeHtml($text) {</p>
+<p>        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Échappe les attributs HTML</p>
+<p>     */</p>
+<p>    public static function escapeHtmlAttr($text) {</p>
+<p>        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Échappe le JavaScript</p>
+<p>     */</p>
+<p>    public static function escapeJs($text) {</p>
+<p>        return json_encode($text, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);</p>
+<p>    }</p>
+<p>    </p>
+<p>    /**</p>
+<p>     * Valide et sécurise une URL</p>
+<p>     */</p>
+<p>    public static function sanitizeUrl($url) {</p>
+<p>        $url = filter_var($url, FILTER_SANITIZE_URL);</p>
+<p>        </p>
+<p>        // Vérifier si l'URL est valide</p>
+<p>        if (!filter_var($url, FILTER_VALIDATE_URL)) {</p>
+<p>            return '#'; // URL invalide, retourner une ancre inoffensive</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Vérifier le protocole (uniquement http et https)</p>
+<p>        $parsedUrl = parse_url($url);</p>
+<p>        if (!isset($parsedUrl['scheme']) || !in_array($parsedUrl['scheme'], ['http', 'https'])) {</p>
+<p>            return '#';</p>
+<p>        }</p>
+<p>        </p>
+<p>        return $url;</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<p>---</p>
+
+<p>Ce guide d'implémentation fournit les détails techniques nécessaires pour comprendre et maintenir les différentes fonctionnalités de sécurité de l'application. Il sert de référence pour les développeurs qui souhaitent contribuer au code ou adapter ces mesures de sécurité à d'autres projets.</p>
+        </div>
+    </div>
+</body>
+</html>

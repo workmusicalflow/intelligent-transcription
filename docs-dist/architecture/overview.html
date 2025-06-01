@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Architecture Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 4xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p { margin-bottom: 1rem; line-height: 1.6; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        ul { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>System Architecture Overview</h1>
+
+<h2>Introduction</h2>
+<p>Intelligent Transcription is a web application that converts audio and video files to text using OpenAI's Whisper API. The system follows Clean Architecture principles with clear separation of concerns.</p>
+
+<h2>High-Level Architecture</h2>
+
+<p>```</p>
+<p>┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐</p>
+<p>│   Frontend      │    │    Backend      │    │  External APIs  │</p>
+<p>│   (Vue.js 3)    │◄──►│   (PHP 8.2)     │◄──►│   (OpenAI)      │</p>
+<p>│                 │    │                 │    │                 │</p>
+<p>│ • Vue Router    │    │ • Clean Arch    │    │ • Whisper API   │</p>
+<p>│ • Pinia Store   │    │ • Domain Layer  │    │ • GPT API       │</p>
+<p>│ • TypeScript    │    │ • SQLite DB     │    │ • YouTube API   │</p>
+<p>│ • Tailwind CSS  │    │ • GraphQL API   │    │                 │</p>
+<p>└─────────────────┘    └─────────────────┘    └─────────────────┘</p>
+<p>```</p>
+
+<h2>Technology Stack</h2>
+
+<h3>Frontend</h3>
+<p>- **Framework:** Vue.js 3 with Composition API</p>
+<p>- **Language:** TypeScript</p>
+<p>- **Styling:** Tailwind CSS</p>
+<p>- **State Management:** Pinia</p>
+<p>- **Routing:** Vue Router 4</p>
+<p>- **Build Tool:** Vite</p>
+<p>- **Testing:** Vitest + Vue Test Utils</p>
+<p>- **E2E Testing:** Cypress</p>
+
+<h3>Backend</h3>
+<p>- **Language:** PHP 8.2+</p>
+<p>- **Architecture:** Clean Architecture / Domain-Driven Design</p>
+<p>- **Database:** SQLite</p>
+<p>- **API:** REST + GraphQL</p>
+<p>- **Queue:** File-based queue system</p>
+<p>- **Template Engine:** Twig</p>
+
+<h3>External Services</h3>
+<p>- **Transcription:** OpenAI Whisper API</p>
+<p>- **AI Chat:** OpenAI GPT API</p>
+<p>- **Video Download:** YouTube API</p>
+<p>- **Error Tracking:** Sentry</p>
+
+<h2>Core Features</h2>
+
+<p>1. **Audio/Video Transcription**</p>
+<p>   - Upload audio/video files</p>
+<p>   - YouTube URL transcription</p>
+<p>   - Real-time processing status</p>
+<p>   - Multiple language support</p>
+
+<p>2. **AI-Powered Chat**</p>
+<p>   - Contextual conversations about transcriptions</p>
+<p>   - Document analysis and summarization</p>
+<p>   - Multi-turn conversations</p>
+
+<p>3. **User Management**</p>
+<p>   - User registration and authentication</p>
+<p>   - Profile management</p>
+<p>   - Usage analytics</p>
+
+<p>4. **Real-time Updates**</p>
+<p>   - WebSocket connections</p>
+<p>   - GraphQL subscriptions</p>
+<p>   - Live transcription progress</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contributing Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Contributing Guide</h1>
+
+<h2>Vue d'ensemble</h2>
+
+<p>Merci de votre intérêt pour contribuer à Intelligent Transcription ! Ce guide vous aidera à démarrer.</p>
+
+<h2>🚀 Démarrage Rapide</h2>
+
+<h3>1. Fork et Clone</h3>
+<p>```bash</p>
+<h1>Fork le repo sur GitHub, puis :</h1>
+<p>git clone https://github.com/YOUR_USERNAME/intelligent-transcription.git</p>
+<p>cd intelligent-transcription</p>
+<p>git remote add upstream https://github.com/workmusicalflow/intelligent-transcription.git</p>
+<p>```</p>
+
+<h3>2. Configuration Environnement</h3>
+<p>```bash</p>
+<h1>Backend</h1>
+<p>composer install</p>
+<p>cp config.example.php config.php</p>
+<h1>Ajouter vos clés API dans config.php</h1>
+
+<h1>Frontend</h1>
+<p>cd frontend</p>
+<p>npm install</p>
+<p>cd ..</p>
+
+<h1>Démarrer les serveurs</h1>
+<p>./start-servers.sh</p>
+<p>```</p>
+
+<h2>🏗️ Architecture du Projet</h2>
+
+<h3>Backend (Clean Architecture)</h3>
+<p>```</p>
+<p>src/</p>
+<p>├── Domain/              # Logique métier pure</p>
+<p>│   ├── Transcription/   # Entités de transcription</p>
+<p>│   └── User/            # Entités utilisateur</p>
+<p>├── Application/         # Cas d'usage</p>
+<p>│   ├── Command/         # Commandes (write)</p>
+<p>│   └── Query/           # Requêtes (read)</p>
+<p>├── Infrastructure/      # Détails techniques</p>
+<p>│   ├── External/        # APIs externes</p>
+<p>│   └── Persistence/     # Base de données</p>
+<p>└── Controllers/         # Points d'entrée HTTP</p>
+<p>```</p>
+
+<h3>Frontend (Vue 3 + TypeScript)</h3>
+<p>```</p>
+<p>src/</p>
+<p>├── components/          # Composants réutilisables</p>
+<p>│   ├── ui/              # Composants UI génériques</p>
+<p>│   ├── layout/          # Composants de mise en page</p>
+<p>│   └── feature/         # Composants spécifiques</p>
+<p>├── views/               # Pages/routes</p>
+<p>├── stores/              # Gestion d'état Pinia</p>
+<p>├── composables/         # Logique réutilisable</p>
+<p>└── api/                 # Clients API</p>
+<p>```</p>
+
+<h2>📋 Standards de Code</h2>
+
+<h3>PHP (Backend)</h3>
+
+<h4>PSR-12 + Clean Architecture</h4>
+<p>```php</p>
+<?php
+
+<p>namespace App\Domain\Transcription\Entity;</p>
+
+<p>use App\Domain\Common\Entity\AggregateRoot;</p>
+<p>use App\Domain\Transcription\ValueObject\TranscriptionId;</p>
+<p>use App\Domain\Transcription\Event\TranscriptionCreated;</p>
+
+<p>/**</p>
+<p> * Représente une transcription audio/vidéo</p>
+<p> * </p>
+<p> * @package App\Domain\Transcription\Entity</p>
+<p> */</p>
+<p>final class Transcription extends AggregateRoot</p>
+<p>{</p>
+<p>    private function __construct(</p>
+<p>        private TranscriptionId $id,</p>
+<p>        private AudioFile $audioFile,</p>
+<p>        private Language $language,</p>
+<p>        private TranscriptionStatus $status</p>
+<p>    ) {</p>
+<p>        $this->recordEvent(new TranscriptionCreated($this->id));</p>
+<p>    }</p>
+<p>    </p>
+<p>    public static function create(</p>
+<p>        TranscriptionId $id,</p>
+<p>        AudioFile $audioFile, </p>
+<p>        Language $language</p>
+<p>    ): self {</p>
+<p>        return new self(</p>
+<p>            $id,</p>
+<p>            $audioFile,</p>
+<p>            $language,</p>
+<p>            TranscriptionStatus::pending()</p>
+<p>        );</p>
+<p>    }</p>
+<p>    </p>
+<p>    public function startProcessing(): void</p>
+<p>    {</p>
+<p>        if (!$this->status->isPending()) {</p>
+<p>            throw new InvalidTranscriptionStateException(</p>
+<p>                'Cannot start processing: transcription is not pending'</p>
+<p>            );</p>
+<p>        }</p>
+<p>        </p>
+<p>        $this->status = TranscriptionStatus::processing();</p>
+<p>        $this->recordEvent(new TranscriptionProcessingStarted($this->id));</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>Conventions</h4>
+<p>- **Namespace** : Follow PSR-4</p>
+<p>- **Types** : Use strict typing</p>
+<p>- **Documentation** : PHPDoc pour toutes les méthodes publiques</p>
+<p>- **Tests** : Un test par méthode publique minimum</p>
+
+<h3>TypeScript (Frontend)</h3>
+
+<h4>Composition API + TypeScript</h4>
+<p>```vue</p>
+<template>
+<p>  <div class="transcription-card" data-testid="transcription-card"></p>
+<p>    <h3 class="text-lg font-semibold">{{ transcription.title }}</h3></p>
+<p>    <TranscriptionStatus :status="transcription.status" /></p>
+<p>    <Button </p>
+<p>      @click="downloadTranscription" </p>
+<p>      :loading="downloading"</p>
+<p>      data-testid="download-button"</p>
+<p>    ></p>
+<p>      Télécharger</p>
+<p>    </Button></p>
+<p>  </div></p>
+</template>
+
+<script setup lang="ts">
+<p>import { ref } from 'vue'</p>
+<p>import type { Transcription } from '@/types'</p>
+<p>import { transcriptionApi } from '@/api/transcriptions'</p>
+<p>import TranscriptionStatus from './TranscriptionStatus.vue'</p>
+<p>import Button from '@/components/ui/Button.vue'</p>
+
+<p>/**</p>
+<p> * Carte d'affichage d'une transcription</p>
+<p> * </p>
+<p> * @example</p>
+<p> * ```vue</p>
+<p> * <TranscriptionCard :transcription="transcription" /></p>
+<p> * ```</p>
+<p> */</p>
+
+<p>interface Props {</p>
+<p>  /** La transcription à afficher */</p>
+<p>  transcription: Transcription</p>
+<p>}</p>
+
+<p>const props = defineProps<Props>()</p>
+
+<p>const downloading = ref(false)</p>
+
+<p>/**</p>
+<p> * Télécharge le fichier de transcription</p>
+<p> */</p>
+<p>async function downloadTranscription(): Promise<void> {</p>
+<p>  try {</p>
+<p>    downloading.value = true</p>
+<p>    await transcriptionApi.download(props.transcription.id)</p>
+<p>  } catch (error) {</p>
+<p>    console.error('Download failed:', error)</p>
+<p>  } finally {</p>
+<p>    downloading.value = false</p>
+<p>  }</p>
+<p>}</p>
+</script>
+<p>```</p>
+
+<h4>Conventions</h4>
+<p>- **Composition API** : Toujours utiliser `<script setup>`</p>
+<p>- **TypeScript** : Interfaces pour toutes les props</p>
+<p>- **Data-testid** : Pour tous les éléments interactifs</p>
+<p>- **JSDoc** : Documentation des composants complexes</p>
+
+<h2>🧪 Workflow de Test</h2>
+
+<h3>Avant chaque commit</h3>
+<p>```bash</p>
+<h1>Tests backend</h1>
+<p>vendor/bin/phpunit</p>
+
+<h1>Tests frontend</h1>
+<p>cd frontend</p>
+<p>npm run test</p>
+<p>npm run type-check</p>
+<p>npm run lint</p>
+
+<h1>Tests E2E (optionnel pour dev)</h1>
+<p>npm run cypress:run</p>
+<p>```</p>
+
+<h3>Test-Driven Development (recommandé)</h3>
+<p>```bash</p>
+<h1>1. Écrire le test qui échoue</h1>
+<h1>2. Écrire le code minimum pour passer</h1>
+<h1>3. Refactorer</h1>
+<h1>4. Répéter</h1>
+<p>```</p>
+
+<h2>🔀 Git Workflow</h2>
+
+<h3>Branches</h3>
+<p>```bash</p>
+<h1>Nouvelle feature</h1>
+<p>git checkout -b feature/transcription-segments</p>
+
+<h1>Bugfix</h1>
+<p>git checkout -b fix/upload-validation</p>
+
+<h1>Documentation</h1>
+<p>git checkout -b docs/api-examples</p>
+<p>```</p>
+
+<h3>Commits (Convention Conventionnelle)</h3>
+<p>```bash</p>
+<h1>Format</h1>
+<type>(<scope>): <description>
+
+<h1>Exemples</h1>
+<p>feat(transcription): add audio segment support</p>
+<p>fix(auth): resolve token expiration issue  </p>
+<p>docs(api): add GraphQL examples</p>
+<p>test(ui): add Button component tests</p>
+<p>refactor(domain): extract transcription value objects</p>
+<p>```</p>
+
+<h3>Pull Request Process</h3>
+<p>1. **Fork** et créer une branche</p>
+<p>2. **Implémenter** avec tests</p>
+<p>3. **Vérifier** que tous les tests passent</p>
+<p>4. **Ouvrir PR** avec description détaillée</p>
+<p>5. **Répondre** aux commentaires de review</p>
+<p>6. **Merge** après approbation</p>
+
+<h2>📋 Types de Contribution</h2>
+
+<h3>🐛 Bug Reports</h3>
+<p>**Template d'issue :**</p>
+<p>```markdown</p>
+<h2>Description</h2>
+<p>Description claire du problème</p>
+
+<h2>Étapes pour reproduire</h2>
+<p>1. Aller à...</p>
+<p>2. Cliquer sur...</p>
+<p>3. Voir l'erreur</p>
+
+<h2>Comportement attendu</h2>
+<p>Ce qui devrait se passer</p>
+
+<h2>Captures d'écran</h2>
+<p>Si applicable</p>
+
+<h2>Environnement</h2>
+<p>- OS: [e.g. macOS 12.0]</p>
+<p>- Navigateur: [e.g. Chrome 95]</p>
+<p>- Version: [e.g. 1.2.3]</p>
+<p>```</p>
+
+<h3>✨ Feature Requests</h3>
+<p>**Template d'issue :**</p>
+<p>```markdown</p>
+<h2>Problème à résoudre</h2>
+<p>Description du besoin utilisateur</p>
+
+<h2>Solution proposée</h2>
+<p>Idée de solution</p>
+
+<h2>Alternatives considérées</h2>
+<p>Autres approches possibles</p>
+
+<h2>Contexte additionnel</h2>
+<p>Informations supplémentaires</p>
+<p>```</p>
+
+<h3>📝 Documentation</h3>
+<p>- **API** : Exemples concrets d'utilisation</p>
+<p>- **Guides** : Tutoriels pas-à-pas</p>
+<p>- **Architecture** : Diagrammes et explications</p>
+<p>- **README** : Instructions claires</p>
+
+<h3>🚀 Nouvelles Features</h3>
+
+<h4>Process de développement</h4>
+<p>1. **Discussion** : Issue pour discuter l'approche</p>
+<p>2. **ADR** : Architecture Decision Record si nécessaire</p>
+<p>3. **Design** : Maquettes/diagrammes si UI/UX</p>
+<p>4. **Implementation** : Code + tests</p>
+<p>5. **Documentation** : Mise à jour des docs</p>
+
+<h2>🚑 Aide et Support</h2>
+
+<h3>💬 Où poser des questions</h3>
+<p>- **GitHub Discussions** : Questions générales</p>
+<p>- **Issues** : Bugs et demandes de features</p>
+<p>- **Discord/Slack** : Chat en temps réel (si disponible)</p>
+
+<h3>📚 Ressources utiles</h3>
+<p>- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)</p>
+<p>- [Vue 3 Composition API](https://vuejs.org/guide/introduction.html)</p>
+<p>- [TypeScript Handbook](https://www.typescriptlang.org/docs/)</p>
+<p>- [Conventional Commits](https://www.conventionalcommits.org/)</p>
+
+<h2>🎆 Reconnaissance</h2>
+
+<p>Tous les contributeurs sont reconnus dans :</p>
+<p>- **README.md** : Section contributeurs</p>
+<p>- **Releases** : Notes de version</p>
+<p>- **Documentation** : Pages d'équipe</p>
+
+<h3>Hall of Fame</h3>
+<p>```markdown</p>
+<h2>Contributors</h2>
+
+<p>- [@workmusicalflow](https://github.com/workmusicalflow) - Project maintainer</p>
+<p>- [@yourname](https://github.com/yourname) - Feature X, Bug fix Y</p>
+<p>```</p>
+
+<h2>📆 Calendrier des Releases</h2>
+
+<p>- **Minor releases** : Chaque mois</p>
+<p>- **Patch releases** : Selon les besoins</p>
+<p>- **Major releases** : Tous les 6 mois</p>
+
+<p>---</p>
+
+<p>**Merci de contribuer à Intelligent Transcription ! 🚀**</p>
+        </div>
+    </div>
+</body>
+</html>

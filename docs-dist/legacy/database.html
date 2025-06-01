@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Database Integration</h1>
+
+<p>This document details the SQLite database integration implemented in the Intelligent Transcription application.</p>
+
+<h2>Overview</h2>
+
+<p>The application previously used a file-based storage system for transcriptions, chat histories, and exports. Now, it includes a SQLite database to provide more robust data storage, better querying capabilities, and improved data relationships.</p>
+
+<h2>Database Schema</h2>
+
+<p>The database consists of the following tables:</p>
+
+<h3>Tables Structure</h3>
+
+<p>```mermaid</p>
+<p>erDiagram</p>
+<p>    transcriptions {</p>
+<p>        string id PK</p>
+<p>        string file_name</p>
+<p>        string file_path</p>
+<p>        text text</p>
+<p>        string language</p>
+<p>        text original_text</p>
+<p>        string youtube_url</p>
+<p>        string youtube_id</p>
+<p>        timestamp created_at</p>
+<p>        integer file_size</p>
+<p>        integer duration</p>
+<p>        boolean is_processed</p>
+<p>        string preprocessed_path</p>
+<p>    }</p>
+<p>    </p>
+<p>    paraphrases {</p>
+<p>        string id PK</p>
+<p>        string transcription_id FK</p>
+<p>        text original_text</p>
+<p>        text paraphrased_text</p>
+<p>        string language</p>
+<p>        timestamp created_at</p>
+<p>    }</p>
+<p>    </p>
+<p>    chat_conversations {</p>
+<p>        string id PK</p>
+<p>        string transcription_id FK</p>
+<p>        string title</p>
+<p>        timestamp created_at</p>
+<p>        timestamp updated_at</p>
+<p>        string prompt_cache_id</p>
+<p>        integer cache_hit_count</p>
+<p>        integer cache_miss_count</p>
+<p>        timestamp last_cache_hit</p>
+<p>    }</p>
+<p>    </p>
+<p>    chat_messages {</p>
+<p>        integer id PK</p>
+<p>        string conversation_id FK</p>
+<p>        string role</p>
+<p>        text content</p>
+<p>        timestamp created_at</p>
+<p>        boolean is_summarized</p>
+<p>        text original_content</p>
+<p>        integer token_count</p>
+<p>    }</p>
+<p>    </p>
+<p>    chat_exports {</p>
+<p>        string id PK</p>
+<p>        string conversation_id FK</p>
+<p>        string file_path</p>
+<p>        string file_name</p>
+<p>        timestamp created_at</p>
+<p>    }</p>
+<p>    </p>
+<p>    prompt_templates {</p>
+<p>        string id PK</p>
+<p>        string name</p>
+<p>        text content</p>
+<p>        string description</p>
+<p>        integer token_count</p>
+<p>        integer usage_count</p>
+<p>        timestamp last_used</p>
+<p>        timestamp created_at</p>
+<p>    }</p>
+<p>    </p>
+<p>    cache_analytics {</p>
+<p>        integer id PK</p>
+<p>        string conversation_id FK</p>
+<p>        boolean is_cache_hit</p>
+<p>        integer response_time_ms</p>
+<p>        integer tokens_saved</p>
+<p>        integer tokens_used</p>
+<p>        timestamp created_at</p>
+<p>    }</p>
+<p>    </p>
+<p>    transcriptions ||--o{ paraphrases : "has"</p>
+<p>    transcriptions ||--o{ chat_conversations : "has"</p>
+<p>    chat_conversations ||--o{ chat_messages : "contains"</p>
+<p>    chat_conversations ||--o{ chat_exports : "has"</p>
+<p>    chat_conversations ||--o{ cache_analytics : "tracks"</p>
+<p>```</p>
+
+<h3>Relationships</h3>
+
+<p>- One transcription can have multiple paraphrases</p>
+<p>- One transcription can have multiple chat conversations</p>
+<p>- One chat conversation can have multiple messages</p>
+<p>- One chat conversation can have multiple exports</p>
+<p>- One chat conversation tracks multiple cache analytics events</p>
+<p>- System uses multiple prompt templates for different contexts</p>
+
+<h2>Database Configuration</h2>
+
+<p>Database settings are configured in `config.php`:</p>
+
+<p>```php</p>
+<p>// Database configuration</p>
+<p>define('DB_PATH', __DIR__ . '/database/transcription.db');</p>
+<p>define('USE_DATABASE', true); // Set to false to continue using file-based storage</p>
+<p>```</p>
+
+<p>The `USE_DATABASE` flag allows toggling between the database and file-based storage, ensuring backward compatibility.</p>
+
+<h2>Initializing the Database</h2>
+
+<p>To create or update the database schema, run the migration script:</p>
+
+<p>```bash</p>
+<p>php migrate.php</p>
+<p>```</p>
+
+<p>This script:</p>
+<p>1. Creates the database file if it doesn't exist</p>
+<p>2. Creates all required tables with proper indexes and constraints</p>
+<p>3. Reports success or issues with the migration</p>
+
+<h2>Database Manager</h2>
+
+<p>The `DatabaseManager` class (`src/Database/DatabaseManager.php`) provides a centralized interface for all database operations:</p>
+
+<p>```php</p>
+<p>use Database\DatabaseManager;</p>
+
+<p>// Get a database connection</p>
+<p>$db = DatabaseManager::getConnection();</p>
+
+<p>// Execute a query with parameters</p>
+<p>$stmt = DatabaseManager::query(</p>
+<p>    "SELECT * FROM transcriptions WHERE id = :id", </p>
+<p>    [':id' => $transcriptionId]</p>
+<p>);</p>
+<p>$result = $stmt->fetch(\PDO::FETCH_ASSOC);</p>
+
+<p>// Get the last inserted ID</p>
+<p>$id = DatabaseManager::lastInsertId();</p>
+
+<p>// Transaction handling</p>
+<p>DatabaseManager::beginTransaction();</p>
+<p>try {</p>
+<p>    // ... perform multiple database operations</p>
+<p>    DatabaseManager::commit();</p>
+<p>} catch (\Exception $e) {</p>
+<p>    DatabaseManager::rollback();</p>
+<p>    // Handle error</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Services Integration</h2>
+
+<h3>TranscriptionService</h3>
+
+<p>The `TranscriptionService` now supports both database and file-based storage:</p>
+
+<p>- **Saving Transcriptions**: Stores transcription results in the database with additional metadata</p>
+<p>- **Retrieving Transcriptions**: Prioritizes database retrieval with fallback to files</p>
+<p>- **Listing Transcriptions**: Provides database-based listing with pagination</p>
+<p>- **Deleting Transcriptions**: Removes from database and associated files</p>
+
+<p>```php</p>
+<p>// Example: Getting a transcription with database support</p>
+<p>public function getTranscriptionResult($resultId)</p>
+<p>{</p>
+<p>    if ($this->useDatabase) {</p>
+<p>        try {</p>
+<p>            $sql = "SELECT * FROM transcriptions WHERE id = :id LIMIT 1";</p>
+<p>            $stmt = DatabaseManager::query($sql, [':id' => $resultId]);</p>
+<p>            $result = $stmt->fetch(\PDO::FETCH_ASSOC);</p>
+<p>            </p>
+<p>            if ($result) {</p>
+<p>                // Format database result</p>
+<p>                return [</p>
+<p>                    'success' => true,</p>
+<p>                    'id' => $result['id'],</p>
+<p>                    'text' => $result['text'],</p>
+<p>                    // ... other fields</p>
+<p>                ];</p>
+<p>            }</p>
+<p>            </p>
+<p>            // Fallback to file-based retrieval</p>
+<p>            return $this->getTranscriptionResultFromFile($resultId);</p>
+<p>        } catch (\Exception $e) {</p>
+<p>            // Handle database errors</p>
+<p>            return $this->getTranscriptionResultFromFile($resultId);</p>
+<p>        }</p>
+<p>    } else {</p>
+<p>        // Use original file-based approach</p>
+<p>        return $this->getTranscriptionResultFromFile($resultId);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>ChatService</h3>
+
+<p>The `ChatService` manages chat-related data with the following database integrations:</p>
+
+<p>- **Conversations**: Create, list, retrieve, and delete conversations</p>
+<p>- **Messages**: Store and retrieve chat messages within conversations</p>
+<p>- **Exports**: Track and manage exported chat histories</p>
+<p>- **Caching**: Optimize responses by caching prompts and conversations</p>
+<p>- **Analytics**: Track cache performance metrics</p>
+
+<p>```php</p>
+<p>// Example: Creating a conversation</p>
+<p>public function getOrCreateConversation($transcriptionId = null, $title = null)</p>
+<p>{</p>
+<p>    if (!$this->useDatabase) {</p>
+<p>        // Generate temporary ID for non-database mode</p>
+<p>        return FileUtils::generateUniqueId();</p>
+<p>    }</p>
+<p>    </p>
+<p>    try {</p>
+<p>        // Check if conversation exists for transcription</p>
+<p>        if ($transcriptionId) {</p>
+<p>            $sql = "SELECT id FROM chat_conversations WHERE transcription_id = :id LIMIT 1";</p>
+<p>            $stmt = DatabaseManager::query($sql, [':id' => $transcriptionId]);</p>
+<p>            $conversation = $stmt->fetch(\PDO::FETCH_ASSOC);</p>
+<p>            </p>
+<p>            if ($conversation) {</p>
+<p>                return $conversation['id'];</p>
+<p>            }</p>
+<p>        }</p>
+<p>        </p>
+<p>        // Create new conversation</p>
+<p>        $conversationId = FileUtils::generateUniqueId();</p>
+<p>        $title = $title ?? "Conversation " . date('Y-m-d H:i:s');</p>
+<p>        </p>
+<p>        $sql = "INSERT INTO chat_conversations (id, transcription_id, title) VALUES (:id, :transcription_id, :title)";</p>
+<p>        DatabaseManager::query($sql, [</p>
+<p>            ':id' => $conversationId,</p>
+<p>            ':transcription_id' => $transcriptionId,</p>
+<p>            ':title' => $title</p>
+<p>        ]);</p>
+<p>        </p>
+<p>        return $conversationId;</p>
+<p>    } catch (\Exception $e) {</p>
+<p>        // Fallback to temporary ID on error</p>
+<p>        return FileUtils::generateUniqueId();</p>
+<p>    }</p>
+<p>}</p>
+
+<p>// Example: Using caching when sending messages</p>
+<p>public function sendMessage($message, $conversationId)</p>
+<p>{</p>
+<p>    // Generate a cache key based on the conversation context and message</p>
+<p>    $cacheKey = PromptUtils::generateCacheKey($this->getConversationMessages($conversationId), $message);</p>
+<p>    </p>
+<p>    // Check if we have a cached response</p>
+<p>    $cachedResponse = $this->cacheService->getCachedConversation($cacheKey);</p>
+<p>    if ($cachedResponse) {</p>
+<p>        // Record cache hit and metrics</p>
+<p>        $this->cacheService->recordCacheHit($conversationId);</p>
+<p>        return $cachedResponse;</p>
+<p>    }</p>
+<p>    </p>
+<p>    // No cache hit, proceed with API call</p>
+<p>    $response = $this->callChatAPI($message, $conversationId);</p>
+<p>    </p>
+<p>    // Store response in cache for future use</p>
+<p>    $this->cacheService->cacheConversation($conversationId, $response, $cacheKey);</p>
+<p>    $this->cacheService->recordCacheMiss($conversationId);</p>
+<p>    </p>
+<p>    return $response;</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Backward Compatibility</h2>
+
+<p>The database implementation maintains backward compatibility with the previous file-based storage:</p>
+
+<p>1. **Dual Storage Support**: Services check the `USE_DATABASE` flag to determine storage method</p>
+<p>2. **Fallback Mechanisms**: If database operations fail, services fall back to file-based methods</p>
+<p>3. **Database Toggle**: Database usage can be disabled by setting `USE_DATABASE` to `false`</p>
+
+<h2>Advanced Features</h2>
+
+<p>With the database integration, the application now supports:</p>
+
+<p>1. **Conversation History**: Users can view their past conversations</p>
+<p>2. **Message Persistence**: Chat messages are stored persistently across sessions</p>
+<p>3. **Transcription Metadata**: Additional metadata (file size, duration, etc.) is stored</p>
+<p>4. **Relationship Management**: Proper linking between transcriptions, conversations, and exports</p>
+<p>5. **Prompt and Conversation Caching**: Optimized response times through intelligent caching</p>
+<p>6. **Cache Analytics**: Performance metrics for cache efficiency monitoring</p>
+
+<h3>Caching System</h3>
+
+<p>The caching system uses several components to optimize responses and reduce API costs:</p>
+
+<p>1. **PromptUtils**: </p>
+<p>   - Manages prompt templates for consistent formatting</p>
+<p>   - Generates cache keys based on conversation content</p>
+<p>   - Estimates token counts for conversations</p>
+
+<p>2. **CacheService**:</p>
+<p>   - Stores and retrieves cached responses</p>
+<p>   - Tracks cache hit/miss metrics</p>
+<p>   - Provides analytics on cache performance</p>
+
+<p>3. **SummarizerService**:</p>
+<p>   - Compresses long conversations to reduce token usage</p>
+<p>   - Maintains summary of older messages while keeping recent ones intact</p>
+<p>   - Improves cache hit rate by removing volatile content</p>
+
+<p>```php</p>
+<p>// Example: Tracking cache analytics</p>
+<p>public function recordCacheHit($conversationId, $responseTime = null, $tokensSaved = null)</p>
+<p>{</p>
+<p>    if ($this->useDatabase) {</p>
+<p>        // Update conversation metrics</p>
+<p>        $sql = "UPDATE chat_conversations </p>
+<p>                SET cache_hit_count = cache_hit_count + 1, </p>
+<p>                    last_cache_hit = CURRENT_TIMESTAMP </p>
+<p>                WHERE id = :id";</p>
+<p>        DatabaseManager::query($sql, [':id' => $conversationId]);</p>
+<p>        </p>
+<p>        // Add detailed analytics if provided</p>
+<p>        if ($responseTime !== null) {</p>
+<p>            $sql = "INSERT INTO cache_analytics </p>
+<p>                    (conversation_id, is_cache_hit, response_time_ms, tokens_saved) </p>
+<p>                    VALUES (:conversation_id, 1, :response_time, :tokens_saved)";</p>
+<p>            </p>
+<p>            DatabaseManager::query($sql, [</p>
+<p>                ':conversation_id' => $conversationId,</p>
+<p>                ':response_time' => $responseTime,</p>
+<p>                ':tokens_saved' => $tokensSaved</p>
+<p>            ]);</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+
+<h2>Error Handling</h2>
+
+<p>Database operations include comprehensive error handling:</p>
+
+<p>1. **Try/Catch Blocks**: All database operations are wrapped in try/catch blocks</p>
+<p>2. **Error Logging**: Database errors are logged for debugging</p>
+<p>3. **Graceful Degradation**: Services fall back to file-based methods on database errors</p>
+<p>4. **Transaction Protection**: Multi-step operations use transactions to ensure data integrity</p>
+
+<h2>Data Migration</h2>
+
+<p>For existing applications with file-based data, consider implementing a data migration script to:</p>
+
+<p>1. Scan existing result files in the `results/` directory</p>
+<p>2. Import data into the appropriate tables</p>
+<p>3. Keep original files for backward compatibility</p>
+
+<h2>Security Considerations</h2>
+
+<p>The SQLite database implementation includes:</p>
+
+<p>1. **Prepared Statements**: All queries use prepared statements to prevent SQL injection</p>
+<p>2. **Input Validation**: Input data is validated before database operations</p>
+<p>3. **File Permissions**: Database files should have proper file system permissions</p>
+<p>4. **Error Message Security**: Database error details are not exposed to users</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>API Documentation</h1>
+
+<p>This document outlines the internal and external API endpoints used by the Intelligent Transcription application.</p>
+
+<h2>🔄 Internal API Endpoints</h2>
+
+<p>These endpoints are used within the application for processing requests.</p>
+
+<h3>Transcription API</h3>
+
+<h4>File Upload Processing</h4>
+
+<p>- **URL**: `/transcribe.php`</p>
+<p>- **Method**: `POST`</p>
+<p>- **Description**: Processes an uploaded audio/video file for transcription</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `audio_file` | File | Yes | Audio/video file to transcribe |</p>
+<p>| `language` | String | No | Language code (e.g., 'en', 'fr', 'auto') |</p>
+<p>| `force_language` | Checkbox | No | Force translation to selected language |</p>
+
+<p>**Response:**</p>
+<p>- Redirects to `result.php?id={result_id}` on success</p>
+<p>- Redirects to index with error query param on failure</p>
+
+<h4>YouTube Video Processing</h4>
+
+<p>- **URL**: `/youtube_download.php`</p>
+<p>- **Method**: `POST`</p>
+<p>- **Description**: Processes a YouTube URL for downloading and transcription</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `youtube_url` | String | Yes | Valid YouTube video URL |</p>
+<p>| `language` | String | No | Language code (e.g., 'en', 'fr', 'auto') |</p>
+<p>| `force_language` | Checkbox | No | Force translation to selected language |</p>
+
+<p>**Response:**</p>
+<p>- Redirects to `result.php?id={result_id}` on success</p>
+<p>- Redirects to index with error query param on failure</p>
+
+<h4>Result Retrieval</h4>
+
+<p>- **URL**: `/result.php`</p>
+<p>- **Method**: `GET`</p>
+<p>- **Description**: Retrieves and displays a transcription result</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `id` | String | Yes | Result ID from transcription process |</p>
+
+<p>**Response:**</p>
+<p>- HTML page with transcription result</p>
+<p>- Redirects to index with error on invalid ID</p>
+
+<h4>Result Download</h4>
+
+<p>- **URL**: `/download.php`</p>
+<p>- **Method**: `GET`</p>
+<p>- **Description**: Downloads a transcription result as a text file</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `id` | String | Yes | Result ID from transcription process |</p>
+
+<p>**Response:**</p>
+<p>- Text file download with transcription content</p>
+<p>- Redirects to index with error on invalid ID</p>
+
+<h3>Chat API</h3>
+
+<h4>Chat Processing</h4>
+
+<p>- **URL**: `/chat.php`</p>
+<p>- **Method**: `POST`</p>
+<p>- **Description**: Processes a chat message with contextual awareness</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `message` | String | Yes | User's chat message |</p>
+<p>| `transcription_id` | String | No | Associated transcription ID |</p>
+
+<p>**Response:**</p>
+<p>- JSON object with assistant's response</p>
+<p>- Error message on failure</p>
+
+<h4>Chat Export</h4>
+
+<p>- **URL**: `/chat.php?action=export`</p>
+<p>- **Method**: `POST`</p>
+<p>- **Description**: Exports chat history to a text file</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `messages` | Array | Yes | Chat history to export |</p>
+
+<p>**Response:**</p>
+<p>- Text file download with formatted chat history</p>
+<p>- Error message on failure</p>
+
+<h3>Paraphrase API</h3>
+
+<p>- **URL**: `/paraphrase.php`</p>
+<p>- **Method**: `POST`</p>
+<p>- **Description**: Paraphrases text to improve clarity and quality</p>
+
+<p>**Request Parameters:**</p>
+<p>| Parameter | Type | Required | Description |</p>
+<p>|-----------|------|----------|-------------|</p>
+<p>| `text` | String | Yes | Text to paraphrase |</p>
+<p>| `language` | String | No | Language code (defaults to 'fr') |</p>
+
+<p>**Response:**</p>
+<p>- JSON object with paraphrased text</p>
+<p>- Error message on failure</p>
+
+<h2>🔌 External API Integrations</h2>
+
+<p>The application integrates with external APIs to provide its functionality.</p>
+
+<h3>OpenAI APIs</h3>
+
+<h4>Whisper Transcription API</h4>
+
+<p>- **Purpose**: Transcribes audio to text</p>
+<p>- **Implementation**: Via `transcribe.py` Python script</p>
+<p>- **Authentication**: OpenAI API key</p>
+
+<p>**Request Format:**</p>
+<p>```python</p>
+<p>response = client.audio.transcriptions.create(</p>
+<p>    model="whisper-1",</p>
+<p>    file=audio_file,</p>
+<p>    language=language</p>
+<p>)</p>
+<p>```</p>
+
+<p>**Response Format:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "text": "Transcribed text content"</p>
+<p>}</p>
+<p>```</p>
+
+<h4>ChatGPT API</h4>
+
+<p>- **Purpose**: Provides contextual chat capabilities</p>
+<p>- **Implementation**: Via `chat_api.py` Python script</p>
+<p>- **Authentication**: OpenAI API key</p>
+
+<p>**Request Format:**</p>
+<p>```python</p>
+<p>response = client.chat.completions.create(</p>
+<p>    model="gpt-4.1-nano",</p>
+<p>    messages=[</p>
+<p>        {"role": "system", "content": "System prompt"},</p>
+<p>        {"role": "user", "content": "User message with context"}</p>
+<p>    ]</p>
+<p>)</p>
+<p>```</p>
+
+<p>**Response Format:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "choices": [</p>
+<p>    {</p>
+<p>      "message": {</p>
+<p>        "content": "Assistant response",</p>
+<p>        "role": "assistant"</p>
+<p>      }</p>
+<p>    }</p>
+<p>  ]</p>
+<p>}</p>
+<p>```</p>
+
+<h4>OpenAI Assistant API</h4>
+
+<p>- **Purpose**: Provides paraphrasing capabilities</p>
+<p>- **Implementation**: Via `paraphrase.py` Python script</p>
+<p>- **Authentication**: OpenAI API key and Assistant ID</p>
+
+<p>**Setup:**</p>
+<p>```python</p>
+<p>assistant = client.beta.assistants.create(</p>
+<p>    name="Paraphraser",</p>
+<p>    instructions="Paraphrasing instructions...",</p>
+<p>    model="gpt-4.1-nano",</p>
+<p>)</p>
+<p>```</p>
+
+<p>**Usage Flow:**</p>
+<p>1. Create/retrieve assistant</p>
+<p>2. Create thread</p>
+<p>3. Add message to thread</p>
+<p>4. Run assistant on thread</p>
+<p>5. Stream response</p>
+
+<h3>Video Download API (loader.to)</h3>
+
+<p>- **Purpose**: Downloads audio from YouTube videos</p>
+<p>- **Implementation**: Via `utils/YouTubeUtils.php`</p>
+<p>- **Authentication**: Video Download API key</p>
+
+<p>**Download Process Flow:**</p>
+<p>1. Submit YouTube URL to loader.to API</p>
+<p>2. Retrieve unique file identifier</p>
+<p>3. Poll progress endpoint until download is complete</p>
+<p>4. Download audio file using provided URL</p>
+
+<p>**Request Format:**</p>
+<p>```</p>
+<p>GET https://loader.to/ajax/download.php?url={youtube_url}&format=mp3&key={api_key}</p>
+<p>```</p>
+
+<p>**Response Format:**</p>
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "id": "unique_file_id",</p>
+<p>  "process_url": "progress_check_url"</p>
+<p>}</p>
+<p>```</p>
+
+<h2>💾 Data Formats</h2>
+
+<h3>Transcription Result Format</h3>
+
+<p>Results are stored as JSON files with the following structure:</p>
+
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "text": "Transcribed content here...",</p>
+<p>  "language": "fr",</p>
+<p>  "original_text": "Original text if translation was applied",</p>
+<p>  "youtube_url": "https://www.youtube.com/watch?v=xyz" // If from YouTube</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Chat Message Format</h3>
+
+<p>Chat messages are stored in session and exported with the following structure:</p>
+
+<p>```json</p>
+<p>[</p>
+<p>  {</p>
+<p>    "role": "user",</p>
+<p>    "content": "User message"</p>
+<p>  },</p>
+<p>  {</p>
+<p>    "role": "assistant",</p>
+<p>    "content": "Assistant response"</p>
+<p>  }</p>
+<p>]</p>
+<p>```</p>
+
+<h3>Paraphrase Result Format</h3>
+
+<p>```json</p>
+<p>{</p>
+<p>  "success": true,</p>
+<p>  "original_text": "Original text content",</p>
+<p>  "paraphrased_text": "Improved version of the text",</p>
+<p>  "language": "fr"</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🔒 Error Handling</h2>
+
+<p>All APIs return consistent error formats:</p>
+
+<p>```json</p>
+<p>{</p>
+<p>  "success": false,</p>
+<p>  "error": "Specific error message"</p>
+<p>}</p>
+<p>```</p>
+
+<p>Common error scenarios:</p>
+<p>1. Invalid file format</p>
+<p>2. File size exceeds limits</p>
+<p>3. API authentication failure</p>
+<p>4. Network connectivity issues</p>
+<p>5. Invalid YouTube URL format</p>
+<p>6. Resource not found (invalid ID)</p>
+        </div>
+    </div>
+</body>
+</html>

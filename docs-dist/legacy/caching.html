@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt and Conversation Caching</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>Prompt and Conversation Caching</h1>
+
+<p>This document provides a comprehensive overview of the prompt and conversation caching implementation in the Intelligent Transcription application.</p>
+
+<h2>Overview</h2>
+
+<p>The caching system optimizes OpenAI API usage by:</p>
+<p>1. Caching responses for similar prompts</p>
+<p>2. Summarizing long conversation history</p>
+<p>3. Tracking and analyzing cache performance</p>
+<p>4. Providing tools to monitor and manage the cache</p>
+
+<h2>Components</h2>
+
+<h3>1. Cache Service (`src/Services/CacheService.php`)</h3>
+
+<p>The `CacheService` provides core caching functionality:</p>
+
+<p>- **In-memory cache**: For ultra-fast responses in the same session</p>
+<p>- **Database cache**: For persistent caching across sessions</p>
+<p>- **Analytics**: Tracks cache hits, misses, and performance metrics</p>
+<p>- **Cache management**: Tools to clear or optimize cached content</p>
+
+<p>```php</p>
+<p>class CacheService {</p>
+<p>    // Core caching methods</p>
+<p>    public function getCachedConversation($cacheKey);</p>
+<p>    public function cacheConversation($conversationId, $messages);</p>
+<p>    public function clearCache($conversationId = null);</p>
+<p>    </p>
+<p>    // Analytics methods</p>
+<p>    public function recordCacheHit($conversationId, $responseTime, $tokensSaved);</p>
+<p>    public function recordCacheMiss($conversationId, $responseTime, $tokensUsed);</p>
+<p>    public function getCacheAnalytics($conversationId = null);</p>
+<p>}</p>
+<p>```</p>
+
+<h3>2. Summarizer Service (`src/Services/SummarizerService.php`)</h3>
+
+<p>The `SummarizerService` optimizes conversation history:</p>
+
+<p>- **Conversation summarization**: Condenses older messages to reduce token usage</p>
+<p>- **Token management**: Ensures conversations stay within token limits</p>
+<p>- **AI-based summarization**: Uses OpenAI to create high-quality summaries</p>
+<p>- **Original content preservation**: Stores original messages for later reference</p>
+
+<p>```php</p>
+<p>class SummarizerService {</p>
+<p>    public function summarizeConversation($conversationId, $maxTokens = 3000);</p>
+<p>    public function expandSummary($messageId);</p>
+<p>    private function createSummary($messages);</p>
+<p>}</p>
+<p>```</p>
+
+<h3>3. Prompt Utilities (`src/Utils/PromptUtils.php`)</h3>
+
+<p>The `PromptUtils` class provides tools for optimizing prompts:</p>
+
+<p>- **System prompt management**: Stores and retrieves standard prompts</p>
+<p>- **Token counting**: Estimates token usage for optimization</p>
+<p>- **Cache key generation**: Creates consistent keys for cache lookups</p>
+<p>- **Prompt optimization**: Structures prompts for better cache hit rates</p>
+
+<p>```php</p>
+<p>class PromptUtils {</p>
+<p>    public static function estimateTokenCount($text);</p>
+<p>    public static function getSystemPrompt($name = 'chat', $customContent = null);</p>
+<p>    public static function createOptimizedPrompt($messages, $transcriptionContext = '');</p>
+<p>    public static function generateCacheKey($messages);</p>
+<p>    public static function calculateTokenSavings($originalMessages, $cachedMessages = null);</p>
+<p>}</p>
+<p>```</p>
+
+<h3>4. Analytics Controller (`src/Controllers/AnalyticsController.php`)</h3>
+
+<p>The `AnalyticsController` visualizes cache performance:</p>
+
+<p>- **Dashboard**: System-wide cache performance overview</p>
+<p>- **Conversation analytics**: Detailed metrics for specific conversations</p>
+<p>- **Cache management UI**: Tools to clear or optimize the cache</p>
+
+<p>```php</p>
+<p>class AnalyticsController {</p>
+<p>    public function showCacheDashboard();</p>
+<p>    public function showConversationAnalytics($conversationId);</p>
+<p>    public function clearCache($conversationId = null);</p>
+<p>    public function optimizeCache();</p>
+<p>}</p>
+<p>```</p>
+
+<h2>Database Schema</h2>
+
+<p>The caching system uses several database tables:</p>
+
+<h3>Chat Conversations Table Extensions</h3>
+
+<p>```sql</p>
+<p>ALTER TABLE chat_conversations </p>
+<p>ADD COLUMN prompt_cache_id TEXT,</p>
+<p>ADD COLUMN cache_hit_count INTEGER DEFAULT 0,</p>
+<p>ADD COLUMN cache_miss_count INTEGER DEFAULT 0,</p>
+<p>ADD COLUMN last_cache_hit TIMESTAMP;</p>
+<p>```</p>
+
+<h3>Chat Messages Table Extensions</h3>
+
+<p>```sql</p>
+<p>ALTER TABLE chat_messages</p>
+<p>ADD COLUMN is_summarized BOOLEAN DEFAULT 0,</p>
+<p>ADD COLUMN original_content TEXT,</p>
+<p>ADD COLUMN token_count INTEGER;</p>
+<p>```</p>
+
+<h3>Cache Analytics Table</h3>
+
+<p>```sql</p>
+<p>CREATE TABLE IF NOT EXISTS cache_analytics (</p>
+<p>    id INTEGER PRIMARY KEY AUTOINCREMENT,</p>
+<p>    conversation_id TEXT NOT NULL,</p>
+<p>    is_cache_hit BOOLEAN NOT NULL DEFAULT 0,</p>
+<p>    response_time_ms INTEGER NULL,</p>
+<p>    tokens_saved INTEGER NULL,</p>
+<p>    tokens_used INTEGER NULL,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</p>
+<p>    FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE</p>
+<p>);</p>
+<p>```</p>
+
+<h3>Prompt Templates Table</h3>
+
+<p>```sql</p>
+<p>CREATE TABLE IF NOT EXISTS prompt_templates (</p>
+<p>    id TEXT PRIMARY KEY,</p>
+<p>    name TEXT NOT NULL,</p>
+<p>    content TEXT NOT NULL,</p>
+<p>    description TEXT NULL,</p>
+<p>    token_count INTEGER NULL,</p>
+<p>    usage_count INTEGER DEFAULT 0,</p>
+<p>    last_used TIMESTAMP NULL,</p>
+<p>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP</p>
+<p>);</p>
+<p>```</p>
+
+<h2>Cache Flow Diagram</h2>
+
+<p>```mermaid</p>
+<p>flowchart TD</p>
+<p>    A[User sends message] --> B{Check cache}</p>
+<p>    B -->|Cache hit| C[Return cached response]</p>
+<p>    B -->|Cache miss| D[Call OpenAI API]</p>
+<p>    </p>
+<p>    D --> E[Save response in cache]</p>
+<p>    E --> F[Return response to user]</p>
+<p>    </p>
+<p>    C --> G[Record cache hit]</p>
+<p>    F --> H[Record cache miss]</p>
+<p>    </p>
+<p>    I[Long conversation] --> J[Summarize older messages]</p>
+<p>    J --> K[Store summary in database]</p>
+<p>    K --> B</p>
+<p>```</p>
+
+<h2>Optimization Strategies</h2>
+
+<p>1. **Prompt Structuring**</p>
+<p>   - Place static content at the beginning of prompts</p>
+<p>   - Keep user-specific content at the end</p>
+<p>   - Maintain consistent formatting</p>
+
+<p>2. **System Prompt Caching**</p>
+<p>   - Store common system prompts in the database</p>
+<p>   - Use them consistently across sessions</p>
+<p>   - Track usage for future optimizations</p>
+
+<p>3. **Conversation Summarization**</p>
+<p>   - Keep recent messages intact</p>
+<p>   - Summarize older messages</p>
+<p>   - Preserve original content for reference</p>
+
+<p>4. **Token Management**</p>
+<p>   - Track token usage for all messages</p>
+<p>   - Automatically summarize when approaching limits</p>
+<p>   - Optimize for maximum context with minimum tokens</p>
+
+<h2>Performance Metrics</h2>
+
+<p>The cache system tracks several key metrics:</p>
+
+<p>- **Cache hit rate**: Percentage of requests served from cache</p>
+<p>- **Response time**: Average response time for cache hits vs. misses</p>
+<p>- **Tokens saved**: Estimated token savings from cache hits</p>
+<p>- **Cost savings**: Estimated cost reduction from caching</p>
+
+<h2>Frontend Integration</h2>
+
+<p>The caching system integrates with the frontend through:</p>
+
+<p>1. **Analytics Dashboard**</p>
+<p>   - System-wide performance metrics</p>
+<p>   - Daily and monthly usage charts</p>
+<p>   - Estimated cost savings visualization</p>
+
+<p>2. **Conversation UI**</p>
+<p>   - Cache hit indicators on messages</p>
+<p>   - Links to conversation analytics</p>
+<p>   - Summarization indicators</p>
+
+<p>3. **Cache Management**</p>
+<p>   - Tools to clear conversation cache</p>
+<p>   - System-wide cache optimization</p>
+<p>   - Performance monitoring</p>
+
+<h2>Benefits</h2>
+
+<p>1. **Reduced API Costs**</p>
+<p>   - Fewer API calls means lower OpenAI costs</p>
+<p>   - Summarization reduces token usage</p>
+
+<p>2. **Improved User Experience**</p>
+<p>   - Faster responses from cache hits</p>
+<p>   - Consistent answers for similar questions</p>
+
+<p>3. **Performance Insights**</p>
+<p>   - Analytics help identify optimization opportunities</p>
+<p>   - Token usage tracking improves resource planning</p>
+
+<h2>Future Optimizations</h2>
+
+<p>1. **Semantic Caching**</p>
+<p>   - Cache responses based on meaning, not exact text</p>
+<p>   - Implement embeddings for similarity matching</p>
+
+<p>2. **Predictive Preloading**</p>
+<p>   - Preload likely responses based on user patterns</p>
+<p>   - Warm cache during low-usage periods</p>
+
+<p>3. **Dynamic Summarization**</p>
+<p>   - Adapt summarization based on content importance</p>
+<p>   - Preserve key information while reducing tokens</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🏗️ Guide d'Architecture Clean & SOLID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+<h1>🏗️ Guide d'Architecture Clean & SOLID</h1>
+
+<h2>📋 Vue d'ensemble</h2>
+
+<p>Ce guide définit l'architecture cible du projet Intelligent Transcription, basée sur les principes Clean Architecture, SOLID et DDD (Domain-Driven Design).</p>
+
+<p>**Note** : Ce document est une référence technique détaillée destinée à l'équipe de développement. Pour la roadmap MVP veuillez consulter le document `MVP_ROADMAP.md`.</p>
+
+<h2>🎯 Objectifs Architecturaux</h2>
+
+<p>1. **Découplage** : Indépendance entre domaine métier et détails techniques</p>
+<p>2. **Testabilité** : Tests unitaires sans infrastructure</p>
+<p>3. **Évolutivité** : Ajout de features sans impact sur l'existant</p>
+<p>4. **Maintenabilité** : Code auto-documenté et prévisible</p>
+<p>5. **Performance** : Optimisations ciblées par couche</p>
+
+<h2>📐 Structure du Projet</h2>
+
+<h3>Organisation des Dossiers</h3>
+
+<p>```</p>
+<p>intelligent-transcription/</p>
+<p>├── src/</p>
+<p>│   ├── Domain/                 # Cœur métier pur</p>
+<p>│   │   ├── Common/            # Shared Kernel</p>
+<p>│   │   │   ├── ValueObject/</p>
+<p>│   │   │   ├── Event/</p>
+<p>│   │   │   └── Exception/</p>
+<p>│   │   ├── Transcription/</p>
+<p>│   │   │   ├── Entity/</p>
+<p>│   │   │   ├── ValueObject/</p>
+<p>│   │   │   ├── Repository/</p>
+<p>│   │   │   ├── Service/</p>
+<p>│   │   │   └── Event/</p>
+<p>│   │   ├── Chat/</p>
+<p>│   │   │   ├── Entity/</p>
+<p>│   │   │   ├── ValueObject/</p>
+<p>│   │   │   └── Repository/</p>
+<p>│   │   └── Analytics/</p>
+<p>│   │       ├── Entity/</p>
+<p>│   │       └── Service/</p>
+<p>│   │</p>
+<p>│   ├── Application/           # Use Cases / Services Applicatifs</p>
+<p>│   │   ├── Command/</p>
+<p>│   │   ├── Query/</p>
+<p>│   │   ├── DTO/</p>
+<p>│   │   └── EventHandler/</p>
+<p>│   │</p>
+<p>│   └── Infrastructure/        # Détails techniques</p>
+<p>│       ├── Persistence/       # Implémentations Repository</p>
+<p>│       │   ├── Doctrine/</p>
+<p>│       │   └── InMemory/</p>
+<p>│       ├── API/              # Controllers & Resolvers</p>
+<p>│       │   ├── REST/</p>
+<p>│       │   ├── GraphQL/</p>
+<p>│       │   └── WebSocket/</p>
+<p>│       ├── External/         # Services externes</p>
+<p>│       │   ├── OpenAI/</p>
+<p>│       │   ├── Google/</p>
+<p>│       │   └── Storage/</p>
+<p>│       └── DependencyInjection/</p>
+<p>│</p>
+<p>├── public/                   # Point d'entrée web</p>
+<p>├── bin/                      # Scripts CLI</p>
+<p>├── config/                   # Configuration</p>
+<p>├── tests/                    # Tests organisés par type</p>
+<p>│   ├── Unit/</p>
+<p>│   ├── Integration/</p>
+<p>│   └── E2E/</p>
+<p>└── docker/                   # Environnement Docker</p>
+<p>```</p>
+
+<h2>🧩 Couches de l'Architecture</h2>
+
+<h3>1. Domain Layer (Entités et Logique Métier)</h3>
+
+<h4>Entités</h4>
+
+<p>```php</p>
+<p>namespace Domain\Transcription\Entity;</p>
+
+<p>use Domain\Common\Entity\AggregateRoot;</p>
+<p>use Domain\Transcription\ValueObject\TranscriptionId;</p>
+<p>use Domain\Transcription\ValueObject\AudioFile;</p>
+<p>use Domain\Transcription\ValueObject\TranscribedText;</p>
+<p>use Domain\Transcription\Event\TranscriptionCompleted;</p>
+
+<p>final class Transcription extends AggregateRoot</p>
+<p>{</p>
+<p>    private TranscriptionStatus $status;</p>
+<p>    private ?TranscribedText $text = null;</p>
+<p>    private array $metadata = [];</p>
+
+<p>    private function __construct(</p>
+<p>        private TranscriptionId $id,</p>
+<p>        private AudioFile $audioFile,</p>
+<p>        private Language $language,</p>
+<p>        private UserId $userId</p>
+<p>    ) {</p>
+<p>        $this->status = TranscriptionStatus::PENDING();</p>
+<p>        $this->recordEvent(new TranscriptionCreated($id, $userId));</p>
+<p>    }</p>
+
+<p>    public static function create(</p>
+<p>        AudioFile $audioFile,</p>
+<p>        Language $language,</p>
+<p>        UserId $userId</p>
+<p>    ): self {</p>
+<p>        return new self(</p>
+<p>            TranscriptionId::generate(),</p>
+<p>            $audioFile,</p>
+<p>            $language,</p>
+<p>            $userId</p>
+<p>        );</p>
+<p>    }</p>
+
+<p>    public function complete(TranscribedText $text, array $metadata = []): void</p>
+<p>    {</p>
+<p>        if (!$this->status->isPending()) {</p>
+<p>            throw new DomainException('Cannot complete non-pending transcription');</p>
+<p>        }</p>
+
+<p>        $this->text = $text;</p>
+<p>        $this->metadata = $metadata;</p>
+<p>        $this->status = TranscriptionStatus::COMPLETED();</p>
+
+<p>        $this->recordEvent(new TranscriptionCompleted(</p>
+<p>            $this->id,</p>
+<p>            $text->wordCount(),</p>
+<p>            $text->duration()</p>
+<p>        ));</p>
+<p>    }</p>
+
+<p>    public function fail(string $reason): void</p>
+<p>    {</p>
+<p>        $this->status = TranscriptionStatus::FAILED();</p>
+<p>        $this->recordEvent(new TranscriptionFailed($this->id, $reason));</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>Value Objects</h4>
+
+<p>```php</p>
+<p>namespace Domain\Transcription\ValueObject;</p>
+
+<p>final class TranscribedText</p>
+<p>{</p>
+<p>    private string $content;</p>
+<p>    private array $segments;</p>
+
+<p>    public function __construct(string $content, array $segments = [])</p>
+<p>    {</p>
+<p>        if (empty(trim($content))) {</p>
+<p>            throw new InvalidArgumentException('Transcribed text cannot be empty');</p>
+<p>        }</p>
+
+<p>        $this->content = $content;</p>
+<p>        $this->segments = $segments;</p>
+<p>    }</p>
+
+<p>    public function content(): string</p>
+<p>    {</p>
+<p>        return $this->content;</p>
+<p>    }</p>
+
+<p>    public function wordCount(): int</p>
+<p>    {</p>
+<p>        return str_word_count($this->content);</p>
+<p>    }</p>
+
+<p>    public function duration(): ?float</p>
+<p>    {</p>
+<p>        if (empty($this->segments)) {</p>
+<p>            return null;</p>
+<p>        }</p>
+
+<p>        $lastSegment = end($this->segments);</p>
+<p>        return $lastSegment['end'] ?? null;</p>
+<p>    }</p>
+
+<p>    public function excerpt(int $length = 100): string</p>
+<p>    {</p>
+<p>        if (strlen($this->content) <= $length) {</p>
+<p>            return $this->content;</p>
+<p>        }</p>
+
+<p>        return substr($this->content, 0, $length) . '...';</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>Domain Services</h4>
+
+<p>```php</p>
+<p>namespace Domain\Transcription\Service;</p>
+
+<p>interface TranscriptionPricingService</p>
+<p>{</p>
+<p>    public function calculatePrice(</p>
+<p>        AudioFile $file,</p>
+<p>        Language $language,</p>
+<p>        bool $isPriority = false</p>
+<p>    ): Money;</p>
+<p>}</p>
+
+<p>final class StandardPricingService implements TranscriptionPricingService</p>
+<p>{</p>
+<p>    private const BASE_RATE_PER_MINUTE = 0.006; // $0.006 per minute</p>
+<p>    private const PRIORITY_MULTIPLIER = 2.5;</p>
+
+<p>    public function calculatePrice(</p>
+<p>        AudioFile $file,</p>
+<p>        Language $language,</p>
+<p>        bool $isPriority = false</p>
+<p>    ): Money {</p>
+<p>        $minutes = ceil($file->duration() / 60);</p>
+<p>        $basePrice = $minutes * self::BASE_RATE_PER_MINUTE;</p>
+
+<p>        if ($isPriority) {</p>
+<p>            $basePrice *= self::PRIORITY_MULTIPLIER;</p>
+<p>        }</p>
+
+<p>        // Language complexity factor</p>
+<p>        $languageFactor = $this->getLanguageFactor($language);</p>
+<p>        $finalPrice = $basePrice * $languageFactor;</p>
+
+<p>        return Money::USD($finalPrice);</p>
+<p>    }</p>
+
+<p>    private function getLanguageFactor(Language $language): float</p>
+<p>    {</p>
+<p>        return match($language->code()) {</p>
+<p>            'en', 'es', 'fr' => 1.0,</p>
+<p>            'zh', 'ja', 'ar' => 1.5,</p>
+<p>            default => 1.2</p>
+<p>        };</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>2. Application Layer (Use Cases)</h3>
+
+<h4>Commands & Handlers</h4>
+
+<p>```php</p>
+<p>namespace Application\Transcription\Command;</p>
+
+<p>final class TranscribeAudioCommand</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        public readonly string $audioFilePath,</p>
+<p>        public readonly string $userId,</p>
+<p>        public readonly ?string $language = null,</p>
+<p>        public readonly bool $priority = false,</p>
+<p>        public readonly array $options = []</p>
+<p>    ) {}</p>
+<p>}</p>
+
+<p>final class TranscribeAudioHandler</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        private TranscriptionRepository $repository,</p>
+<p>        private TranscriberInterface $transcriber,</p>
+<p>        private FileStorage $storage,</p>
+<p>        private EventBus $eventBus,</p>
+<p>        private TranscriptionPricingService $pricingService</p>
+<p>    ) {}</p>
+
+<p>    public function handle(TranscribeAudioCommand $command): TranscriptionId</p>
+<p>    {</p>
+<p>        // 1. Validate and prepare audio file</p>
+<p>        $audioFile = $this->storage->retrieve($command->audioFilePath);</p>
+<p>        if (!$audioFile->isValid()) {</p>
+<p>            throw new InvalidAudioFileException();</p>
+<p>        }</p>
+
+<p>        // 2. Detect or validate language</p>
+<p>        $language = $command->language</p>
+<p>            ? Language::fromCode($command->language)</p>
+<p>            : $this->transcriber->detectLanguage($audioFile);</p>
+
+<p>        // 3. Calculate pricing</p>
+<p>        $price = $this->pricingService->calculatePrice(</p>
+<p>            $audioFile,</p>
+<p>            $language,</p>
+<p>            $command->priority</p>
+<p>        );</p>
+
+<p>        // 4. Create transcription entity</p>
+<p>        $transcription = Transcription::create(</p>
+<p>            $audioFile,</p>
+<p>            $language,</p>
+<p>            UserId::fromString($command->userId)</p>
+<p>        );</p>
+
+<p>        // 5. Persist</p>
+<p>        $this->repository->save($transcription);</p>
+
+<p>        // 6. Dispatch for async processing</p>
+<p>        $this->eventBus->dispatch(</p>
+<p>            new ProcessTranscriptionCommand(</p>
+<p>                $transcription->id()->toString(),</p>
+<p>                $command->priority</p>
+<p>            )</p>
+<p>        );</p>
+
+<p>        return $transcription->id();</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>Queries & Handlers</h4>
+
+<p>```php</p>
+<p>namespace Application\Transcription\Query;</p>
+
+<p>final class GetTranscriptionQuery</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        public readonly string $transcriptionId,</p>
+<p>        public readonly string $userId</p>
+<p>    ) {}</p>
+<p>}</p>
+
+<p>final class GetTranscriptionHandler</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        private TranscriptionRepository $repository,</p>
+<p>        private TranscriptionReadModel $readModel</p>
+<p>    ) {}</p>
+
+<p>    public function handle(GetTranscriptionQuery $query): ?TranscriptionDTO</p>
+<p>    {</p>
+<p>        $transcription = $this->repository->findById(</p>
+<p>            TranscriptionId::fromString($query->transcriptionId)</p>
+<p>        );</p>
+
+<p>        if (!$transcription || !$transcription->belongsTo($query->userId)) {</p>
+<p>            return null;</p>
+<p>        }</p>
+
+<p>        // Use read model for optimized queries</p>
+<p>        return $this->readModel->getDetails($transcription->id());</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>3. Infrastructure Layer</h3>
+
+<h4>Repository Implementation</h4>
+
+<p>```php</p>
+<p>namespace Infrastructure\Persistence\Doctrine;</p>
+
+<p>use Doctrine\ORM\EntityManagerInterface;</p>
+<p>use Domain\Transcription\Repository\TranscriptionRepository;</p>
+
+<p>final class DoctrineTranscriptionRepository implements TranscriptionRepository</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        private EntityManagerInterface $em</p>
+<p>    ) {}</p>
+
+<p>    public function save(Transcription $transcription): void</p>
+<p>    {</p>
+<p>        $this->em->persist($transcription);</p>
+<p>        $this->em->flush();</p>
+
+<p>        // Dispatch domain events</p>
+<p>        foreach ($transcription->pullDomainEvents() as $event) {</p>
+<p>            $this->em->getEventManager()->dispatchEvent(</p>
+<p>                $event::class,</p>
+<p>                new DomainEventArgs($event)</p>
+<p>            );</p>
+<p>        }</p>
+<p>    }</p>
+
+<p>    public function findById(TranscriptionId $id): ?Transcription</p>
+<p>    {</p>
+<p>        return $this->em->find(Transcription::class, $id);</p>
+<p>    }</p>
+
+<p>    public function findByUser(UserId $userId, int $limit = 10): array</p>
+<p>    {</p>
+<p>        return $this->em->createQueryBuilder()</p>
+<p>            ->select('t')</p>
+<p>            ->from(Transcription::class, 't')</p>
+<p>            ->where('t.userId = :userId')</p>
+<p>            ->setParameter('userId', $userId)</p>
+<p>            ->orderBy('t.createdAt', 'DESC')</p>
+<p>            ->setMaxResults($limit)</p>
+<p>            ->getQuery()</p>
+<p>            ->getResult();</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>External Service Adapter</h4>
+
+<p>```php</p>
+<p>namespace Infrastructure\External\OpenAI;</p>
+
+<p>use Domain\Transcription\Service\TranscriberInterface;</p>
+<p>use OpenAI\Client;</p>
+
+<p>final class OpenAITranscriber implements TranscriberInterface</p>
+<p>{</p>
+<p>    private Client $client;</p>
+<p>    private CacheInterface $cache;</p>
+<p>    private MetricsCollector $metrics;</p>
+
+<p>    public function __construct(</p>
+<p>        string $apiKey,</p>
+<p>        string $organizationId,</p>
+<p>        CacheInterface $cache,</p>
+<p>        MetricsCollector $metrics</p>
+<p>    ) {</p>
+<p>        $this->client = OpenAI::client($apiKey, $organizationId);</p>
+<p>        $this->cache = $cache;</p>
+<p>        $this->metrics = $metrics;</p>
+<p>    }</p>
+
+<p>    public function transcribe(AudioFile $audioFile): TranscriptionResult</p>
+<p>    {</p>
+<p>        $startTime = microtime(true);</p>
+
+<p>        try {</p>
+<p>            $response = $this->client->audio()->transcriptions->create([</p>
+<p>                'model' => 'whisper-1',</p>
+<p>                'file' => fopen($audioFile->path(), 'r'),</p>
+<p>                'language' => $audioFile->detectedLanguage()?->code(),</p>
+<p>                'response_format' => 'verbose_json'</p>
+<p>            ]);</p>
+
+<p>            $this->metrics->increment('openai.transcription.success');</p>
+<p>            $this->metrics->histogram(</p>
+<p>                'openai.transcription.duration',</p>
+<p>                microtime(true) - $startTime</p>
+<p>            );</p>
+
+<p>            return new TranscriptionResult(</p>
+<p>                $response->text,</p>
+<p>                $response->segments ?? [],</p>
+<p>                Language::fromCode($response->language)</p>
+<p>            );</p>
+
+<p>        } catch (\Exception $e) {</p>
+<p>            $this->metrics->increment('openai.transcription.error');</p>
+<p>            throw new TranscriptionFailedException(</p>
+<p>                'OpenAI transcription failed: ' . $e->getMessage(),</p>
+<p>                previous: $e</p>
+<p>            );</p>
+<p>        }</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h4>API Controllers</h4>
+
+<p>```php</p>
+<p>namespace Infrastructure\API\REST;</p>
+
+<p>use Symfony\Component\HttpFoundation\JsonResponse;</p>
+<p>use Symfony\Component\Routing\Annotation\Route;</p>
+
+#[Route('/api/v1/transcriptions')]
+<p>final class TranscriptionController</p>
+<p>{</p>
+<p>    public function __construct(</p>
+<p>        private CommandBus $commandBus,</p>
+<p>        private QueryBus $queryBus</p>
+<p>    ) {}</p>
+
+<p>    #[Route('', methods: ['POST'])]</p>
+<p>    public function create(Request $request): JsonResponse</p>
+<p>    {</p>
+<p>        $command = new TranscribeAudioCommand(</p>
+<p>            audioFilePath: $request->get('audio_path'),</p>
+<p>            userId: $request->attributes->get('user_id'),</p>
+<p>            language: $request->get('language'),</p>
+<p>            priority: $request->get('priority', false)</p>
+<p>        );</p>
+
+<p>        try {</p>
+<p>            $transcriptionId = $this->commandBus->dispatch($command);</p>
+
+<p>            return new JsonResponse([</p>
+<p>                'id' => $transcriptionId->toString(),</p>
+<p>                'status' => 'processing'</p>
+<p>            ], 202);</p>
+
+<p>        } catch (InvalidAudioFileException $e) {</p>
+<p>            return new JsonResponse([</p>
+<p>                'error' => 'Invalid audio file',</p>
+<p>                'details' => $e->getMessage()</p>
+<p>            ], 400);</p>
+<p>        }</p>
+<p>    }</p>
+
+<p>    #[Route('/{id}', methods: ['GET'])]</p>
+<p>    public function get(string $id, Request $request): JsonResponse</p>
+<p>    {</p>
+<p>        $query = new GetTranscriptionQuery(</p>
+<p>            transcriptionId: $id,</p>
+<p>            userId: $request->attributes->get('user_id')</p>
+<p>        );</p>
+
+<p>        $transcription = $this->queryBus->ask($query);</p>
+
+<p>        if (!$transcription) {</p>
+<p>            return new JsonResponse(['error' => 'Not found'], 404);</p>
+<p>        }</p>
+
+<p>        return new JsonResponse($transcription);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>🔧 Patterns et Pratiques</h2>
+
+<h3>Dependency Injection avec PHP-DI</h3>
+
+<p>```php</p>
+<p>// config/container.php</p>
+<p>use DI\ContainerBuilder;</p>
+
+<p>$containerBuilder = new ContainerBuilder();</p>
+
+<p>$containerBuilder->addDefinitions([</p>
+<p>    // Domain Services</p>
+<p>    TranscriptionPricingService::class => DI\create(StandardPricingService::class),</p>
+
+<p>    // Repositories</p>
+<p>    TranscriptionRepository::class => DI\autowire(DoctrineTranscriptionRepository::class),</p>
+
+<p>    // External Services</p>
+<p>    TranscriberInterface::class => DI\factory(function ($c) {</p>
+<p>        return new OpenAITranscriber(</p>
+<p>            $_ENV['OPENAI_API_KEY'],</p>
+<p>            $_ENV['OPENAI_ORG_ID'],</p>
+<p>            $c->get(CacheInterface::class),</p>
+<p>            $c->get(MetricsCollector::class)</p>
+<p>        );</p>
+<p>    }),</p>
+
+<p>    // Command Bus</p>
+<p>    CommandBus::class => DI\factory(function ($c) {</p>
+<p>        $bus = new SimpleCommandBus();</p>
+<p>        $bus->register(TranscribeAudioCommand::class, $c->get(TranscribeAudioHandler::class));</p>
+<p>        return $bus;</p>
+<p>    })</p>
+<p>]);</p>
+
+<p>return $containerBuilder->build();</p>
+<p>```</p>
+
+<h3>Tests Unitaires (Domain)</h3>
+
+<p>```php</p>
+<p>namespace Tests\Unit\Domain\Transcription;</p>
+
+<p>use PHPUnit\Framework\TestCase;</p>
+<p>use Domain\Transcription\Entity\Transcription;</p>
+<p>use Domain\Transcription\ValueObject\TranscribedText;</p>
+
+<p>class TranscriptionTest extends TestCase</p>
+<p>{</p>
+<p>    public function test_can_complete_pending_transcription(): void</p>
+<p>    {</p>
+<p>        // Arrange</p>
+<p>        $transcription = Transcription::create(</p>
+<p>            AudioFile::fromPath('/tmp/test.mp3'),</p>
+<p>            Language::FRENCH(),</p>
+<p>            UserId::fromString('user-123')</p>
+<p>        );</p>
+
+<p>        $text = new TranscribedText('Bonjour le monde', [</p>
+<p>            ['start' => 0, 'end' => 2, 'text' => 'Bonjour le monde']</p>
+<p>        ]);</p>
+
+<p>        // Act</p>
+<p>        $transcription->complete($text);</p>
+
+<p>        // Assert</p>
+<p>        $this->assertTrue($transcription->isCompleted());</p>
+<p>        $this->assertEquals('Bonjour le monde', $transcription->text()->content());</p>
+<p>        $this->assertEquals(3, $transcription->text()->wordCount());</p>
+
+<p>        $events = $transcription->pullDomainEvents();</p>
+<p>        $this->assertCount(2, $events); // Created + Completed</p>
+<p>        $this->assertInstanceOf(TranscriptionCompleted::class, $events[1]);</p>
+<p>    }</p>
+
+<p>    public function test_cannot_complete_already_completed_transcription(): void</p>
+<p>    {</p>
+<p>        // Arrange</p>
+<p>        $transcription = $this->createCompletedTranscription();</p>
+
+<p>        // Assert</p>
+<p>        $this->expectException(DomainException::class);</p>
+
+<p>        // Act</p>
+<p>        $transcription->complete(new TranscribedText('New text'));</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h3>Tests d'Intégration</h3>
+
+<p>```php</p>
+<p>namespace Tests\Integration\Application;</p>
+
+<p>use Tests\IntegrationTestCase;</p>
+<p>use Application\Transcription\Command\TranscribeAudioCommand;</p>
+
+<p>class TranscribeAudioTest extends IntegrationTestCase</p>
+<p>{</p>
+<p>    public function test_can_transcribe_audio_file(): void</p>
+<p>    {</p>
+<p>        // Arrange</p>
+<p>        $audioPath = $this->uploadTestFile('sample.mp3');</p>
+<p>        $command = new TranscribeAudioCommand(</p>
+<p>            audioFilePath: $audioPath,</p>
+<p>            userId: 'test-user',</p>
+<p>            language: 'fr'</p>
+<p>        );</p>
+
+<p>        // Act</p>
+<p>        $transcriptionId = $this->commandBus->dispatch($command);</p>
+
+<p>        // Assert</p>
+<p>        $this->assertNotNull($transcriptionId);</p>
+
+<p>        // Verify in database</p>
+<p>        $transcription = $this->repository->findById($transcriptionId);</p>
+<p>        $this->assertNotNull($transcription);</p>
+<p>        $this->assertTrue($transcription->isPending());</p>
+
+<p>        // Verify event was dispatched</p>
+<p>        $this->assertEventDispatched(ProcessTranscriptionCommand::class);</p>
+<p>    }</p>
+<p>}</p>
+<p>```</p>
+
+<h2>📊 Métriques et Monitoring</h2>
+
+<h3>Complexité Cyclomatique</h3>
+
+<p>```php</p>
+<p>// Utiliser PHPStan ou Psalm</p>
+<p>// phpstan.neon</p>
+<p>parameters:</p>
+<p>    level: 8</p>
+<p>    paths:</p>
+<p>        - src</p>
+<p>    excludePaths:</p>
+<p>        - src/Infrastructure/Migrations</p>
+
+<p>    # Règles de complexité</p>
+<p>    complexityLimit: 10</p>
+<p>    methodLengthLimit: 20</p>
+<p>    classLengthLimit: 200</p>
+<p>```</p>
+
+<h3>Code Coverage</h3>
+
+<p>```xml</p>
+<!-- phpunit.xml -->
+<phpunit>
+<p>    <coverage></p>
+<p>        <include></p>
+<p>            <directory suffix=".php">src</directory></p>
+<p>        </include></p>
+<p>        <exclude></p>
+<p>            <directory>src/Infrastructure/Migrations</directory></p>
+<p>        </exclude></p>
+<p>        <report></p>
+<p>            <html outputDirectory="build/coverage"/></p>
+<p>            <text outputFile="build/coverage.txt" showOnlySummary="true"/></p>
+<p>        </report></p>
+<p>    </coverage></p>
+</phpunit>
+<p>```</p>
+
+<h2>🚀 Migration depuis l'Architecture Actuelle</h2>
+
+<h3>Phase 1 : Extraction du Domain (2 semaines)</h3>
+
+<p>1. Créer les Value Objects pour remplacer les arrays</p>
+<p>2. Extraire les entités depuis les Services actuels</p>
+<p>3. Définir les interfaces Repository</p>
+
+<h3>Phase 2 : Application Layer (1 semaine)</h3>
+
+<p>1. Transformer les Controllers en Commands/Queries</p>
+<p>2. Implémenter les Handlers</p>
+<p>3. Ajouter le Command/Query Bus</p>
+
+<h3>Phase 3 : Infrastructure (2 semaines)</h3>
+
+<p>1. Adapter les Services existants comme Infrastructure</p>
+<p>2. Implémenter les Repository avec Doctrine</p>
+<p>3. Configurer PHP-DI</p>
+
+<h3>Phase 4 : API & Frontend (3 semaines)</h3>
+
+<p>1. GraphQL avec GraphQLite</p>
+<p>2. Migration progressive vers Vue 3</p>
+<p>3. TypeScript et tests E2E</p>
+
+<h2>📚 Ressources et Références</h2>
+
+<p>- [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)</p>
+<p>- [Domain-Driven Design - Eric Evans](https://domainlanguage.com/ddd/)</p>
+<p>- [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)</p>
+<p>- [Hexagonal Architecture - Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/)</p>
+
+<p>---</p>
+
+<p>**Note** : Cette architecture est conçue pour évoluer. Commencez simple, mesurez, et refactorisez quand nécessaire. L'over-engineering est aussi dangereux que l'under-engineering.</p>
+        </div>
+    </div>
+</body>
+</html>
