@@ -29,19 +29,7 @@ jobs:
     - name: Run tests with coverage
       run: |
         cd frontend
-        npm run test:coverage || npx vitest run --coverage --reporter=verbose --reporter=html --outputFile=coverage/index.html
-        
-    - name: Generate coverage report
-      run: |
-        cd frontend
-        # Generate coverage badge
-        COVERAGE_PERCENT=$(npx c8 report --reporter=text-summary | grep 'Lines' | awk '{print $3}' | sed 's/%//')
-        echo "Coverage: ${COVERAGE_PERCENT}%" > coverage/coverage-summary.txt
-        
-        # Create coverage HTML report if not exists
-        if [ ! -f "coverage/index.html" ]; then
-          npx c8 report --reporter=html --reports-dir=coverage
-        fi
+        npx vitest run --coverage --reporter=verbose --reporter=html
         
     - name: Update coverage documentation
       run: |
