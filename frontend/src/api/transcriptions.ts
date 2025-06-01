@@ -1,5 +1,4 @@
 import { apiClient } from './client'
-import { authApi } from './auth'
 import type { 
   ApiResponse, 
   PaginatedResponse,
@@ -98,25 +97,14 @@ export class TranscriptionAPI {
         formData.append('language', data.language)
       }
 
-      const token = authApi.getToken()
-      if (!token) {
-        throw new Error('Token d\'authentification requis')
-      }
-
-      const response = await fetch(`${this.baseUrl}/create.php`, {
-        method: 'POST',
+      // Utiliser l'API v2 moderne avec apiClient (gère automatiquement l'auth)
+      const response = await apiClient.post('/api/v2/transcriptions', formData, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Erreur lors de la création de la transcription')
-      }
-
-      return await response.json()
+      return response
     } catch (error) {
       console.error('Erreur lors de la création de transcription:', error)
       throw error
