@@ -309,9 +309,63 @@ EOF
 done
 
 # Create placeholder files for missing sections
-mkdir -p docs-dist/components docs-dist/testing docs-dist/deployment docs-dist/quality docs-dist/setup docs-dist/contributing docs-dist/workflows
+mkdir -p docs-dist/components docs-dist/testing docs-dist/deployment docs-dist/quality docs-dist/setup docs-dist/contributing docs-dist/workflows docs-dist/api
 
-# Components documentation
+# Convert documentation markdown files to HTML
+for section in api testing deployment setup contributing workflows; do
+    if [ -f "docs/${section}/README.md" ]; then
+        cat > docs-dist/${section}/index.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$(head -n1 docs/${section}/README.md | sed 's/^# //')</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .dark body { background: #111827; color: #f3f4f6; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f3f4f6; }
+        .dark p { color: #d1d5db; }
+        .dark pre { background: #1f2937; }
+        .dark code:not(pre code) { background: #374151; color: #f3f4f6; }
+        .dark th { background: #374151; }
+        .dark td { border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+$(cat docs/${section}/README.md | sed 's/^# \(.*\)/<h1>\1<\/h1>/' | sed 's/^## \(.*\)/<h2>\1<\/h2>/' | sed 's/^### \(.*\)/<h3>\1<\/h3>/' | sed 's/^#### \(.*\)/<h4>\1<\/h4>/' | sed 's/^\([^<#].*\)/<p>\1<\/p>/' | sed 's/```\([^`]*\)```/<pre><code>\1<\/code><\/pre>/g')
+        </div>
+    </div>
+</body>
+</html>
+EOF
+    fi
+done
+
+# Components documentation (fallback if no markdown)
+if [ ! -f "docs-dist/components/index.html" ]; then
 cat > docs-dist/components/index.html << 'EOF'
 <!DOCTYPE html>
 <html>
