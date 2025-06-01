@@ -94,5 +94,10 @@ export const authApi = {
   setAuthToken,
 
   // Clear auth token
-  clearAuthToken
+  clearAuthToken,
+
+  // Get current token
+  getToken: (): string | null => {
+    return localStorage.getItem('auth-token')
+  }
 }
