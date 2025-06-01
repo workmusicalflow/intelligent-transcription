@@ -9,8 +9,8 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: ['./src/tests/setup.ts'],
     coverage: {
-      provider: 'istanbul',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
       reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
