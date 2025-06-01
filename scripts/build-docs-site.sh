@@ -312,7 +312,7 @@ done
 mkdir -p docs-dist/components docs-dist/testing docs-dist/deployment docs-dist/quality docs-dist/setup docs-dist/contributing docs-dist/workflows docs-dist/api
 
 # Convert documentation markdown files to HTML
-for section in api testing deployment setup contributing workflows; do
+for section in api testing deployment setup contributing workflows components; do
     if [ -f "docs/${section}/README.md" ]; then
         cat > docs-dist/${section}/index.html << EOF
 <!DOCTYPE html>
@@ -361,6 +361,56 @@ $(cat docs/${section}/README.md | sed 's/^# \(.*\)/<h1>\1<\/h1>/' | sed 's/^## \
 </body>
 </html>
 EOF
+    fi
+done
+
+# Convert existing standalone documentation files
+mkdir -p docs-dist/legacy
+for file in docs/*.md; do
+    if [ -f "$file" ]; then
+        filename=$(basename "$file" .md)
+        if [ "$filename" != "README" ]; then
+            cat > docs-dist/legacy/${filename}.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$(head -n1 "$file" | sed 's/^# //' || echo "$filename")</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .markdown { max-width: 5xl; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937; }
+        h2 { font-size: 2rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; margin-bottom: 0.75rem; color: #4b5563; }
+        h4 { font-size: 1.25rem; font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #6b7280; }
+        p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+        code:not(pre code) { background: #e5e7eb; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 2rem; }
+        li { margin-bottom: 0.5rem; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #d1d5db; padding: 0.75rem; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="markdown">
+        <div class="mb-8">
+            <a href="../index.html" class="text-blue-600 hover:text-blue-800">
+                ← Retour à la documentation
+            </a>
+        </div>
+        <div class="prose prose-lg max-w-none">
+$(cat "$file" | sed 's/^# \(.*\)/<h1>\1<\/h1>/' | sed 's/^## \(.*\)/<h2>\1<\/h2>/' | sed 's/^### \(.*\)/<h3>\1<\/h3>/' | sed 's/^#### \(.*\)/<h4>\1<\/h4>/' | sed 's/^\([^<#].*\)/<p>\1<\/p>/')
+        </div>
+    </div>
+</body>
+</html>
+EOF
+        fi
     fi
 done
 
