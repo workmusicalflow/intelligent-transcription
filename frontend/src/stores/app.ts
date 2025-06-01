@@ -58,16 +58,14 @@ export const useAppStore = defineStore('app', () => {
   
   const checkConnectivity = async () => {
     try {
-      const response = await fetch('/api/transcriptions/list.php', {
-        method: 'HEAD',
+      // Utiliser un endpoint qui existe vraiment
+      const response = await fetch('/api/auth/login.php', {
+        method: 'OPTIONS', // OPTIONS ne nécessite pas d'authentification
         cache: 'no-cache'
       })
       
-      if (response.ok) {
-        setConnectionStatus('online')
-      } else {
-        setConnectionStatus('offline')
-      }
+      // Si le serveur répond (même avec 404 ou autre), il est en ligne
+      setConnectionStatus('online')
     } catch (error) {
       setConnectionStatus('offline')
     }

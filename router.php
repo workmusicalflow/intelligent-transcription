@@ -18,23 +18,33 @@ if (strpos($path, '/api/') === 0) {
     // Router vers le bon fichier
     switch (true) {
         case $apiPath === '/auth/login':
+        case $apiPath === '/auth/login.php':
             require __DIR__ . '/api/auth/login.php';
             return true;
             
         case $apiPath === '/auth/logout':
+        case $apiPath === '/auth/logout.php':
             require __DIR__ . '/api/auth/logout.php';
             return true;
             
         case $apiPath === '/auth/me':
+        case $apiPath === '/auth/me.php':
             require __DIR__ . '/api/auth/me.php';
             return true;
             
         case $apiPath === '/transcriptions/list':
+        case $apiPath === '/transcriptions/list.php':
             require __DIR__ . '/api/transcriptions/list.php';
             return true;
             
         case $apiPath === '/transcriptions/detail':
+        case $apiPath === '/transcriptions/detail.php':
             require __DIR__ . '/api/transcriptions/detail.php';
+            return true;
+            
+        case $apiPath === '/transcriptions/create':
+        case $apiPath === '/transcriptions/create.php':
+            require __DIR__ . '/api/transcriptions/create.php';
             return true;
             
         case preg_match('#^/v2/(.+)$#', $apiPath, $matches):

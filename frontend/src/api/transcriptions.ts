@@ -78,35 +78,61 @@ export class TranscriptionAPI {
   /**
    * Créer une nouvelle transcription (nouvelle implémentation)
    */
-  static async createTranscription(data: CreateTranscriptionData): Promise<ApiResponse<TranscriptionCreationResponse>> {
+  static async createTranscription(transcriptionData: CreateTranscriptionData): Promise<ApiResponse<TranscriptionCreationResponse>> {
     try {
+      console.log('Données à envoyer:', transcriptionData)
+      
       const formData = new FormData()
       
-      if (data.file) {
-        formData.append('audio_file', data.file)
-        if (data.title) {
-          formData.append('title', data.title)
+      if (transcriptionData.file) {
+        console.log('Ajout du fichier:', transcriptionData.file.name)
+        formData.append('audio_file', transcriptionData.file)
+        if (transcriptionData.title) {
+          formData.append('title', transcriptionData.title)
         }
-      } else if (data.youtubeUrl) {
-        formData.append('youtube_url', data.youtubeUrl)
+      } else if (transcriptionData.youtubeUrl) {
+        console.log('Ajout de l\'URL YouTube:', transcriptionData.youtubeUrl)
+        formData.append('youtube_url', transcriptionData.youtubeUrl)
       } else {
         throw new Error('Fichier ou URL YouTube requis')
       }
       
-      if (data.language) {
-        formData.append('language', data.language)
+      if (transcriptionData.language) {
+        console.log('Ajout de la langue:', transcriptionData.language)
+        formData.append('language', transcriptionData.language)
       }
 
-      // Utiliser temporairement l'ancienne API qui fonctionne
-      const response = await apiClient.post('/transcriptions/create.php', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+      // Debug: afficher le contenu du FormData
+      console.log('Contenu du FormData:')
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value)
+      }
 
-      return response
+      // Utiliser fetch directement pour éviter les problèmes d'Axios avec FormData
+      const token = localStorage.getItem('auth-token')
+      
+      const response = await fetch('/api/transcriptions/create.php', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // Ne PAS ajouter Content-Type, le navigateur le gère automatiquement pour FormData
+        },
+        body: formData
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erreur serveur' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
+      
+      const data = await response.json()
+
+      return data
     } catch (error) {
       console.error('Erreur lors de la création de transcription:', error)
+      if (error.response?.data) {
+        console.error('Détails de l\'erreur du serveur:', error.response.data)
+      }
       throw error
     }
   }
@@ -188,7 +214,7 @@ export class TranscriptionAPI {
     order?: 'asc' | 'desc'
   } = {}): Promise<ApiResponse<any>> {
     try {
-      const token = authApi.getToken()
+      const token = localStorage.getItem('auth-token')
       if (!token) {
         throw new Error('Token d\'authentification requis')
       }
@@ -223,7 +249,7 @@ export class TranscriptionAPI {
    */
   static async getTranscriptionDetails(id: string): Promise<ApiResponse<any>> {
     try {
-      const token = authApi.getToken()
+      const token = localStorage.getItem('auth-token')
       if (!token) {
         throw new Error('Token d\'authentification requis')
       }
@@ -234,12 +260,21 @@ export class TranscriptionAPI {
         }
       })
 
+      const responseText = await response.text()
+      console.log('Réponse serveur brute:', responseText)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Erreur lors de la récupération des détails')
+        console.error('Erreur HTTP:', response.status, responseText)
+        throw new Error(`HTTP ${response.status}: ${responseText.substring(0, 200)}`)
       }
 
-      return await response.json()
+      try {
+        return JSON.parse(responseText)
+      } catch (e) {
+        console.error('Erreur parsing JSON:', e)
+        console.error('Contenu reçu:', responseText.substring(0, 500))
+        throw new Error('Réponse serveur invalide: ' + responseText.substring(0, 100))
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des détails:', error)
       throw error

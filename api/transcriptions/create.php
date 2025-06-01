@@ -55,6 +55,13 @@ try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    // Debug : afficher ce qui est reçu
+    error_log("=== DEBUG CREATE TRANSCRIPTION ===");
+    error_log("POST data: " . print_r($_POST, true));
+    error_log("FILES data: " . print_r($_FILES, true));
+    error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
+    error_log("Content type: " . ($_SERVER['CONTENT_TYPE'] ?? 'non défini'));
+    
     // Déterminer le type de transcription (fichier ou YouTube)
     $isFileUpload = isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK;
     $isYouTube = !$isFileUpload && isset($_POST['youtube_url']) && !empty($_POST['youtube_url']);
@@ -140,10 +147,10 @@ try {
     $insertQuery = "
         INSERT INTO transcriptions (
             id, user_id, file_name, file_path, file_size, language, 
-            youtube_url, youtube_id, created_at, is_processed
+            youtube_url, youtube_id, created_at, is_processed, text
         ) VALUES (
             :id, :user_id, :file_name, :file_path, :file_size, :language,
-            :youtube_url, :youtube_id, :created_at, :is_processed
+            :youtube_url, :youtube_id, :created_at, :is_processed, :text
         )
     ";
     
@@ -158,7 +165,8 @@ try {
         'youtube_url' => $youtubeUrl ?: null,
         'youtube_id' => $youtubeId ?: null,
         'created_at' => date('Y-m-d H:i:s'),
-        'is_processed' => 0
+        'is_processed' => 0,
+        'text' => '' // Texte vide temporaire, sera rempli par le processus de transcription
     ]);
     
     if (!$result) {

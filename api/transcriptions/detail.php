@@ -92,6 +92,19 @@ try {
         exit;
     }
     
+    // Essayer de récupérer les vrais segments Whisper depuis les métadonnées
+    $realSegments = [];
+    $hasRealSegments = false;
+    
+    // Vérifier s'il existe des données Whisper avec segments
+    if (!empty($transcription['whisper_data'])) {
+        $whisperData = json_decode($transcription['whisper_data'], true);
+        if ($whisperData && isset($whisperData['segments'])) {
+            $realSegments = $whisperData['segments'];
+            $hasRealSegments = true;
+        }
+    }
+    
     // Formater les données pour le frontend
     $formattedTranscription = [
         'id' => $transcription['id'],
@@ -125,19 +138,6 @@ try {
         'paragraphCount' => substr_count($transcription['text'], "\n") + 1,
         'estimatedReadingTime' => ceil(str_word_count($transcription['text']) / 200) // 200 mots/minute
     ];
-    
-    // Essayer de récupérer les vrais segments Whisper depuis les métadonnées
-    $realSegments = [];
-    $hasRealSegments = false;
-    
-    // Vérifier s'il existe des données Whisper avec segments
-    if (!empty($transcription['whisper_data'])) {
-        $whisperData = json_decode($transcription['whisper_data'], true);
-        if ($whisperData && isset($whisperData['segments'])) {
-            $realSegments = $whisperData['segments'];
-            $hasRealSegments = true;
-        }
-    }
     
     // Si pas de vrais segments, générer des segments estimés
     $segments = [];

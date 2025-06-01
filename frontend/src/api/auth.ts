@@ -14,22 +14,22 @@ export interface AuthResponse {
 export const authApi = {
   // Login
   login: async (credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> => {
-    return api.post<AuthResponse>('/auth/login', credentials)
+    return api.post<AuthResponse>('/auth/login.php', credentials)
   },
 
   // Register
   register: async (data: RegisterData): Promise<ApiResponse<AuthResponse>> => {
-    return api.post<AuthResponse>('/auth/register', data)
+    return api.post<AuthResponse>('/auth/register.php', data)
   },
 
   // Logout
   logout: async (): Promise<ApiResponse> => {
-    return api.post('/auth/logout')
+    return api.post('/auth/logout.php')
   },
 
   // Get current user
   me: async (): Promise<ApiResponse<User>> => {
-    return api.get<User>('/auth/me')
+    return api.get<User>('/auth/me.php')
   },
 
   // Update profile
