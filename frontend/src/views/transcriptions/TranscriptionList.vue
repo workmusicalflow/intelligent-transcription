@@ -86,9 +86,9 @@
           <button
             @click="toggleSortOrder"
             class="px-2 py-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            :title="filters.sortOrder === 'DESC' ? 'Croissant' : 'Décroissant'"
+            :title="filters.sortOrder === 'desc' ? 'Décroissant' : 'Croissant'"
           >
-            {{ filters.sortOrder === 'DESC' ? '⬇️' : '⬆️' }}
+            {{ filters.sortOrder === 'desc' ? '⬇️' : '⬆️' }}
           </button>
         </div>
 
@@ -154,7 +154,11 @@
         <div
           v-for="transcription in transcriptions"
           :key="transcription.id"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700"
+          :class="[
+            'bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700',
+            transcription.status === 'processing' ? 'processing-card' : '',
+            transcription.status === 'completed' ? 'completed-card' : ''
+          ]"
         >
           <div class="p-4">
             <!-- En-tête de la carte -->
@@ -166,13 +170,16 @@
                 <div class="flex items-center space-x-2 mt-1">
                   <span 
                     :class="[
-                      'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+                      'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium status-transition',
                       transcription.status === 'completed'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                     ]"
                   >
-                    {{ transcription.status === 'completed' ? '✅ Terminée' : '⏳ En cours' }}
+                    <span class="status-icon">
+                      {{ transcription.status === 'completed' ? '✅' : '⏳' }}
+                    </span>
+                    {{ transcription.status === 'completed' ? ' Terminée' : ' En cours' }}
                   </span>
                   <span class="text-xs text-gray-500 dark:text-gray-400">
                     {{ getLanguageName(transcription.language) }}
@@ -245,10 +252,22 @@
 
           <!-- Barre de progression pour les transcriptions en cours -->
           <div v-if="transcription.status === 'processing'" class="px-4 pb-4">
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div class="bg-yellow-500 h-2 rounded-full animate-pulse" :style="{ width: '60%' }"></div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-fast"></div>
+              </div>
             </div>
-            <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Transcription en cours...</p>
+            <div class="flex items-center justify-between mt-2">
+              <p class="text-xs text-yellow-600 dark:text-yellow-400 flex items-center">
+                <span class="animate-spin mr-1">⚡</span>
+                Transcription en cours...
+              </p>
+              <div class="flex space-x-1">
+                <div class="w-1 h-1 bg-yellow-500 rounded-full animate-bounce"></div>
+                <div class="w-1 h-1 bg-yellow-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-1 h-1 bg-yellow-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -300,7 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { TranscriptionAPI } from '@/api/transcriptions'
 import { useUIStore } from '@/stores/ui'
@@ -322,7 +341,7 @@ const filters = ref({
   language: '',
   status: '',
   sortBy: 'created_at',
-  sortOrder: 'DESC'
+  sortOrder: 'desc' as 'asc' | 'desc'
 })
 
 const pagination = ref({
@@ -461,7 +480,7 @@ const applyFilters = () => {
 
 // Toggle du tri
 const toggleSortOrder = () => {
-  filters.value.sortOrder = filters.value.sortOrder === 'DESC' ? 'ASC' : 'DESC'
+  filters.value.sortOrder = filters.value.sortOrder === 'desc' ? 'asc' : 'desc'
   applyFilters()
 }
 
@@ -471,7 +490,7 @@ const clearFilters = () => {
   filters.value.language = ''
   filters.value.status = ''
   filters.value.sortBy = 'created_at'
-  filters.value.sortOrder = 'DESC'
+  filters.value.sortOrder = 'desc'
   pagination.value.currentPage = 1
   loadTranscriptions()
 }
@@ -522,10 +541,94 @@ const handleClickOutside = (event: Event) => {
   }
 }
 
+// Variables pour le polling
+const pollingInterval = ref<NodeJS.Timeout | null>(null)
+const isPolling = ref(false)
+
+// Fonction de polling pour les transcriptions en cours
+const startPolling = () => {
+  if (isPolling.value) return
+  
+  // Vérifier s'il y a des transcriptions en cours
+  const hasProcessing = transcriptions.value.some(t => t.status === 'processing')
+  if (!hasProcessing) return
+  
+  isPolling.value = true
+  pollingInterval.value = setInterval(async () => {
+    try {
+      // Recharger la liste silencieusement (sans loader)
+      const response = await TranscriptionAPI.listTranscriptions({
+        page: pagination.value.currentPage,
+        limit: pagination.value.limit,
+        search: filters.value.search,
+        language: filters.value.language,
+        status: filters.value.status,
+        sort: filters.value.sortBy,
+        order: filters.value.sortOrder
+      })
+      
+      if (response.success && response.data) {
+        const oldTranscriptions = [...transcriptions.value]
+        transcriptions.value = response.data.transcriptions
+        
+        // Vérifier s'il y a des changements de statut
+        oldTranscriptions.forEach(oldT => {
+          const newT = transcriptions.value.find(t => t.id === oldT.id)
+          if (newT && oldT.status !== newT.status) {
+            console.log('🔄 Transcription mise à jour:', oldT.id, oldT.status, '→', newT.status)
+            
+            if (newT.status === 'completed') {
+              uiStore.showNotification({
+                type: 'success',
+                title: 'Transcription terminée',
+                message: `"${newT.fileName}" a été traitée avec succès.`,
+                duration: 4000
+              })
+            }
+          }
+        })
+        
+        // Arrêter le polling s'il n'y a plus de transcriptions en cours
+        const stillProcessing = transcriptions.value.some(t => t.status === 'processing')
+        if (!stillProcessing) {
+          stopPolling()
+        }
+      }
+    } catch (err) {
+      console.error('Erreur lors du polling de la liste:', err)
+    }
+  }, 5000) // Vérifier toutes les 5 secondes
+}
+
+const stopPolling = () => {
+  if (pollingInterval.value) {
+    clearInterval(pollingInterval.value)
+    pollingInterval.value = null
+  }
+  isPolling.value = false
+}
+
+// Watcher pour démarrer le polling quand il y a des transcriptions en cours
+watch(() => transcriptions.value, (newTranscriptions) => {
+  const hasProcessing = newTranscriptions.some(t => t.status === 'processing')
+  if (hasProcessing && !isPolling.value) {
+    console.log('🚀 Démarrage du polling - transcriptions en cours détectées')
+    startPolling()
+  } else if (!hasProcessing && isPolling.value) {
+    console.log('✅ Arrêt du polling - plus de transcriptions en cours')
+    stopPolling()
+  }
+}, { deep: true })
+
 // Lifecycle
 onMounted(() => {
   loadTranscriptions()
   document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  stopPolling()
+  document.removeEventListener('click', handleClickOutside)
 })
 
 // Nettoyage
@@ -551,5 +654,103 @@ export default {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Animation shimmer rapide pour les barres de progression */
+@keyframes shimmer-fast {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer-fast {
+  animation: shimmer-fast 1.5s infinite;
+}
+
+/* Animation d'apparition pour les cartes de transcription */
+.grid > div {
+  animation: fadeInScale 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.grid > div:nth-child(1) { animation-delay: 0.1s; }
+.grid > div:nth-child(2) { animation-delay: 0.2s; }
+.grid > div:nth-child(3) { animation-delay: 0.3s; }
+.grid > div:nth-child(4) { animation-delay: 0.4s; }
+.grid > div:nth-child(5) { animation-delay: 0.5s; }
+.grid > div:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animation pour les changements de statut */
+.status-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Animation de pulsation pour les transcriptions en cours */
+.processing-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.processing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  animation: processingGlow 2s infinite;
+}
+
+@keyframes processingGlow {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Animation de completion */
+@keyframes completionPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+}
+
+.completed-card {
+  animation: completionPulse 1s ease-out;
+}
+
+/* Amélioration des transitions de survol */
+.grid > div:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease-out;
+}
+
+/* Animation des icônes de statut */
+.status-icon {
+  transition: transform 0.2s ease-in-out;
+}
+
+.status-icon:hover {
+  transform: scale(1.1);
 }
 </style>

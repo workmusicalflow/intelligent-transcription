@@ -297,12 +297,39 @@
         <div class="flex-1 overflow-auto">
           <!-- Reading mode -->
           <div v-if="viewMode === 'read'" class="p-8" data-testid="read-mode">
-            <div
-              ref="textContainer"
-              class="prose prose-lg max-w-none dark:prose-invert"
-              :style="{ fontSize: fontSize + 'px', lineHeight: '1.8' }"
-              v-html="highlightedText"
-            ></div>
+            <!-- Loading state for text content -->
+            <TranscriptionLoader 
+              v-if="transcription?.status === 'processing'" 
+              :show-steps="true"
+              :steps="transcriptionSteps"
+            />
+            
+            <!-- Text content with fade-in animation -->
+            <transition
+              name="text-reveal"
+              enter-active-class="transition-all duration-1000 ease-out"
+              enter-from-class="opacity-0 transform translate-y-8 scale-95"
+              enter-to-class="opacity-100 transform translate-y-0 scale-100"
+            >
+              <div
+                v-if="transcription?.status === 'completed' && transcription?.text"
+                ref="textContainer"
+                class="prose prose-lg max-w-none dark:prose-invert"
+                :style="{ fontSize: fontSize + 'px', lineHeight: '1.8' }"
+                v-html="highlightedText"
+              ></div>
+            </transition>
+            
+            <!-- Empty state for no text yet -->
+            <div v-if="!transcription?.text && transcription?.status !== 'processing'" class="text-center py-12">
+              <div class="text-6xl mb-4 opacity-50">📝</div>
+              <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
+                Aucun texte disponible
+              </h3>
+              <p class="text-gray-400 dark:text-gray-500">
+                La transcription n'a pas encore été générée
+              </p>
+            </div>
           </div>
 
           <!-- Edit mode -->
@@ -381,10 +408,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TranscriptionAPI } from '@/api/transcriptions'
 import { useUIStore } from '@/stores/ui'
+import TranscriptionLoader from '@/components/ui/TranscriptionLoader.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -474,6 +502,13 @@ const exportFormats = [
   { key: 'docx', icon: '📘', label: 'DOCX' },
   { key: 'json', icon: '⚙️', label: 'JSON' }
 ]
+
+// Étapes de transcription pour l'animation
+const transcriptionSteps = ref([
+  { label: 'Préparation', completed: true, active: false },
+  { label: 'Analyse IA', completed: false, active: true },
+  { label: 'Finalisation', completed: false, active: false }
+])
 
 // Computed
 const highlightedText = computed(() => {
@@ -720,14 +755,132 @@ const loadTranscription = async () => {
   }
 }
 
+// Variables pour le polling
+const pollingInterval = ref<NodeJS.Timeout | null>(null)
+const isPolling = ref(false)
+
+// Fonction de polling pour les transcriptions en cours
+const startPolling = () => {
+  if (isPolling.value) return
+  
+  isPolling.value = true
+  pollingInterval.value = setInterval(async () => {
+    try {
+      const transcriptionId = route.params.id as string
+      const response = await TranscriptionAPI.getTranscriptionDetails(transcriptionId)
+      
+      if (response.success && response.data) {
+        const newTranscription = response.data.transcription
+        
+        // Vérifier si le statut a changé
+        if (transcription.value && newTranscription.status !== transcription.value.status) {
+          console.log('🔄 Mise à jour du statut:', transcription.value.status, '→', newTranscription.status)
+          
+          // Afficher une notification
+          if (newTranscription.status === 'completed') {
+            uiStore.showNotification({
+              type: 'success',
+              title: 'Transcription terminée !',
+              message: 'Votre transcription a été traitée avec succès.',
+              duration: 5000
+            })
+          } else if (newTranscription.status === 'failed') {
+            uiStore.showNotification({
+              type: 'error',
+              title: 'Erreur de transcription',
+              message: 'Une erreur est survenue lors du traitement.',
+              duration: 5000
+            })
+          }
+          
+          // Mettre à jour toutes les données
+          transcription.value = newTranscription
+          textStats.value = response.data.textStats
+          segments.value = response.data.segments
+          
+          // Mettre à jour le texte d'édition si la transcription est terminée
+          if (newTranscription.status === 'completed' && newTranscription.text) {
+            originalText.value = newTranscription.text
+            if (!hasChanges.value) {
+              editText.value = newTranscription.text
+            }
+          }
+          
+          // Arrêter le polling si terminé ou échoué
+          if (newTranscription.status === 'completed' || newTranscription.status === 'failed') {
+            stopPolling()
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Erreur lors du polling:', err)
+      // Continuer le polling même en cas d'erreur
+    }
+  }, 3000) // Vérifier toutes les 3 secondes
+}
+
+const stopPolling = () => {
+  if (pollingInterval.value) {
+    clearInterval(pollingInterval.value)
+    pollingInterval.value = null
+  }
+  isPolling.value = false
+}
+
 // Watchers
 watch(() => editText.value, (newValue) => {
   hasChanges.value = newValue !== originalText.value
 })
 
+// Fonction pour mettre à jour les étapes de progression
+const updateTranscriptionSteps = (status: string) => {
+  if (status === 'processing') {
+    // Simulation de progression des étapes pendant le traitement
+    transcriptionSteps.value = [
+      { label: 'Préparation', completed: true, active: false },
+      { label: 'Analyse IA', completed: false, active: true },
+      { label: 'Finalisation', completed: false, active: false }
+    ]
+    
+    // Simuler la progression toutes les 10 secondes
+    setTimeout(() => {
+      if (transcription.value?.status === 'processing') {
+        transcriptionSteps.value = [
+          { label: 'Préparation', completed: true, active: false },
+          { label: 'Analyse IA', completed: true, active: false },
+          { label: 'Finalisation', completed: false, active: true }
+        ]
+      }
+    }, 10000)
+  } else if (status === 'completed') {
+    transcriptionSteps.value = [
+      { label: 'Préparation', completed: true, active: false },
+      { label: 'Analyse IA', completed: true, active: false },
+      { label: 'Finalisation', completed: true, active: false }
+    ]
+  }
+}
+
+// Watcher pour démarrer/arrêter le polling selon le statut
+watch(() => transcription.value?.status, (newStatus) => {
+  if (newStatus === 'processing') {
+    console.log('🚀 Démarrage du polling pour transcription en cours')
+    updateTranscriptionSteps(newStatus)
+    startPolling()
+  } else if (newStatus === 'completed' || newStatus === 'failed') {
+    console.log('✅ Arrêt du polling - transcription terminée')
+    updateTranscriptionSteps(newStatus)
+    stopPolling()
+  }
+}, { immediate: true })
+
 // Lifecycle
 onMounted(() => {
   loadTranscription()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 </script>
 
@@ -780,5 +933,117 @@ html {
 
 .dark .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
+}
+
+/* Animation pour la révélation du texte */
+.text-reveal-enter-active {
+  transition: all 1s ease-out;
+}
+
+.text-reveal-enter-from {
+  opacity: 0;
+  transform: translateY(2rem) scale(0.95);
+}
+
+.text-reveal-enter-to {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Animation de l'effet shimmer */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Animation de typing */
+@keyframes typing-cursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor {
+  animation: typing-cursor 1s infinite;
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+.typing-animation {
+  font-family: 'Courier New', monospace;
+}
+
+.typing-text {
+  position: relative;
+}
+
+/* Animation de pulsation douce pour les éléments de chargement */
+@keyframes soft-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 2s ease-in-out infinite;
+}
+
+/* Transition pour l'apparition progressive des paragraphes */
+.prose p {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.prose p:nth-child(1) { animation-delay: 0.1s; }
+.prose p:nth-child(2) { animation-delay: 0.2s; }
+.prose p:nth-child(3) { animation-delay: 0.3s; }
+.prose p:nth-child(4) { animation-delay: 0.4s; }
+.prose p:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation pour les skeleton loaders */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-pulse {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.dark .animate-pulse {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
 }
 </style>

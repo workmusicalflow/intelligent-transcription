@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ```bash
 cd /Users/ns2poportable/Desktop/inteligent-transcription
-php -S localhost:8000 -t .
+php -S localhost:8000 -c php.ini router.php
 ```
 
 ### Terminal 2 : Frontend Vue 3
@@ -46,7 +46,16 @@ cd /Users/ns2poportable/Desktop/inteligent-transcription/frontend
 npm run dev
 ```
 
-### Terminal 3 : Worker Asynchrone PHP (optionnel)
+### Terminal 3 : Worker de Transcription (recommandé)
+
+```bash
+cd /Users/ns2poportable/Desktop/inteligent-transcription
+php transcription_worker.php
+```
+
+> Ce worker traite automatiquement les transcriptions en arrière-plan
+
+### Terminal 4 : Worker Asynchrone PHP (optionnel)
 
 ```bash
 cd /Users/ns2poportable/Desktop/inteligent-transcription
