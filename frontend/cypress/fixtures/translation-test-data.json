@@ -1,0 +1,424 @@
+{
+  "testTranscriptions": [
+    {
+      "id": "test_en_basic_transcription",
+      "title": "Basic English Test",
+      "language": "en",
+      "file_name": "test_basic.mp3",
+      "status": "completed",
+      "duration": 15.5,
+      "segments": [
+        {
+          "id": 1,
+          "start": 0.0,
+          "end": 3.5,
+          "text": "Hello, this is Matt. This MCP tutorial is all you'll need.",
+          "words": [
+            { "word": "Hello", "start": 0.0, "end": 0.5 },
+            { "word": "this", "start": 0.6, "end": 0.8 },
+            { "word": "is", "start": 0.9, "end": 1.0 },
+            { "word": "Matt", "start": 1.1, "end": 1.4 },
+            { "word": "This", "start": 2.0, "end": 2.3 },
+            { "word": "MCP", "start": 2.4, "end": 2.7 },
+            { "word": "tutorial", "start": 2.8, "end": 3.1 },
+            { "word": "is", "start": 3.2, "end": 3.3 },
+            { "word": "all", "start": 3.4, "end": 3.5 }
+          ]
+        },
+        {
+          "id": 2,
+          "start": 4.0,
+          "end": 8.2,
+          "text": "We'll explore advanced features for professional dubbing workflows.",
+          "words": [
+            { "word": "We'll", "start": 4.0, "end": 4.3 },
+            { "word": "explore", "start": 4.4, "end": 4.9 },
+            { "word": "advanced", "start": 5.0, "end": 5.6 },
+            { "word": "features", "start": 5.7, "end": 6.2 },
+            { "word": "for", "start": 6.3, "end": 6.4 },
+            { "word": "professional", "start": 6.5, "end": 7.2 },
+            { "word": "dubbing", "start": 7.3, "end": 7.7 },
+            { "word": "workflows", "start": 7.8, "end": 8.2 }
+          ]
+        },
+        {
+          "id": 3,
+          "start": 9.0,
+          "end": 15.5,
+          "text": "Revolutionary translation with emotion preservation and precise timing synchronization.",
+          "words": [
+            { "word": "Revolutionary", "start": 9.0, "end": 9.8 },
+            { "word": "translation", "start": 9.9, "end": 10.6 },
+            { "word": "with", "start": 10.7, "end": 10.9 },
+            { "word": "emotion", "start": 11.0, "end": 11.5 },
+            { "word": "preservation", "start": 11.6, "end": 12.4 },
+            { "word": "and", "start": 12.5, "end": 12.6 },
+            { "word": "precise", "start": 12.7, "end": 13.2 },
+            { "word": "timing", "start": 13.3, "end": 13.7 },
+            { "word": "synchronization", "start": 13.8, "end": 15.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test_en_technical_content",
+      "title": "Technical Content Test",
+      "language": "en", 
+      "file_name": "test_technical.mp3",
+      "status": "completed",
+      "duration": 22.8,
+      "segments": [
+        {
+          "id": 1,
+          "start": 0.0,
+          "end": 6.5,
+          "text": "Machine learning algorithms require substantial computational resources for training neural networks.",
+          "words": [
+            { "word": "Machine", "start": 0.0, "end": 0.5 },
+            { "word": "learning", "start": 0.6, "end": 1.1 },
+            { "word": "algorithms", "start": 1.2, "end": 1.9 },
+            { "word": "require", "start": 2.0, "end": 2.5 },
+            { "word": "substantial", "start": 2.6, "end": 3.4 },
+            { "word": "computational", "start": 3.5, "end": 4.4 },
+            { "word": "resources", "start": 4.5, "end": 5.1 },
+            { "word": "for", "start": 5.2, "end": 5.3 },
+            { "word": "training", "start": 5.4, "end": 5.9 },
+            { "word": "neural", "start": 6.0, "end": 6.3 },
+            { "word": "networks", "start": 6.4, "end": 6.5 }
+          ]
+        },
+        {
+          "id": 2,
+          "start": 7.0,
+          "end": 14.2,
+          "text": "GPU acceleration enables faster processing through parallel computation using CUDA cores efficiently.",
+          "words": [
+            { "word": "GPU", "start": 7.0, "end": 7.4 },
+            { "word": "acceleration", "start": 7.5, "end": 8.3 },
+            { "word": "enables", "start": 8.4, "end": 8.9 },
+            { "word": "faster", "start": 9.0, "end": 9.4 },
+            { "word": "processing", "start": 9.5, "end": 10.2 },
+            { "word": "through", "start": 10.3, "end": 10.7 },
+            { "word": "parallel", "start": 10.8, "end": 11.4 },
+            { "word": "computation", "start": 11.5, "end": 12.3 },
+            { "word": "using", "start": 12.4, "end": 12.7 },
+            { "word": "CUDA", "start": 12.8, "end": 13.2 },
+            { "word": "cores", "start": 13.3, "end": 13.7 },
+            { "word": "efficiently", "start": 13.8, "end": 14.2 }
+          ]
+        },
+        {
+          "id": 3,
+          "start": 15.0,
+          "end": 22.8,
+          "text": "Optimization techniques include batch normalization, dropout regularization, and learning rate scheduling.",
+          "words": [
+            { "word": "Optimization", "start": 15.0, "end": 15.8 },
+            { "word": "techniques", "start": 15.9, "end": 16.6 },
+            { "word": "include", "start": 16.7, "end": 17.2 },
+            { "word": "batch", "start": 17.3, "end": 17.7 },
+            { "word": "normalization", "start": 17.8, "end": 18.7 },
+            { "word": "dropout", "start": 18.8, "end": 19.3 },
+            { "word": "regularization", "start": 19.4, "end": 20.4 },
+            { "word": "and", "start": 20.5, "end": 20.6 },
+            { "word": "learning", "start": 20.7, "end": 21.2 },
+            { "word": "rate", "start": 21.3, "end": 21.5 },
+            { "word": "scheduling", "start": 21.6, "end": 22.8 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "test_en_emotional_content",
+      "title": "Emotional Content Test",
+      "language": "en",
+      "file_name": "test_emotional.mp3", 
+      "status": "completed",
+      "duration": 18.3,
+      "segments": [
+        {
+          "id": 1,
+          "start": 0.0,
+          "end": 5.8,
+          "text": "I'm absolutely thrilled to announce this incredible breakthrough in AI technology!",
+          "words": [
+            { "word": "I'm", "start": 0.0, "end": 0.3 },
+            { "word": "absolutely", "start": 0.4, "end": 1.1 },
+            { "word": "thrilled", "start": 1.2, "end": 1.8 },
+            { "word": "to", "start": 1.9, "end": 2.0 },
+            { "word": "announce", "start": 2.1, "end": 2.7 },
+            { "word": "this", "start": 2.8, "end": 3.0 },
+            { "word": "incredible", "start": 3.1, "end": 3.9 },
+            { "word": "breakthrough", "start": 4.0, "end": 4.8 },
+            { "word": "in", "start": 4.9, "end": 5.0 },
+            { "word": "AI", "start": 5.1, "end": 5.3 },
+            { "word": "technology", "start": 5.4, "end": 5.8 }
+          ]
+        },
+        {
+          "id": 2,
+          "start": 6.5,
+          "end": 12.1,
+          "text": "However, we must carefully consider the ethical implications of these powerful capabilities.",
+          "words": [
+            { "word": "However", "start": 6.5, "end": 7.0 },
+            { "word": "we", "start": 7.1, "end": 7.2 },
+            { "word": "must", "start": 7.3, "end": 7.6 },
+            { "word": "carefully", "start": 7.7, "end": 8.3 },
+            { "word": "consider", "start": 8.4, "end": 8.9 },
+            { "word": "the", "start": 9.0, "end": 9.1 },
+            { "word": "ethical", "start": 9.2, "end": 9.7 },
+            { "word": "implications", "start": 9.8, "end": 10.6 },
+            { "word": "of", "start": 10.7, "end": 10.8 },
+            { "word": "these", "start": 10.9, "end": 11.1 },
+            { "word": "powerful", "start": 11.2, "end": 11.7 },
+            { "word": "capabilities", "start": 11.8, "end": 12.1 }
+          ]
+        },
+        {
+          "id": 3,
+          "start": 13.0,
+          "end": 18.3,
+          "text": "Together, we can build a future where technology serves humanity with wisdom and compassion.",
+          "words": [
+            { "word": "Together", "start": 13.0, "end": 13.5 },
+            { "word": "we", "start": 13.6, "end": 13.7 },
+            { "word": "can", "start": 13.8, "end": 14.0 },
+            { "word": "build", "start": 14.1, "end": 14.4 },
+            { "word": "a", "start": 14.5, "end": 14.6 },
+            { "word": "future", "start": 14.7, "end": 15.1 },
+            { "word": "where", "start": 15.2, "end": 15.5 },
+            { "word": "technology", "start": 15.6, "end": 16.3 },
+            { "word": "serves", "start": 16.4, "end": 16.8 },
+            { "word": "humanity", "start": 16.9, "end": 17.5 },
+            { "word": "with", "start": 17.6, "end": 17.8 },
+            { "word": "wisdom", "start": 17.9, "end": 18.2 },
+            { "word": "and", "start": 18.3, "end": 18.3 }
+          ]
+        }
+      ]
+    }
+  ],
+  
+  "expectedTranslations": {
+    "en_to_fr": {
+      "basic": {
+        "segments": [
+          {
+            "id": 1,
+            "start": 0.0,
+            "end": 3.8,
+            "text": "Salut, c'est Matt. Ce tutoriel MCP est tout ce dont vous aurez besoin.",
+            "length_adaptation_ratio": 1.09
+          },
+          {
+            "id": 2,
+            "start": 4.0,
+            "end": 8.5,
+            "text": "Nous explorerons les fonctionnalités avancées pour les flux de travail de doublage professionnel.",
+            "length_adaptation_ratio": 1.04
+          },
+          {
+            "id": 3,
+            "start": 9.0,
+            "end": 16.2,
+            "text": "Traduction révolutionnaire avec préservation des émotions et synchronisation temporelle précise.",
+            "length_adaptation_ratio": 1.05
+          }
+        ],
+        "quality_metrics": {
+          "expected_quality_score": 0.92,
+          "timestamp_preservation_score": 0.98,
+          "emotional_preservation_score": 0.85
+        }
+      },
+      "technical": {
+        "segments": [
+          {
+            "id": 1,
+            "start": 0.0,
+            "end": 7.1,
+            "text": "Les algorithmes d'apprentissage automatique nécessitent des ressources informatiques substantielles pour l'entraînement des réseaux de neurones.",
+            "length_adaptation_ratio": 1.09
+          },
+          {
+            "id": 2,
+            "start": 7.0,
+            "end": 15.0,
+            "text": "L'accélération GPU permet un traitement plus rapide grâce au calcul parallèle utilisant efficacement les cœurs CUDA.",
+            "length_adaptation_ratio": 1.06
+          },
+          {
+            "id": 3,
+            "start": 15.0,
+            "end": 24.2,
+            "text": "Les techniques d'optimisation incluent la normalisation par lots, la régularisation par abandon et la planification du taux d'apprentissage.",
+            "length_adaptation_ratio": 1.06
+          }
+        ],
+        "quality_metrics": {
+          "expected_quality_score": 0.95,
+          "timestamp_preservation_score": 0.97,
+          "technical_terms_preservation": 0.93
+        }
+      },
+      "emotional": {
+        "segments": [
+          {
+            "id": 1,
+            "start": 0.0,
+            "end": 6.2,
+            "text": "Je suis absolument ravi d'annoncer cette incroyable percée dans la technologie IA !",
+            "length_adaptation_ratio": 1.07
+          },
+          {
+            "id": 2,
+            "start": 6.5,
+            "end": 12.8,
+            "text": "Cependant, nous devons soigneusement considérer les implications éthiques de ces capacités puissantes.",
+            "length_adaptation_ratio": 1.06
+          },
+          {
+            "id": 3,
+            "start": 13.0,
+            "end": 19.5,
+            "text": "Ensemble, nous pouvons construire un avenir où la technologie sert l'humanité avec sagesse et compassion.",
+            "length_adaptation_ratio": 1.07
+          }
+        ],
+        "quality_metrics": {
+          "expected_quality_score": 0.91,
+          "timestamp_preservation_score": 0.96,
+          "emotional_preservation_score": 0.94
+        }
+      }
+    },
+    
+    "en_to_es": {
+      "basic": {
+        "segments": [
+          {
+            "id": 1,
+            "start": 0.0,
+            "end": 3.8,
+            "text": "Hola, soy Matt. Este tutorial MCP es todo lo que necesitarás.",
+            "length_adaptation_ratio": 1.09
+          }
+        ],
+        "quality_metrics": {
+          "expected_quality_score": 0.89,
+          "timestamp_preservation_score": 0.97
+        }
+      }
+    }
+  },
+  
+  "testUsers": [
+    {
+      "type": "basic",
+      "email": "test.basic@example.com",
+      "password": "TestPassword123!",
+      "name": "Test Basic User",
+      "role": "user"
+    },
+    {
+      "type": "premium", 
+      "email": "test.premium@example.com",
+      "password": "TestPassword123!",
+      "name": "Test Premium User",
+      "role": "user"
+    },
+    {
+      "type": "admin",
+      "email": "test.admin@example.com", 
+      "password": "AdminPassword123!",
+      "name": "Test Admin User",
+      "role": "admin"
+    }
+  ],
+  
+  "translationConfigs": {
+    "dubbing_optimized": {
+      "optimize_for_dubbing": true,
+      "preserve_emotions": true,
+      "use_character_names": false,
+      "technical_terms_handling": true,
+      "style_adaptation": "cinematic",
+      "length_optimization": true,
+      "quality_threshold": 0.9
+    },
+    "educational": {
+      "optimize_for_dubbing": false,
+      "preserve_emotions": false,
+      "use_character_names": false,
+      "technical_terms_handling": true,
+      "style_adaptation": "educational", 
+      "length_optimization": false,
+      "quality_threshold": 0.85
+    },
+    "technical": {
+      "optimize_for_dubbing": false,
+      "preserve_emotions": false,
+      "use_character_names": false,
+      "technical_terms_handling": true,
+      "style_adaptation": "formal",
+      "length_optimization": false,
+      "quality_threshold": 0.95
+    },
+    "emotional": {
+      "optimize_for_dubbing": true,
+      "preserve_emotions": true,
+      "use_character_names": true,
+      "technical_terms_handling": false,
+      "style_adaptation": "cinematic",
+      "length_optimization": true,
+      "quality_threshold": 0.88
+    }
+  },
+  
+  "apiMockResponses": {
+    "capabilities": {
+      "success": true,
+      "data": {
+        "services": [
+          {
+            "name": "GPT-4o Mini Translation",
+            "provider": "gpt-4o-mini",
+            "capabilities": ["emotional_context", "timing_preservation", "dubbing_optimization"],
+            "supported_languages": ["fr", "es", "de", "it", "pt"],
+            "cost_per_minute": 0.008
+          }
+        ],
+        "supported_languages": {
+          "fr": {
+            "name": "Français",
+            "code": "fr", 
+            "quality": "excellent",
+            "optimal_providers": ["gpt-4o-mini", "hybrid"],
+            "specialties": ["dubbing", "cinema", "technical"]
+          },
+          "es": {
+            "name": "Español",
+            "code": "es",
+            "quality": "excellent", 
+            "optimal_providers": ["gpt-4o-mini", "hybrid"],
+            "specialties": ["dubbing", "cinema", "news"]
+          }
+        }
+      }
+    },
+    "createTranslation": {
+      "success": true,
+      "data": {
+        "translation_id": "trans_test_12345",
+        "transcription_id": "test_en_basic_transcription",
+        "target_language": "fr",
+        "provider_used": "gpt-4o-mini",
+        "status": "pending",
+        "estimated_cost": 0.008,
+        "estimated_processing_time": 3.5,
+        "created_at": "2025-06-02T20:45:00Z"
+      }
+    }
+  }
+}

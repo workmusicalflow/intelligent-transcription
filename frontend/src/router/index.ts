@@ -15,6 +15,7 @@ const TranscriptionDetail = () => import('@views/transcriptions/TranscriptionDet
 const CreateTranscription = () => import('@views/transcriptions/CreateTranscription.vue')
 const Chat = () => import('@views/chat/Chat.vue')
 const ChatDetail = () => import('@views/chat/ChatDetail.vue')
+const Translations = () => import('@views/translations/Translations.vue')
 const Analytics = () => import('@views/analytics/Analytics.vue')
 const Settings = () => import('@views/settings/Settings.vue')
 const NotFound = () => import('@views/errors/NotFound.vue')
@@ -147,6 +148,17 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       title: 'Conversation'
+    }
+  },
+
+  // Translation routes
+  {
+    path: '/translations',
+    name: 'Translations',
+    component: Translations,
+    meta: {
+      requiresAuth: true,
+      title: 'Traductions'
     }
   },
 

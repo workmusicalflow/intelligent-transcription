@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
 import vitePreprocessor from '@cypress/vite-dev-server'
 import path from 'path'
+import { translationTasks } from './cypress/plugins/translation-tasks'
 
 export default defineConfig({
   e2e: {
@@ -23,7 +24,9 @@ export default defineConfig({
         table(message) {
           console.table(message)
           return null
-        }
+        },
+        // Tâches pour les tests de traduction
+        ...translationTasks
       })
       
       return config

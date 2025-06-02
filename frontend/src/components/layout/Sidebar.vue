@@ -87,6 +87,7 @@ import {
   HomeIcon,
   DocumentTextIcon,
   ChatBubbleLeftRightIcon,
+  LanguageIcon,
   ChartBarIcon,
   CogIcon,
   UsersIcon,
@@ -134,6 +135,13 @@ const mainNavigation = computed(() => [
     href: '/chat',
     icon: ChatBubbleLeftRightIcon,
     current: route.path.startsWith('/chat')
+  },
+  {
+    name: 'Traductions',
+    href: '/translations',
+    icon: LanguageIcon,
+    current: route.path.startsWith('/translations'),
+    badge: 'NEW'
   },
   {
     name: 'Analytiques',

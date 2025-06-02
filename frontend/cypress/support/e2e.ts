@@ -6,6 +6,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import './translation-commands'
 
 // Custom types
 declare global {
