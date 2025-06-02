@@ -1,13 +1,22 @@
-# Rediriger toutes les requêtes vers index.php
 RewriteEngine On
+
+# Activation des en-têtes CORS
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Gestion des requêtes OPTIONS (preflight)
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Routes API Translations
+RewriteRule ^translations/create/?$ translations/create.php [QSA,L]
+RewriteRule ^translations/status/([a-zA-Z0-9_-]+)/?$ translations/status.php?id=$1 [QSA,L]
+RewriteRule ^translations/list/?$ translations/list.php [QSA,L]
+RewriteRule ^translations/capabilities/?$ translations/capabilities.php [QSA,L]
+RewriteRule ^translations/download/([a-zA-Z0-9_-]+)/?$ translations/download.php?id=$1 [QSA,L]
+
+# Fallback vers index pour documentation
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
-
-# Désactiver l'affichage du contenu des dossiers
-Options -Indexes
-
-# Headers de sécurité
-Header set X-Content-Type-Options "nosniff"
-Header set X-Frame-Options "DENY"
-Header set X-XSS-Protection "1; mode=block"

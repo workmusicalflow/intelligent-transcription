@@ -1,61 +1,43 @@
 <?php
 
 /**
- * Autoloader pour charger automatiquement les classes
+ * Autoloader simple pour les services de traduction
+ * En production, utiliser Composer autoload
  */
 
-// Load Composer's autoloader first (for external dependencies like Twig)
-$composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
-if (file_exists($composerAutoload)) {
-    require_once $composerAutoload;
-}
-
-// Then register our custom autoloader for application classes
-spl_autoload_register(function ($class) {
-    // Only try to autoload classes we expect to be in our application
-    // Add additional namespaces here as needed
-    $supportedNamespaces = [
-        'Controllers\\',
-        'Database\\',
-        'Middleware\\',
-        'Models\\',
-        'Services\\',
-        'Template\\',
-        'Utils\\',
-        'App\\Services\\',
-        'App\\',
-        'Domain\\',
-        'Application\\',
-        'Infrastructure\\'
-    ];
+spl_autoload_register(function ($className) {
+    // Convertir namespace en chemin fichier
+    $className = str_replace('App\\', '', $className);
+    $className = str_replace('\\', '/', $className);
     
-    $namespaceFound = false;
-    foreach ($supportedNamespaces as $namespace) {
-        if (strpos($class, $namespace) === 0) {
-            $namespaceFound = true;
-            break;
+    $file = __DIR__ . '/' . $className . '.php';
+    
+    if (file_exists($file)) {
+        require_once $file;
+        return true;
+    }
+    
+    return false;
+});
+
+// Charger dépendances essentielles si pas disponibles
+if (!interface_exists('Psr\Log\LoggerInterface')) {
+    // Définir interface logger simple
+    eval('
+    namespace Psr\Log {
+        interface LoggerInterface {
+            public function debug(string $message, array $context = []): void;
+            public function info(string $message, array $context = []): void;
+            public function warning(string $message, array $context = []): void;
+            public function error(string $message, array $context = []): void;
+        }
+        
+        class NullLogger implements LoggerInterface {
+            public function debug(string $message, array $context = []): void {}
+            public function info(string $message, array $context = []): void {}
+            public function warning(string $message, array $context = []): void {}
+            public function error(string $message, array $context = []): void {}
         }
     }
-    
-    if (!$namespaceFound) {
-        return; // Not our namespace, let the next autoloader handle it
-    }
-    
-    // Base directory for the application
-    $baseDir = __DIR__ . '/';
-    
-    // Handle App namespace mapping to src directory
-    if (strpos($class, 'App\\') === 0) {
-        // Remove 'App\' prefix and map to src directory
-        $class = substr($class, 4);
-    }
-    
-    // Replace namespace separators with directory separators
-    // Add .php to the end
-    $file = $baseDir . str_replace('\\', '/', $class) . '.php';
-    
-    // If the file exists, load it
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+    ');
+}
