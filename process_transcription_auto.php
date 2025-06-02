@@ -20,6 +20,71 @@ function logMessage($message) {
     echo "[$timestamp] $message\n";
 }
 
+/**
+ * 🔑 FONCTION POST-PROCESSING: Améliorer la ponctuation manquante
+ */
+function enhancePunctuation($text) {
+    if (empty($text)) return $text;
+    
+    // Si le texte a déjà une bonne ponctuation, ne pas modifier
+    $punctuationCount = preg_match_all('/[.!?,:;]/', $text);
+    $wordCount = str_word_count($text);
+    
+    if ($punctuationCount > $wordCount * 0.05) { // Si déjà 5% de ponctuation, c'est suffisant
+        return $text;
+    }
+    
+    $enhanced = $text;
+    
+    // 1. Ajouter des apostrophes pour les contractions françaises courantes
+    $contractions = [
+        '/\bj ai\b/i' => "j'ai",
+        '/\bj entends\b/i' => "j'entends",
+        '/\bc est\b/i' => "c'est",
+        '/\bd accord\b/i' => "d'accord",
+        '/\bl une\b/i' => "l'une",
+        '/\bn ai\b/i' => "n'ai",
+        '/\bqu un\b/i' => "qu'un",
+        '/\bqu est\b/i' => "qu'est",
+        '/\bqu il\b/i' => "qu'il",
+        '/\bqu elle\b/i' => "qu'elle"
+    ];
+    
+    foreach ($contractions as $pattern => $replacement) {
+        $enhanced = preg_replace($pattern, $replacement, $enhanced);
+    }
+    
+    // 2. Ajouter des points aux fins de phrases (mots de fin courants)
+    $endingWords = ['monsieur', 'madame', 'merci', 'suffisant', 'fait', 'ça', 'voilà'];
+    foreach ($endingWords as $word) {
+        $enhanced = preg_replace('/\b' . preg_quote($word) . '\b(?!\s*[.!?])/i', $word . '.', $enhanced);
+    }
+    
+    // 3. Ajouter des virgules avant certains mots de liaison
+    $conjunctions = ['mais', 'alors', 'donc', 'car', 'or'];
+    foreach ($conjunctions as $conjunction) {
+        $enhanced = preg_replace('/\s+' . preg_quote($conjunction) . '\s+/', ', ' . $conjunction . ' ', $enhanced);
+    }
+    
+    // 4. Points d'interrogation pour les questions
+    $enhanced = preg_replace('/\b(est ce que|comment|pourquoi|quand|où|qui|que|quoi)\b([^.!?]*?)(\s+[A-Z]|$)/', '$1$2?$3', $enhanced);
+    
+    // 5. Majuscules après les points
+    $enhanced = preg_replace_callback('/([.!?])\s+([a-z])/', function($matches) {
+        return $matches[1] . ' ' . strtoupper($matches[2]);
+    }, $enhanced);
+    
+    // 6. Majuscule au début si manquante
+    $enhanced = ucfirst(trim($enhanced));
+    
+    // 7. Point final si manquant
+    if (!preg_match('/[.!?]$/', trim($enhanced))) {
+        $enhanced = trim($enhanced) . '.';
+    }
+    
+    return $enhanced;
+}
+
 logMessage("Début du traitement automatique pour: $transcriptionId");
 
 try {
@@ -270,7 +335,8 @@ try {
         'model' => 'whisper-1',
         'file' => new CURLFile($filePath, 'audio/mp4', basename($filePath)),
         'response_format' => 'verbose_json',
-        'timestamp_granularities' => 'segment,word' // 🔑 RÉVOLUTIONNAIRE: Word-level timestamps activés
+        'timestamp_granularities[]' => 'segment', // 🔑 RÉVOLUTIONNAIRE: Format PHP correct
+        'timestamp_granularities[]' => 'word'     // 🔑 RÉVOLUTIONNAIRE: Word-level timestamps activés
     ];
     
     // Ajouter la langue si spécifiée
@@ -278,15 +344,27 @@ try {
         $postFields['language'] = $language;
     }
     
-    // 🔑 Prompt contextuel pour optimiser la transcription pour le doublage
-    $dubbingPrompt = "Accurate transcription with natural flow, proper punctuation and conversational style. " .
-                     "Preserve emotional tone, pauses, and natural speech rhythm for dubbing synchronization.";
+    // 🔑 Prompt contextuel AMÉLIORÉ pour optimiser transcription + ponctuation
+    $dubbingPrompt = "Please provide an accurate transcription with proper punctuation, natural sentence structure, " .
+                     "and clear paragraph breaks. Use periods, commas, question marks, and exclamation points " .
+                     "appropriately. Include apostrophes in contractions (like j'ai, d'accord, c'est). " .
+                     "Maintain conversational flow and natural speech rhythm for professional dubbing.";
     
     if ($isYoutube) {
-        $dubbingPrompt .= " This is video content with potential background music and multiple speakers.";
+        $dubbingPrompt .= " This video may contain multiple speakers - preserve dialogue structure and speaker changes.";
     }
     
     $postFields['prompt'] = $dubbingPrompt;
+    
+    // 🔑 DEBUG: Log de la configuration envoyée à Whisper
+    logMessage("DEBUG: Configuration Whisper envoyée:");
+    logMessage("  - model: " . $postFields['model']);
+    logMessage("  - response_format: " . $postFields['response_format']);
+    logMessage("  - timestamp_granularities: segment,word (fixed PHP format)");
+    logMessage("  - prompt length: " . strlen($postFields['prompt']));
+    if (isset($postFields['language'])) {
+        logMessage("  - language: " . $postFields['language']);
+    }
     
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
     
@@ -323,6 +401,18 @@ try {
     logMessage("Langue détectée: " . ($data['language'] ?? 'N/A'));
     logMessage("Durée audio: " . ($data['duration'] ?? 'N/A') . "s");
     logMessage("Texte: " . strlen($data['text']) . " caractères");
+    
+    // 🔑 DEBUG: Examiner la structure de la réponse Whisper
+    logMessage("DEBUG: Clés de réponse Whisper: " . implode(', ', array_keys($data)));
+    if (isset($data['words'])) {
+        logMessage("DEBUG: Nombre de mots avec timestamps: " . count($data['words']));
+        if (!empty($data['words'])) {
+            $firstWord = $data['words'][0];
+            logMessage("DEBUG: Premier mot example: " . json_encode($firstWord));
+        }
+    } else {
+        logMessage("DEBUG: Pas de clé 'words' dans la réponse Whisper");
+    }
     
     // 🔑 Nouvelles métriques pour le doublage
     $wordCount = isset($data['words']) ? count($data['words']) : str_word_count($data['text']);
@@ -383,12 +473,54 @@ try {
         $data['segments'] = $cleanedSegments;
     }
     
-    // Reconstruire le texte à partir des segments nettoyés
+    // 🔑 RÉVOLUTIONNAIRE: Préserver le texte original ponctué de Whisper quand possible
+    $originalWhisperText = $data['text'] ?? '';
     $cleanedText = '';
-    foreach ($cleanedSegments as $segment) {
-        $cleanedText .= trim($segment['text']) . ' ';
+    
+    // Analyser la qualité de la ponctuation du texte original
+    $originalPunctuationRatio = 0;
+    if (!empty($originalWhisperText)) {
+        $punctuationCount = preg_match_all('/[.!?,:;\'"]/', $originalWhisperText);
+        $wordCount = str_word_count($originalWhisperText);
+        $originalPunctuationRatio = $wordCount > 0 ? $punctuationCount / $wordCount : 0;
     }
-    $data['text'] = trim($cleanedText);
+    
+    // 🎯 NOUVELLE LOGIQUE: Prioriser le texte original si bien ponctué
+    if (!empty($originalWhisperText) && $originalPunctuationRatio > 0.03) {
+        // Le texte original a une ponctuation correcte (>3%), le conserver
+        logMessage("✨ Texte original Whisper conservé (ponctuation: " . round($originalPunctuationRatio * 100, 1) . "%)");
+        $finalText = $originalWhisperText;
+    } elseif (!empty($cleanedSegments)) {
+        // Reconstruire à partir des segments nettoyés
+        foreach ($cleanedSegments as $segment) {
+            $cleanedText .= trim($segment['text']) . ' ';
+        }
+        $finalText = trim($cleanedText);
+        logMessage("Texte reconstruit à partir de " . count($cleanedSegments) . " segments nettoyés");
+    } elseif (isset($data['words']) && !empty($data['words'])) {
+        // 🚀 Fallback: reconstruction word-level avec amélioration ponctuation
+        foreach ($data['words'] as $word) {
+            $cleanedText .= $word['word'] . ' ';
+        }
+        $finalText = trim($cleanedText);
+        logMessage("🔥 Texte reconstruit à partir de " . count($data['words']) . " mots individuels (word-level)");
+        
+        // Améliorer la ponctuation seulement si reconstruction word-level
+        $finalText = enhancePunctuation($finalText);
+        logMessage("📝 Ponctuation améliorée par post-processing");
+    } else {
+        // Dernier recours: texte original même sans ponctuation
+        if (!empty($originalWhisperText)) {
+            $finalText = $originalWhisperText;
+            logMessage("Utilisation du texte original Whisper (fallback)");
+        } else {
+            logMessage("⚠️ Aucun texte disponible dans la réponse Whisper");
+            $finalText = '';
+        }
+    }
+    
+    // Appliquer le texte final déterminé par la logique ci-dessus
+    $data['text'] = $finalText;
     
     // Calculer la confiance moyenne sur les segments nettoyés
     $confidence = 0.0;
