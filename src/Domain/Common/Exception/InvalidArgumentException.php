@@ -24,4 +24,30 @@ class InvalidArgumentException extends DomainException
     {
         return new self(sprintf('%s cannot exceed %d characters', $field, $maxLength));
     }
+    
+    public static function forInvalidChoice(string $field, $value, array $validChoices): self
+    {
+        return new self(sprintf(
+            'Invalid %s: %s. Valid choices are: %s',
+            $field,
+            $value,
+            implode(', ', $validChoices)
+        ));
+    }
+    
+    public static function forOutOfRange(string $field, $value, $min, $max): self
+    {
+        return new self(sprintf(
+            '%s must be between %s and %s, got %s',
+            $field,
+            $min,
+            $max,
+            $value
+        ));
+    }
+    
+    public static function forNegativeValue(string $field): self
+    {
+        return new self(sprintf('%s cannot be negative', $field));
+    }
 }

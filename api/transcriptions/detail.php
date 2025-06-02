@@ -53,7 +53,7 @@ try {
     $pdo = new PDO("sqlite:$dbPath");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Requête pour récupérer la transcription complète
+    // Requête pour récupérer la transcription complète avec nouvelles métadonnées de doublage
     $query = "
         SELECT 
             id,
@@ -73,7 +73,10 @@ try {
             confidence_score,
             detected_language,
             processing_model,
-            whisper_version
+            whisper_version,
+            has_word_timestamps,
+            speech_rate,
+            word_count
         FROM transcriptions 
         WHERE id = :id AND user_id = :user_id
     ";
@@ -92,16 +95,24 @@ try {
         exit;
     }
     
-    // Essayer de récupérer les vrais segments Whisper depuis les métadonnées
+    // 🔑 Extraire les données Whisper enrichies pour le doublage
     $realSegments = [];
+    $wordLevelData = [];
     $hasRealSegments = false;
+    $hasWordTimestamps = (bool)($transcription['has_word_timestamps'] ?? false);
     
-    // Vérifier s'il existe des données Whisper avec segments
+    // Vérifier s'il existe des données Whisper avec segments et mots
     if (!empty($transcription['whisper_data'])) {
         $whisperData = json_decode($transcription['whisper_data'], true);
         if ($whisperData && isset($whisperData['segments'])) {
             $realSegments = $whisperData['segments'];
             $hasRealSegments = true;
+            
+            // 🔑 RÉVOLUTIONNAIRE: Extraire les données word-level
+            if (isset($whisperData['words']) && !empty($whisperData['words'])) {
+                $wordLevelData = $whisperData['words'];
+                $hasWordTimestamps = true;
+            }
         }
     }
     
@@ -127,7 +138,17 @@ try {
             'detectedLanguage' => $transcription['detected_language'],
             'processingModel' => $transcription['processing_model'],
             'whisperVersion' => $transcription['whisper_version'],
-            'hasSegments' => $hasRealSegments
+            'hasSegments' => $hasRealSegments,
+            // 🔑 Nouvelles métadonnées révolutionnaires pour le doublage
+            'hasWordTimestamps' => $hasWordTimestamps,
+            'speechRate' => $transcription['speech_rate'] ? floatval($transcription['speech_rate']) : null,
+            'wordCount' => $transcription['word_count'] ? intval($transcription['word_count']) : null,
+            'dubbingCapabilities' => [
+                'wordLevelSync' => $hasWordTimestamps,
+                'preciseTimestamps' => $hasWordTimestamps,
+                'speechAnalysis' => !empty($transcription['speech_rate']),
+                'optimizedForDubbing' => $hasWordTimestamps && !empty($transcription['speech_rate'])
+            ]
         ]
     ];
     
@@ -143,16 +164,52 @@ try {
     $segments = [];
     
     if ($hasRealSegments) {
-        // Utiliser les vrais segments Whisper
+        // Utiliser les vrais segments Whisper avec enrichissements pour le doublage
         foreach ($realSegments as $index => $segment) {
-            $segments[] = [
+            $segmentData = [
                 'id' => $index,
                 'text' => $segment['text'],
                 'startTime' => (float)$segment['start'],
                 'endTime' => (float)$segment['end'],
                 'confidence' => isset($segment['avg_logprob']) ? exp($segment['avg_logprob']) : null,
-                'isEstimated' => false
+                'isEstimated' => false,
+                // 🔑 Métadonnées avancées pour le doublage
+                'duration' => (float)$segment['end'] - (float)$segment['start'],
+                'wordCount' => str_word_count($segment['text']),
+                'metadata' => [
+                    'avgLogprob' => $segment['avg_logprob'] ?? null,
+                    'compressionRatio' => $segment['compression_ratio'] ?? null,
+                    'noSpeechProb' => $segment['no_speech_prob'] ?? null,
+                    'temperature' => $segment['temperature'] ?? null
+                ]
             ];
+            
+            // 🔑 RÉVOLUTIONNAIRE: Ajouter les mots avec timestamps si disponibles
+            if ($hasWordTimestamps && !empty($wordLevelData)) {
+                $segmentWords = [];
+                $segmentStart = (float)$segment['start'];
+                $segmentEnd = (float)$segment['end'];
+                
+                foreach ($wordLevelData as $word) {
+                    $wordStart = (float)$word['start'];
+                    $wordEnd = (float)$word['end'];
+                    
+                    // Vérifier si le mot appartient à ce segment
+                    if ($wordStart >= $segmentStart && $wordEnd <= $segmentEnd) {
+                        $segmentWords[] = [
+                            'word' => $word['word'],
+                            'start' => $wordStart,
+                            'end' => $wordEnd,
+                            'confidence' => $word['confidence'] ?? null
+                        ];
+                    }
+                }
+                
+                $segmentData['words'] = $segmentWords;
+                $segmentData['hasWordTimestamps'] = !empty($segmentWords);
+            }
+            
+            $segments[] = $segmentData;
         }
     } else {
         // Générer des segments estimés basés sur les phrases
@@ -222,6 +279,21 @@ try {
                 'hasRealSegments' => $hasRealSegments,
                 'segmentCount' => count($segments),
                 'estimationMethod' => $hasRealSegments ? 'whisper' : 'sentence_based'
+            ],
+            // 🔑 RÉVOLUTIONNAIRE: Données word-level pour synchronisation ultra-précise
+            'wordLevelData' => $hasWordTimestamps ? [
+                'available' => true,
+                'totalWords' => count($wordLevelData),
+                'words' => $wordLevelData,
+                'dubbingReady' => true,
+                'syncPrecision' => 'word-level',
+                'averageWordDuration' => !empty($wordLevelData) ? 
+                    array_sum(array_map(function($w) { return $w['end'] - $w['start']; }, $wordLevelData)) / count($wordLevelData) : null
+            ] : [
+                'available' => false,
+                'dubbingReady' => false,
+                'syncPrecision' => 'segment-level',
+                'upgradeRequired' => 'Reprocess with word-level timestamps for premium dubbing capabilities'
             ]
         ]
     ];
