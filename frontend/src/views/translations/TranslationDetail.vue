@@ -380,6 +380,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TranslationAPI } from '@/api/translations'
 import TranslationProcessingIndicator from '@/components/translation/TranslationProcessingIndicator.vue'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 // Props
 const route = useRoute()
@@ -491,6 +492,20 @@ const loadTranslation = async (silent = false) => {
     if (!silent) {
       console.error('Erreur chargement:', err)
     }
+    
+    // Gérer spécifiquement l'erreur "Too many requests"
+    if (err.message && err.message.includes('Too many requests')) {
+      console.warn('Rate limit atteint, arrêt du polling temporaire')
+      stopStatusPolling()
+      
+      // Réessayer après un délai
+      setTimeout(() => {
+        if (translation.value?.status === 'processing') {
+          startStatusPolling()
+        }
+      }, 30000) // 30 secondes
+    }
+    
     error.value = err.message || 'Erreur lors du chargement'
   } finally {
     if (!silent) loading.value = false
