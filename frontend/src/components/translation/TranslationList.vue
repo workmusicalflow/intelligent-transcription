@@ -247,6 +247,19 @@
               </svg>
             </button>
 
+            <!-- Traitement immédiat -->
+            <button
+              v-if="translation.status === 'pending' && canProcessImmediately(translation)"
+              @click="processImmediately(translation.id)"
+              class="p-2 text-blue-500 hover:text-blue-700 transition-colors"
+              title="Lancer le traitement immédiat"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </button>
+
             <!-- Arrêter la traduction -->
             <button
               v-if="['pending', 'processing'].includes(translation.status)"
@@ -706,6 +719,90 @@ const deleteTranslation = async (translationId: string) => {
   }
 }
 
+const canProcessImmediately = (translation: any) => {
+  return translation.status === 'pending' && 
+         (translation.segments_count || 0) <= 20 // Limite pour traitement immédiat
+}
+
+const processImmediately = async (translationId: string) => {
+  if (!confirm('Lancer le traitement immédiat ? Cela peut prendre quelques minutes selon la taille de la traduction.')) {
+    return
+  }
+  
+  try {
+    // Marquer localement comme processing
+    const index = translations.value.findIndex(t => t.id === translationId)
+    if (index !== -1) {
+      translations.value[index].status = 'processing'
+      translations.value[index].started_at = new Date().toISOString()
+    }
+    
+    // Lancer le traitement
+    const response = await TranslationAPI.processImmediately(translationId)
+    
+    if (response.success) {
+      // Démarrer le polling pour le feedback temps réel
+      startPolling(translationId)
+      
+      // TODO: Afficher notification de succès
+      console.log('Traitement immédiat démarré')
+    }
+  } catch (error: any) {
+    // Restaurer le statut en cas d'erreur
+    const index = translations.value.findIndex(t => t.id === translationId)
+    if (index !== -1) {
+      translations.value[index].status = 'pending'
+      translations.value[index].started_at = null
+    }
+    
+    console.error('Erreur lors du lancement:', error)
+    // TODO: Afficher notification d'erreur
+  }
+}
+
+// Map pour stocker les intervals de polling
+const pollingIntervals = new Map<string, NodeJS.Timeout>()
+
+const startPolling = (translationId: string) => {
+  // Arrêter le polling précédent s'il existe
+  if (pollingIntervals.has(translationId)) {
+    clearInterval(pollingIntervals.get(translationId)!)
+  }
+  
+  const interval = setInterval(async () => {
+    try {
+      const response = await TranslationAPI.getTranslationStatus(translationId)
+      if (response.success) {
+        const index = translations.value.findIndex(t => t.id === translationId)
+        if (index !== -1) {
+          translations.value[index] = { ...translations.value[index], ...response.data }
+        }
+        
+        // Arrêter le polling si terminé
+        const status = response.data?.status
+        if (status && ['completed', 'failed', 'cancelled'].includes(status)) {
+          clearInterval(interval)
+          pollingIntervals.delete(translationId)
+          
+          // TODO: Afficher notification de fin
+          const statusMessages = {
+            completed: 'Traduction terminée !',
+            failed: 'Traduction échouée',
+            cancelled: 'Traduction annulée'
+          }
+          console.log(statusMessages[status as keyof typeof statusMessages])
+        }
+      }
+    } catch (error) {
+      console.error('Erreur polling:', error)
+      clearInterval(interval)
+      pollingIntervals.delete(translationId)
+    }
+  }, 2000) // Polling toutes les 2 secondes
+  
+  pollingIntervals.set(translationId, interval)
+}
+
 // Fermer le menu de téléchargement quand on clique ailleurs
 const handleClickOutside = (event: Event) => {
   if (openDownloadMenu.value) {
@@ -727,6 +824,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  
+  // Nettoyer tous les intervals de polling
+  pollingIntervals.forEach((interval) => {
+    clearInterval(interval)
+  })
+  pollingIntervals.clear()
 })
 </script>
 

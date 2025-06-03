@@ -74,6 +74,20 @@
 
           <!-- Actions -->
           <div class="flex items-center gap-2">
+            <!-- Process Immediately -->
+            <button
+              v-if="translation.status === 'pending' && canProcessImmediately()"
+              @click="processImmediately"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg 
+                     flex items-center gap-2 transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              Traitement immédiat
+            </button>
+
             <!-- Stop Translation -->
             <button
               v-if="['pending', 'processing'].includes(translation.status)"
@@ -538,6 +552,45 @@ const deleteTranslation = async () => {
     }
   } catch (error: any) {
     console.error('Erreur lors de la suppression:', error)
+    // TODO: Afficher notification d'erreur
+  }
+}
+
+const canProcessImmediately = () => {
+  return translation.value?.status === 'pending' && 
+         (translation.value.segments_count || 0) <= 20 // Limite pour traitement immédiat
+}
+
+const processImmediately = async () => {
+  if (!confirm('Lancer le traitement immédiat ? Cela peut prendre quelques minutes selon la taille de la traduction.')) {
+    return
+  }
+  
+  try {
+    // Marquer localement comme processing
+    if (translation.value) {
+      translation.value.status = 'processing'
+      translation.value.started_at = new Date().toISOString()
+    }
+    
+    // Lancer le traitement
+    const response = await TranslationAPI.processImmediately(translationId.value)
+    
+    if (response.success) {
+      // Démarrer le polling pour le feedback temps réel
+      startStatusPolling()
+      
+      // TODO: Afficher notification de succès
+      console.log('Traitement immédiat démarré')
+    }
+  } catch (error: any) {
+    // Restaurer le statut en cas d'erreur
+    if (translation.value) {
+      translation.value.status = 'pending'
+      translation.value.started_at = null
+    }
+    
+    console.error('Erreur lors du lancement:', error)
     // TODO: Afficher notification d'erreur
   }
 }

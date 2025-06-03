@@ -78,6 +78,7 @@ class ApiRouter
         $this->addRoute('POST', '/translations/estimate', [TranslationApiController::class, 'estimateTranslationCost']);
         $this->addRoute('POST', '/translations/stop/{id}', [TranslationApiController::class, 'stopTranslation']);
         $this->addRoute('DELETE', '/translations/{id}', [TranslationApiController::class, 'deleteTranslation']);
+        $this->addRoute('POST', '/translations/process', [TranslationApiController::class, 'processTranslation']);
         
         // Webhooks
         $this->addRoute('POST', '/webhooks/transcription-completed', [TranscriptionApiController::class, 'webhookCompleted']);

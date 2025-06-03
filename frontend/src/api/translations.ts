@@ -433,6 +433,40 @@ export class TranslationAPI {
       throw error
     }
   }
+
+  /**
+   * Lancer le traitement immédiat d'une traduction
+   */
+  static async processImmediately(id: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const token = localStorage.getItem('auth-token')
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(`${this.baseUrl}/api/v2/translations/process`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          translation_id: id
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erreur serveur' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors du lancement du traitement immédiat:', error)
+      throw error
+    }
+  }
 }
 
 export default TranslationAPI

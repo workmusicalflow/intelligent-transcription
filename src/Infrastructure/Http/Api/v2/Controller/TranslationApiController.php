@@ -380,6 +380,9 @@ class TranslationApiController extends BaseApiController
             'has_character_names' => (bool)($result['has_character_names'] ?? false),
             'has_technical_terms' => (bool)($result['has_technical_terms'] ?? false),
             
+            // Flags de traitement
+            'immediate_processing' => (bool)($result['immediate_processing'] ?? false),
+            
             // Timestamps
             'created_at' => $result['created_at'],
             'updated_at' => $result['updated_at'],
@@ -445,6 +448,9 @@ class TranslationApiController extends BaseApiController
                 'has_emotional_context' => (bool)($translation['has_emotional_context'] ?? false),
                 'has_character_names' => (bool)($translation['has_character_names'] ?? false),
                 'has_technical_terms' => (bool)($translation['has_technical_terms'] ?? false),
+                
+                // Flags de traitement
+                'immediate_processing' => (bool)($translation['immediate_processing'] ?? false),
                 
                 // Timestamps
                 'created_at' => $translation['created_at'],
@@ -835,6 +841,57 @@ class TranslationApiController extends BaseApiController
                 $this->pdo->rollBack();
                 throw $e;
             }
+            
+        } catch (Exception $e) {
+            return new ApiResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/translations/process
+     * Démarrer le traitement immédiat d'une traduction
+     */
+    public function processTranslation(ApiRequest $request): ApiResponse
+    {
+        try {
+            $data = $request->getJsonBody();
+            $translationId = $data['translation_id'] ?? null;
+            
+            if (!$translationId) {
+                return new ApiResponse(['error' => 'translation_id requis'], 400);
+            }
+            
+            // Vérifier que la traduction existe et est en attente
+            $translation = $this->getTranslationProjectById($translationId);
+            if (!$translation) {
+                return new ApiResponse(['error' => 'Traduction non trouvée'], 404);
+            }
+            
+            if ($translation['status'] !== 'pending') {
+                return new ApiResponse(['error' => 'Traduction déjà traitée ou en cours'], 400);
+            }
+            
+            // Marquer comme traitement immédiat
+            $updateSql = "UPDATE translation_projects 
+                         SET immediate_processing = 1, 
+                             updated_at = datetime('now')
+                         WHERE id = ?";
+            $updateStmt = $this->pdo->prepare($updateSql);
+            $updateStmt->execute([$translationId]);
+            
+            // Lancer le worker batch en arrière-plan
+            $cmd = sprintf(
+                'php %s/../../../../../process_translations_batch.php > /dev/null 2>&1 &',
+                __DIR__
+            );
+            
+            exec($cmd);
+            
+            return new ApiResponse([
+                'success' => true,
+                'message' => 'Traitement démarré',
+                'translation_id' => $translationId
+            ], 200);
             
         } catch (Exception $e) {
             return new ApiResponse(['error' => $e->getMessage()], 500);
