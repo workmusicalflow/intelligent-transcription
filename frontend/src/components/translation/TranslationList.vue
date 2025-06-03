@@ -97,6 +97,7 @@
               <option value="processing">En cours</option>
               <option value="completed">Terminé</option>
               <option value="failed">Échoué</option>
+              <option value="cancelled">Annulé</option>
             </select>
           </div>
         </div>
@@ -170,7 +171,7 @@
             <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
               <div>Transcription: {{ translation.transcription_id }}</div>
               <div class="flex items-center gap-4 mt-1">
-                <span>{{ translation.segments_count }} segments</span>
+                <span>{{ translation.segments_count || 'N/A' }} segments</span>
                 <span>{{ formatDuration(translation.total_duration) }}</span>
                 <span>Créé le {{ formatDate(translation.created_at) }}</span>
               </div>
@@ -179,31 +180,31 @@
             <!-- Métriques -->
             <div class="flex items-center gap-6 text-sm">
               <!-- Score qualité -->
-              <div v-if="translation.quality_score" class="flex items-center gap-1">
+              <div v-if="translation.quality_score && !isNaN(Number(translation.quality_score))" class="flex items-center gap-1">
                 <span class="text-gray-600 dark:text-gray-400">Qualité:</span>
                 <div class="flex items-center gap-1">
                   <div class="w-12 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                     <div 
                       class="h-full bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 rounded-full"
-                      :style="{ width: `${translation.quality_score * 100}%` }"
+                      :style="{ width: `${Math.max(0, Math.min(100, (Number(translation.quality_score) || 0) * 100))}%` }"
                     ></div>
                   </div>
-                  <span class="font-medium">{{ (translation.quality_score * 100).toFixed(1) }}%</span>
+                  <span class="font-medium">{{ ((Number(translation.quality_score) || 0) * 100).toFixed(1) }}%</span>
                 </div>
               </div>
 
               <!-- Coût -->
-              <div v-if="translation.actual_cost || translation.estimated_cost">
+              <div v-if="(translation.actual_cost || translation.estimated_cost) && !isNaN(Number(translation.actual_cost || translation.estimated_cost))">
                 <span class="text-gray-600 dark:text-gray-400">Coût:</span>
                 <span class="font-medium">
-                  ${{ (translation.actual_cost || translation.estimated_cost).toFixed(4) }}
+                  ${{ (Number(translation.actual_cost || translation.estimated_cost) || 0).toFixed(4) }}
                 </span>
               </div>
 
               <!-- Temps de traitement -->
-              <div v-if="translation.processing_time">
+              <div v-if="translation.processing_time && !isNaN(Number(translation.processing_time))">
                 <span class="text-gray-600 dark:text-gray-400">Traitement:</span>
-                <span class="font-medium">{{ translation.processing_time.toFixed(1) }}s</span>
+                <span class="font-medium">{{ (Number(translation.processing_time) || 0).toFixed(1) }}s</span>
               </div>
             </div>
 
@@ -246,6 +247,21 @@
               </svg>
             </button>
 
+            <!-- Arrêter la traduction -->
+            <button
+              v-if="['pending', 'processing'].includes(translation.status)"
+              @click="stopTranslation(translation.id)"
+              class="p-2 text-orange-400 hover:text-orange-600 transition-colors"
+              title="Arrêter la traduction"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
+              </svg>
+            </button>
+
             <!-- Téléchargement -->
             <div v-if="translation.status === 'completed'" class="relative">
               <button
@@ -277,9 +293,21 @@
               </div>
             </div>
 
+            <!-- Supprimer -->
+            <button
+              @click="deleteTranslation(translation.id)"
+              class="p-2 text-red-400 hover:text-red-600 transition-colors"
+              title="Supprimer la traduction"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+
             <!-- Détails -->
             <button
-              @click="$emit('view-details', translation.id)"
+              @click="$router.push(`/translations/${translation.id}`)"
               class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
               title="Voir les détails"
             >
@@ -370,28 +398,30 @@
       
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600">{{ statistics.total_translations }}</div>
+          <div class="text-2xl font-bold text-blue-600">{{ safeStatistics.total_translations }}</div>
           <div class="text-gray-600 dark:text-gray-400">Total</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-green-600">{{ statistics.success_rate }}%</div>
+          <div class="text-2xl font-bold text-green-600">{{ safeStatistics.success_rate }}%</div>
           <div class="text-gray-600 dark:text-gray-400">Taux succès</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-purple-600">${{ statistics.total_cost_usd.toFixed(3) }}</div>
-          <div class="text-gray-600 dark:text-gray-400">Coût total</div>
+          <div class="text-2xl font-bold text-purple-600">
+            ${{ isNaN(safeStatistics.average_cost) ? '0.000' : safeStatistics.average_cost.toFixed(3) }}
+          </div>
+          <div class="text-gray-600 dark:text-gray-400">Coût moyen</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-orange-600">
-            {{ statistics.average_quality_score ? (statistics.average_quality_score * 100).toFixed(1) + '%' : 'N/A' }}
+            {{ isNaN(safeStatistics.average_quality) ? '0.0' : safeStatistics.average_quality.toFixed(1) }}%
           </div>
           <div class="text-gray-600 dark:text-gray-400">Qualité moy.</div>
         </div>
       </div>
       
       <div class="mt-4 text-xs text-gray-500 text-center">
-        Langue préférée: {{ getLanguageName(statistics.favorite_target_language) }} • 
-        Service favori: {{ statistics.most_used_provider }}
+        Langue préférée: {{ getLanguageName(safeStatistics.favorite_language) }} • 
+        Service favori: {{ safeStatistics.favorite_provider }}
       </div>
     </div>
   </div>
@@ -435,6 +465,24 @@ const downloadFormats = [
 ]
 
 // Computed
+const safeStatistics = computed(() => {
+  return statistics.value ? {
+    total_translations: Number(statistics.value.total_translations) || 0,
+    success_rate: Number(statistics.value.success_rate) || 0,
+    average_cost: Number(statistics.value.average_cost) || 0,
+    average_quality: Number(statistics.value.average_quality) || 0,
+    favorite_language: statistics.value.favorite_language || 'fr',
+    favorite_provider: statistics.value.favorite_provider || 'gpt-4o-mini'
+  } : {
+    total_translations: 0,
+    success_rate: 0,
+    average_cost: 0,
+    average_quality: 0,
+    favorite_language: 'fr',
+    favorite_provider: 'gpt-4o-mini'
+  }
+})
+
 const hasFilters = computed(() => {
   return filters.target_language || filters.provider || filters.status || filters.search
 })
@@ -476,7 +524,8 @@ const getStatusLabel = (status: string) => {
     pending: 'En attente',
     processing: 'En cours',
     completed: 'Terminé',
-    failed: 'Échoué'
+    failed: 'Échoué',
+    cancelled: 'Annulé'
   }
   return labels[status] || status
 }
@@ -486,12 +535,17 @@ const getStatusBadgeClass = (status: string) => {
     pending: 'px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full',
     processing: 'px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full animate-pulse',
     completed: 'px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full',
-    failed: 'px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full'
+    failed: 'px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full',
+    cancelled: 'px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full'
   }
   return classes[status] || 'px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full'
 }
 
-const formatDuration = (seconds: number) => {
+const formatDuration = (seconds: number | null | undefined) => {
+  if (!seconds || isNaN(seconds) || seconds < 0) {
+    return 'N/A'
+  }
+  
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = Math.floor(seconds % 60)
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
@@ -526,7 +580,7 @@ const refreshList = async () => {
       pagination.value = data.pagination
       statistics.value = data.statistics
     } else {
-      console.error('Erreur chargement traductions:', response.error)
+      console.error('Erreur chargement traductions:', response)
     }
   } catch (error: any) {
     console.error('Erreur chargement traductions:', error)
@@ -595,6 +649,60 @@ const refreshTranslationStatus = async (translationId: string) => {
     }
   } catch (error: any) {
     console.error('Erreur actualisation statut:', error)
+  }
+}
+
+const stopTranslation = async (translationId: string) => {
+  if (!confirm('Êtes-vous sûr de vouloir arrêter cette traduction ?')) {
+    return
+  }
+  
+  try {
+    const response = await TranslationAPI.stopTranslation(translationId)
+    
+    if (response.success) {
+      // Mettre à jour la traduction dans la liste
+      const index = translations.value.findIndex(t => t.id === translationId)
+      if (index !== -1) {
+        translations.value[index].status = 'cancelled'
+        translations.value[index].completed_at = new Date().toISOString()
+      }
+      
+      // TODO: Afficher notification de succès
+      console.log('Traduction arrêtée avec succès')
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de l\'arrêt:', error)
+    // TODO: Afficher notification d'erreur
+  }
+}
+
+const deleteTranslation = async (translationId: string) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement cette traduction ? Cette action est irréversible.')) {
+    return
+  }
+  
+  try {
+    const response = await TranslationAPI.deleteTranslation(translationId)
+    
+    if (response.success) {
+      // Supprimer la traduction de la liste
+      const index = translations.value.findIndex(t => t.id === translationId)
+      if (index !== -1) {
+        translations.value.splice(index, 1)
+      }
+      
+      // Mettre à jour les statistiques
+      if (statistics.value) {
+        statistics.value.total_translations = Math.max(0, statistics.value.total_translations - 1)
+      }
+      
+      // TODO: Afficher notification de succès
+      console.log('Traduction supprimée avec succès')
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la suppression:', error)
+    // TODO: Afficher notification d'erreur
   }
 }
 

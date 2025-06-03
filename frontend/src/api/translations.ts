@@ -13,13 +13,13 @@ export interface Translation {
   target_language: string
   source_language?: string
   provider_used: string
-  status: 'pending' | 'processing' | 'completed' | 'failed'
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
   quality_score?: number
   processing_time?: number
   estimated_cost: number
   actual_cost?: number
-  segments_count: number
-  total_duration: number
+  segments_count?: number
+  total_duration?: number
   created_at: string
   completed_at?: string
   
@@ -212,18 +212,19 @@ export class TranslationAPI {
   static async createTranslation(data: CreateTranslationRequest): Promise<ApiResponse<TranslationCreationResponse>> {
     try {
       const token = localStorage.getItem('auth-token')
-      if (!token) {
-        throw new Error('Token d\'authentification requis')
-      }
 
       console.log('Création traduction avec données:', data)
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`${this.baseUrl}/api/v2/translations/create`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(data)
       })
       
@@ -248,10 +249,7 @@ export class TranslationAPI {
   static async getTranslations(params: GetTranslationsParams = {}): Promise<ApiResponse<TranslationsListResponse>> {
     try {
       const token = localStorage.getItem('auth-token')
-      if (!token) {
-        throw new Error('Token d\'authentification requis')
-      }
-
+      
       const searchParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -259,10 +257,13 @@ export class TranslationAPI {
         }
       })
 
+      const headers: Record<string, string> = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`${this.baseUrl}/api/v2/translations/list?${searchParams}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers
       })
 
       if (!response.ok) {
@@ -369,6 +370,66 @@ export class TranslationAPI {
       return await response.json()
     } catch (error) {
       console.error('Erreur lors de l\'estimation:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Arrêter une traduction en cours
+   */
+  static async stopTranslation(id: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const token = localStorage.getItem('auth-token')
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(`${this.baseUrl}/api/v2/translations/stop/${id}`, {
+        method: 'POST',
+        headers
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erreur serveur' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de l\'arrêt de la traduction:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Supprimer une traduction
+   */
+  static async deleteTranslation(id: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const token = localStorage.getItem('auth-token')
+      
+      const headers: Record<string, string> = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(`${this.baseUrl}/api/v2/translations/${id}`, {
+        method: 'DELETE',
+        headers
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erreur serveur' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la traduction:', error)
       throw error
     }
   }

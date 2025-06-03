@@ -6,9 +6,11 @@ use Infrastructure\Http\Api\v2\Controller\TranscriptionApiController;
 use Infrastructure\Http\Api\v2\Controller\AuthApiController;
 use Infrastructure\Http\Api\v2\Controller\ChatApiController;
 use Infrastructure\Http\Api\v2\Controller\AnalyticsApiController;
+use App\Infrastructure\Http\Api\v2\Controller\TranslationApiController;
 use Infrastructure\Http\Api\v2\Middleware\AuthMiddleware;
 use Infrastructure\Http\Api\v2\Middleware\RateLimitMiddleware;
 use Infrastructure\Http\Api\v2\Middleware\CorsMiddleware;
+use Infrastructure\Http\Api\v2\Middleware\CacheMiddleware;
 
 /**
  * Routeur principal pour l'API v2
@@ -33,6 +35,7 @@ class ApiRouter
     {
         $this->middlewares = [
             new CorsMiddleware(),
+            new CacheMiddleware(),
             new RateLimitMiddleware(),
         ];
     }
@@ -66,6 +69,16 @@ class ApiRouter
         $this->addRoute('GET', '/analytics/usage', [AnalyticsApiController::class, 'usage'], [AuthMiddleware::class]);
         $this->addRoute('GET', '/analytics/costs', [AnalyticsApiController::class, 'costs'], [AuthMiddleware::class]);
         
+        // Routes protégées - Traductions (temporairement sans auth pour debug)
+        $this->addRoute('GET', '/translations/capabilities', [TranslationApiController::class, 'getCapabilities']);
+        $this->addRoute('POST', '/translations/create', [TranslationApiController::class, 'createTranslation']);
+        $this->addRoute('GET', '/translations/list', [TranslationApiController::class, 'listTranslations']);
+        $this->addRoute('GET', '/translations/status/{id}', [TranslationApiController::class, 'getTranslationStatus']);
+        $this->addRoute('GET', '/translations/download/{id}', [TranslationApiController::class, 'downloadTranslation']);
+        $this->addRoute('POST', '/translations/estimate', [TranslationApiController::class, 'estimateTranslationCost']);
+        $this->addRoute('POST', '/translations/stop/{id}', [TranslationApiController::class, 'stopTranslation']);
+        $this->addRoute('DELETE', '/translations/{id}', [TranslationApiController::class, 'deleteTranslation']);
+        
         // Webhooks
         $this->addRoute('POST', '/webhooks/transcription-completed', [TranscriptionApiController::class, 'webhookCompleted']);
         
@@ -92,9 +105,9 @@ class ApiRouter
      */
     public function handle(string $method, string $uri): void
     {
-        // Nettoyer l'URI
-        $uri = parse_url($uri, PHP_URL_PATH);
-        $uri = str_replace('/api/v2', '', $uri);
+        // Nettoyer l'URI - PATH_INFO n'a pas besoin de nettoyage
+        // car router.php a déjà extrait la partie après /api/v2/
+        $uri = $uri;
         
         // Trouver la route correspondante
         $route = $this->findRoute($method, $uri);
@@ -125,7 +138,15 @@ class ApiRouter
             if (is_array($handler)) {
                 [$class, $method] = $handler;
                 $controller = is_string($class) ? new $class() : $class;
-                $response = $controller->$method($request);
+                
+                // Passer les paramètres d'URL selon la méthode
+                if (in_array($method, ['getTranslationStatus', 'stopTranslation', 'deleteTranslation']) && isset($route['params']['id'])) {
+                    $response = $controller->$method($route['params']['id']);
+                } elseif (in_array($method, ['downloadTranslation']) && isset($route['params']['id'])) {
+                    $response = $controller->$method($route['params']['id'], $request);
+                } else {
+                    $response = $controller->$method($request);
+                }
             } else {
                 $response = $handler($request);
             }
