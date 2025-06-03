@@ -295,22 +295,45 @@
 
       <!-- Processing Status -->
       <div v-else-if="translation.status === 'processing'" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h3 class="font-medium text-gray-900 dark:text-white mb-4">État du traitement</h3>
-        <div class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
-          <p class="text-gray-600 dark:text-gray-400">
-            Votre traduction est en cours de traitement par {{ getProviderName(translation.provider_used) }}
-          </p>
-          <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">
-            Cela peut prendre quelques minutes selon la longueur du contenu
-          </p>
-          <button
-            @click="refreshStatus"
-            class="mt-4 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 
-                   text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg transition-colors"
-          >
-            Actualiser le statut
-          </button>
+        <!-- Traitement immédiat avec animation détaillée -->
+        <div v-if="translation.immediate_processing">
+          <h3 class="font-medium text-gray-900 dark:text-white mb-4">Traitement immédiat</h3>
+          <TranslationProcessingIndicator 
+            variant="detailed" 
+            :segments-count="translation.segments_count || 10"
+            :start-time="new Date(translation.started_at || Date.now())"
+            :show-progress="true"
+          />
+          <div class="flex justify-center mt-4">
+            <button
+              @click="refreshStatus"
+              class="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 
+                     text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg transition-colors"
+            >
+              Actualiser le statut
+            </button>
+          </div>
+        </div>
+        
+        <!-- Traitement standard en arrière-plan -->
+        <div v-else>
+          <h3 class="font-medium text-gray-900 dark:text-white mb-4">État du traitement</h3>
+          <div class="text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-gray-600 dark:text-gray-400">
+              Votre traduction est en cours de traitement par {{ getProviderName(translation.provider_used) }}
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">
+              Cela peut prendre quelques minutes selon la longueur du contenu
+            </p>
+            <button
+              @click="refreshStatus"
+              class="mt-4 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 
+                     text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg transition-colors"
+            >
+              Actualiser le statut
+            </button>
+          </div>
         </div>
       </div>
 
@@ -356,6 +379,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TranslationAPI } from '@/api/translations'
+import TranslationProcessingIndicator from '@/components/translation/TranslationProcessingIndicator.vue'
 
 // Props
 const route = useRoute()

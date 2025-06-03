@@ -208,6 +208,16 @@
               </div>
             </div>
 
+            <!-- Indicateur de traitement immédiat -->
+            <div v-if="translation.status === 'processing' && translation.immediate_processing" class="mt-3">
+              <TranslationProcessingIndicator 
+                variant="inline" 
+                :segments-count="translation.segments_count || 10"
+                :start-time="new Date(translation.started_at || Date.now())"
+                :show-progress="true"
+              />
+            </div>
+
             <!-- Capacités spéciales -->
             <div v-if="hasSpecialCapabilities(translation)" class="flex items-center gap-2 mt-2">
               <span class="text-xs text-gray-500">Capacités:</span>
@@ -443,6 +453,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { TranslationAPI, type GetTranslationsParams, type TranslationsListResponse } from '@/api/translations'
+import TranslationProcessingIndicator from './TranslationProcessingIndicator.vue'
 
 const emit = defineEmits<{
   'create-new': []
