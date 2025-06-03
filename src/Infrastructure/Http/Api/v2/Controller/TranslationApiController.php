@@ -296,8 +296,22 @@ class TranslationApiController extends BaseApiController
     ): void {
         // Calculer les métriques depuis la transcription
         $whisperData = json_decode($transcription['whisper_data'] ?? '{}', true);
+        
+        // Gérer différentes structures de whisper_data
         $segments = $whisperData['segments'] ?? [];
-        $segmentsCount = count($segments);
+        
+        // Si pas de segments mais des words (structure YouTube), générer des segments
+        if (empty($segments) && !empty($whisperData['words']) && !empty($whisperData['text'])) {
+            // Estimer le nombre de segments basé sur la durée (1 segment par ~6 secondes)
+            $duration = (float)($whisperData['duration'] ?? $transcription['duration'] ?? 60);
+            $estimatedSegments = max(1, (int)($duration / 6));
+            
+            // Ou compter les phrases
+            $sentences = preg_split('/[.!?]+/', $whisperData['text'], -1, PREG_SPLIT_NO_EMPTY);
+            $segmentsCount = min($estimatedSegments, count($sentences));
+        } else {
+            $segmentsCount = count($segments);
+        }
         $totalDuration = (float)($transcription['duration'] ?? 0);
         $estimatedCost = $this->estimateCost($transcription, $provider);
         
