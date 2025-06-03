@@ -458,7 +458,18 @@ export class TranslationAPI {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Erreur serveur' }))
-        throw new Error(errorData.error || `HTTP ${response.status}`)
+        let errorMessage = errorData.error || `HTTP ${response.status}`
+        
+        // Messages d'erreur spécifiques pour le traitement immédiat
+        if (response.status === 429) {
+          errorMessage = 'API temporairement indisponible (trop de requêtes). Veuillez patienter quelques instants.'
+        } else if (errorMessage.includes('whisper_data') || errorMessage.includes('segments')) {
+          errorMessage = 'Cette transcription ne contient pas les données nécessaires pour la traduction. Veuillez re-transcrire le fichier audio.'
+        } else if (errorMessage.includes('déjà traitée')) {
+          errorMessage = 'Cette traduction est déjà en cours de traitement ou terminée.'
+        }
+        
+        throw new Error(errorMessage)
       }
 
       return await response.json()
