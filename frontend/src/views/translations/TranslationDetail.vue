@@ -582,11 +582,11 @@ const deleteTranslation = async () => {
 
 const canProcessImmediately = () => {
   return translation.value?.status === 'pending' && 
-         (translation.value.segments_count || 0) <= 20 // Limite pour traitement immédiat
+         (translation.value.segments_count || 0) <= 100 // Limite pour traitement immédiat
 }
 
 const processImmediately = async () => {
-  if (!confirm('Lancer le traitement immédiat ? Cela peut prendre quelques minutes selon la taille de la traduction.')) {
+  if (!confirm('Lancer le traitement immédiat ? Cela peut prendre de quelques secondes à 5 minutes selon la taille de la traduction (jusqu\'à 100 segments).')) {
     return
   }
   

@@ -118,6 +118,9 @@ const processingMessages = [
   "Adaptation du timing pour le doublage...",
   "Optimisation de la qualité de traduction...",
   "Génération des timestamps précis...",
+  "Traitement par batch intelligent...",
+  "Synchronisation des segments audio...",
+  "Validation de la cohérence textuelle...",
   "Finalisation de la traduction..."
 ]
 
