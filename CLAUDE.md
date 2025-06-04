@@ -206,6 +206,16 @@ cd frontend && npx vue-tsc --noEmit --pretty
 - Temporary file cleanup
 - Secure file storage with proper permissions
 
+### Rate Limiting & Performance
+- **Backend Limits**: 300 req/min, 5000 req/h (increased from 60/1000)
+- **Exempt Routes**: Read-only endpoints like capabilities, list, status
+- **Frontend Handling**: Automatic retry with exponential backoff
+- **Caching Strategy**: Capabilities (1h), Lists (5min) to reduce API calls
+- **Stores**: Pinia stores for centralized state (translations, capabilities)
+- See `RATE_LIMITING_GUIDE.md` for complete documentation
+
+## 🚨 Important Notes for Future Sessions
+
 ## 🚨 Important Notes for Future Sessions
 
 ### Database Migrations
@@ -217,6 +227,7 @@ cd frontend && npx vue-tsc --noEmit --pretty
 - Use API v2 structure for new endpoints
 - Follow existing naming conventions and response patterns
 - Test endpoints with both success and error scenarios
+- **CRITICAL**: `ApiResponse` class does NOT have `toJson()` method - use `json_encode()` directly on data
 
 ### Frontend Development
 - Always run `npx vue-tsc --noEmit --pretty` before commits
@@ -227,6 +238,11 @@ cd frontend && npx vue-tsc --noEmit --pretty
 - Workers process ONE item then exit (no infinite loops)
 - Use lock files to prevent concurrent execution
 - Test worker functionality with `php process_translations_batch.php`
+
+### Recent Critical Fixes (2025-06-04)
+- **Translation API Response**: Fixed `ApiResponse::toJson()` undefined method error
+- **Immediate Processing**: Now works correctly without frontend JSON parsing errors
+- **Rate Limiting**: Increased limits to 300/5000 req/min/hour with route exemptions
 
 ## 🎯 Immediate Next Steps
 

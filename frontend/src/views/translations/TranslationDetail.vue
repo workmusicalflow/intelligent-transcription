@@ -480,8 +480,8 @@ const loadTranslation = async (silent = false) => {
     if (response.success) {
       translation.value = response.data
       
-      // Charger les segments si la traduction est complète
-      if (response.data?.status === 'completed' && !silent) {
+      // Charger les segments si la traduction est complète (même en mode silencieux)
+      if (response.data?.status === 'completed') {
         await loadTranslationSegments()
       }
     } else {
@@ -606,29 +606,30 @@ const processImmediately = async () => {
   }
   
   try {
-    // Marquer localement comme processing
-    if (translation.value) {
-      translation.value.status = 'processing'
-      translation.value.started_at = new Date().toISOString()
-    }
-    
     // Lancer le traitement
     const response = await TranslationAPI.processImmediately(translationId.value)
     
     if (response.success) {
+      // Mettre à jour le statut localement pour afficher l'animation immédiatement
+      if (translation.value) {
+        translation.value.status = 'processing' // ✨ Changement clé pour l'UX
+        translation.value.immediate_processing = true
+        // Assurer que started_at est défini pour l'indicateur de temps
+        if (!translation.value.started_at) {
+          translation.value.started_at = new Date().toISOString()
+        }
+      }
+      
       // Démarrer le polling pour le feedback temps réel
       startStatusPolling()
       
       // TODO: Afficher notification de succès
       console.log('Traitement immédiat démarré')
+      
+      // Le setTimeout est maintenant moins critique car l'UI est déjà mise à jour
+      setTimeout(() => loadTranslation(true), 1000)
     }
   } catch (error: any) {
-    // Restaurer le statut en cas d'erreur
-    if (translation.value) {
-      translation.value.status = 'pending'
-      translation.value.started_at = null
-    }
-    
     console.error('Erreur lors du lancement:', error)
     // TODO: Afficher notification d'erreur
   }
@@ -665,17 +666,28 @@ const formatSegmentTime = (seconds: number) => {
 
 // Polling automatique pour les traductions en cours
 const startStatusPolling = () => {
-  if (translation.value?.status === 'processing' || translation.value?.status === 'pending') {
-    statusInterval = setInterval(async () => {
-      // Utiliser le mode silencieux pour ne pas spammer la console
-      await loadTranslation(true)
-      
-      // Arrêter le polling si terminé
-      if (['completed', 'failed', 'cancelled'].includes(translation.value?.status || '')) {
-        stopStatusPolling()
-      }
-    }, 5000) // Polling toutes les 5 secondes
+  // Ne démarrer le polling que si nécessaire
+  if (!translation.value?.status || 
+      !['processing', 'pending'].includes(translation.value.status)) {
+    return // Pas besoin de polling pour traductions terminées
   }
+  
+  // Éviter les multiples intervalles
+  if (statusInterval) {
+    clearInterval(statusInterval)
+  }
+  
+  console.log('[POLLING] Démarrage polling pour traduction', translation.value.status)
+  statusInterval = setInterval(async () => {
+    // Utiliser le mode silencieux pour ne pas spammer la console
+    await loadTranslation(true)
+    
+    // Arrêter le polling si terminé
+    if (['completed', 'failed', 'cancelled'].includes(translation.value?.status || '')) {
+      console.log('[POLLING] Arrêt polling - statut:', translation.value?.status)
+      stopStatusPolling()
+    }
+  }, 5000) // Polling toutes les 5 secondes
 }
 
 const stopStatusPolling = () => {
@@ -688,7 +700,14 @@ const stopStatusPolling = () => {
 // Lifecycle
 onMounted(async () => {
   await loadTranslation()
-  startStatusPolling()
+  
+  // Ne démarrer le polling que si la traduction est en cours
+  if (translation.value?.status && 
+      ['processing', 'pending'].includes(translation.value.status)) {
+    startStatusPolling()
+  } else {
+    console.log('[POLLING] Pas de polling nécessaire - statut:', translation.value?.status)
+  }
 })
 
 onBeforeUnmount(() => {
